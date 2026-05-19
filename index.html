@@ -457,6 +457,41 @@ body {
 }
 .g-cell.g-hidden { display: none; }
 
+/* ─── BEFORE / AFTER CLAY TOGGLE ───────────────────────────── */
+.g-cell[data-before-after] .img-before,
+.g-cell[data-before-after] .img-after {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: opacity 0.5s var(--ease-out),
+              transform 1.2s var(--ease-out),
+              filter 0.5s;
+}
+/* Default: show clay (before), hide textured (after) */
+.g-cell[data-before-after] .img-after { opacity: 0; }
+/* .show-textured: flip */
+.g-cell.show-textured .img-before { opacity: 0; }
+.g-cell.show-textured .img-after  { opacity: 1; }
+
+.ba-toggle {
+  position: absolute; top: 12px; right: 12px; z-index: 4;
+  font-family: var(--f-semi);
+  font-size: 0.5rem; letter-spacing: 0.3em;
+  text-transform: uppercase;
+  padding: 6px 13px;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(6,5,12,0.6);
+  backdrop-filter: blur(10px);
+  color: var(--ink-dim);
+  cursor: none;
+  transition: border-color 0.25s, color 0.25s, background 0.25s;
+}
+.ba-toggle:hover {
+  border-color: rgba(255,255,255,0.55);
+  color: var(--ink);
+  background: rgba(6,5,12,0.82);
+}
+
 /* Placeholder canvas in gallery cells */
 .g-canvas {
   width: 100%; height: 100%;
@@ -1398,12 +1433,16 @@ loadWorld(0, (p) => {
 const GALLERY_ITEMS = [
   { title: 'Dragon — Character', tag: 'Blender · Character Creator 4', world: 0, cat: 'character' },
   { title: 'Galaxy Blob',        tag: 'Blender · After Effects',       world: 1, cat: 'abstract'  },
-  { title: 'Sci-Fi Room',        tag: 'Blender · Substance 3D',        world: 3, cat: 'renders'   },
-  { title: 'Earth Render',       tag: 'Blender · Compositing',         world: 2, cat: 'renders'   },
+  { title: 'Sci-Fi Room',        tag: 'Blender · Substance 3D',        world: 3, cat: 'renders',
+    ba: { before: null, after: `${CDN}/gallery/renders/03.png` } },
+  { title: 'Earth Render',       tag: 'Blender · Compositing',         world: 2, cat: 'renders',
+    ba: { before: null, after: `${CDN}/gallery/renders/01.png` } },
   { title: 'Fluid Simulation',   tag: 'Blender · Cycles',              world: 1, cat: 'abstract'  },
-  { title: 'Product — Orb',      tag: 'Blender · After Effects',       world: 3, cat: 'renders'   },
+  { title: 'Product — Orb',      tag: 'Blender · After Effects',       world: 3, cat: 'renders',
+    ba: { before: null, after: `${CDN}/gallery/renders/05.png` } },
   { title: 'Cave Walk',          tag: 'UE5 · Cinematic',               world: 0, cat: 'renders'   },
-  { title: 'Ocean Render',       tag: 'Blender · HDRI',                world: 2, cat: 'renders'   },
+  { title: 'Ocean Render',       tag: 'Blender · HDRI',                world: 2, cat: 'renders',
+    ba: { before: null, after: `${CDN}/gallery/renders/07.png` } },
   { title: 'Rings World',        tag: 'Blender · Geometry Nodes',      world: 4, cat: 'abstract'  },
 ];
 
@@ -1412,32 +1451,56 @@ GALLERY_ITEMS.forEach((item, i) => {
   const cell = document.createElement('div');
   cell.className = 'g-cell';
   cell.dataset.category = item.cat;
-  const cvs = document.createElement('canvas');
-  cvs.className = 'g-canvas';
+
   const info = document.createElement('div');
   info.className = 'g-cell-info';
   info.innerHTML = `<div class="g-cell-title">${item.title}</div><div class="g-cell-tag">${item.tag}</div>`;
-  cell.appendChild(cvs);
+
+  if (item.ba) {
+    // Before/after cell — two stacked images with clay toggle
+    cell.classList.add('show-textured');
+    cell.setAttribute('data-before-after', '');
+    const imgBefore = document.createElement('img');
+    imgBefore.className = 'img-before';
+    imgBefore.alt = item.title + ' — clay';
+    imgBefore.loading = 'lazy';
+    if (item.ba.before) imgBefore.src = item.ba.before;
+    const imgAfter = document.createElement('img');
+    imgAfter.className = 'img-after';
+    imgAfter.alt = item.title;
+    imgAfter.loading = 'lazy';
+    if (item.ba.after) imgAfter.src = item.ba.after;
+    const baBtn = document.createElement('button');
+    baBtn.className = 'ba-toggle';
+    baBtn.textContent = 'Clay';
+    cell.appendChild(imgBefore);
+    cell.appendChild(imgAfter);
+    cell.appendChild(baBtn);
+  } else {
+    // Placeholder canvas
+    const cvs = document.createElement('canvas');
+    cvs.className = 'g-canvas';
+    cell.appendChild(cvs);
+    requestAnimationFrame(() => {
+      cvs.width = cvs.offsetWidth || 300;
+      cvs.height = cvs.offsetHeight || 200;
+      const c = cvs.getContext('2d');
+      const [r,g,b] = WORLDS[item.world].rgb;
+      const grad = c.createLinearGradient(0,0,cvs.width,cvs.height);
+      grad.addColorStop(0, `rgba(${r*0.15},${g*0.12},${b*0.2},1)`);
+      grad.addColorStop(1, 'rgb(6,5,12)');
+      c.fillStyle = grad;
+      c.fillRect(0,0,cvs.width,cvs.height);
+      const glow = c.createRadialGradient(cvs.width*0.4,cvs.height*0.4,0,cvs.width*0.4,cvs.height*0.4,cvs.width*0.5);
+      glow.addColorStop(0, `rgba(${r},${g},${b},0.2)`);
+      glow.addColorStop(1,'rgba(0,0,0,0)');
+      c.fillStyle = glow;
+      c.fillRect(0,0,cvs.width,cvs.height);
+    });
+  }
+
   cell.appendChild(info);
   gGrid.appendChild(cell);
-
-  // Draw placeholder
-  requestAnimationFrame(() => {
-    cvs.width = cvs.offsetWidth || 300;
-    cvs.height = cvs.offsetHeight || 200;
-    const c = cvs.getContext('2d');
-    const [r,g,b] = WORLDS[item.world].rgb;
-    const grad = c.createLinearGradient(0,0,cvs.width,cvs.height);
-    grad.addColorStop(0, `rgba(${r*0.15},${g*0.12},${b*0.2},1)`);
-    grad.addColorStop(1, 'rgb(6,5,12)');
-    c.fillStyle = grad;
-    c.fillRect(0,0,cvs.width,cvs.height);
-    const glow = c.createRadialGradient(cvs.width*0.4,cvs.height*0.4,0,cvs.width*0.4,cvs.height*0.4,cvs.width*0.5);
-    glow.addColorStop(0, `rgba(${r},${g},${b},0.2)`);
-    glow.addColorStop(1,'rgba(0,0,0,0)');
-    c.fillStyle = glow;
-    c.fillRect(0,0,cvs.width,cvs.height);
-  });
 });
 
 // ─── GALLERY FILTERS ─────────────────────────────────────────
@@ -1467,6 +1530,15 @@ document.querySelectorAll('.g-filter').forEach(btn => {
       });
     }, 260);
   });
+});
+
+// ─── BEFORE/AFTER TOGGLE (event delegation) ──────────────────
+gGrid.addEventListener('click', e => {
+  const btn = e.target.closest('.ba-toggle');
+  if (!btn) return;
+  const cell = btn.closest('.g-cell');
+  const isNowTextured = cell.classList.toggle('show-textured');
+  btn.textContent = isNowTextured ? 'Clay' : 'Textured';
 });
 
 // About canvas
