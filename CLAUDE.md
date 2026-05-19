@@ -194,4 +194,22 @@ D:\portfolio\
   loader onComplete — ScrollTrigger only fires after curtain exits.
   currentWorldIndex guard prevents duplicate world loads. Only world-01
   loads on init; others load on-demand. Committed c22adb8.
+- [19/05/2026] index.html rewritten as self-contained single-file app:
+  inline CSS design tokens, inline ES module script, importmap Three.js CDN.
+  Barlow Condensed / Barlow / Barlow Semi Condensed font system.
+  Native scroll engine replaces GSAP ScrollTrigger.
+- [20/05/2026] World names set: Ashfall / Luminara / Verdant / Helios / Aurum.
+  WORLDS array and HUD updated in index.html and worlds.config.js.
+- [20/05/2026] Character showreel section added (split-screen video + text,
+  play button unmutes, IntersectionObserver muted autoplay). R2 path:
+  showreel/character-reel.mp4.
+- [20/05/2026] Ads/commercial horizontal drag carousel added (9 portrait MP4
+  cards, hover play/pause, drag-to-scroll). R2 paths: gallery/ads/*.mp4.
+- [20/05/2026] Gallery category filters added (All / Renders / Character /
+  Abstract). 220ms fade-out → display:none swap → reveal re-enter animation.
+- [20/05/2026] Gallery wired to real R2 assets: 14 render WebP images
+  (gallery/renders/01-14.webp), 8 abstract MP4 videos
+  (gallery/abstract/*.mp4). 3-col uniform grid, aspect-ratio 4/3 cells.
+  Clay toggle feature removed. IntersectionObserver (threshold 0.3) drives
+  abstract video play/pause.
 - [ ] Next: Phase 6 — Audio (AudioManager.js) or Mango Moments
