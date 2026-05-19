@@ -1,0 +1,143 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   LOADER  — theatrical curtain reveal
+
+   Structure:
+     #loader
+       .loader-curtain--top     (0 → 50vh, overflow:hidden)
+         .loader-stage            (0 → 100vh, flex centered — shows top half)
+       .loader-curtain--bottom  (50vh → 100vh, overflow:hidden)
+         .loader-stage            (0 → 100vh, flex centered — shows bottom half)
+
+   The two stages are identical in content and positioning.
+   Each curtain's overflow:hidden clips the half it doesn't own.
+   On exit: top panel translateY(-100%), bottom panel translateY(100%).
+   ───────────────────────────────────────────────────────────────────────── */
+
+
+/* ── Shell ─────────────────────────────────────────────────────────────── */
+
+#loader {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: block;       /* override base.css flex */
+  background: transparent;
+  pointer-events: all;
+}
+
+
+/* ── Curtain panels ─────────────────────────────────────────────────────── */
+
+.loader-curtain {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  background: #090810;
+  overflow: hidden;
+  will-change: transform;
+  transition: transform 1s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.loader-curtain--top {
+  top: 0;
+  height: 50%;
+}
+
+.loader-curtain--bottom {
+  bottom: 0;
+  height: 50%;
+}
+
+
+/* ── Stage — full-viewport container inside each panel ──────────────────── */
+/*
+ * height: 200% of the 50vh panel = 100vh total.
+ * Flex centering positions content at 50vh from the top.
+ * overflow:hidden on the parent clips whichever half it doesn't own.
+ *
+ * Top panel    — stage starts at top:0,    content center at 50vh, clips below 50vh.
+ * Bottom panel — stage starts at bottom:0, content center at 50vh, clips above 50vh.
+ */
+
+.loader-stage {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 200%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader-curtain--top    .loader-stage { top: 0; }
+.loader-curtain--bottom .loader-stage { bottom: 0; }
+
+
+/* ── Counter ─────────────────────────────────────────────────────────────── */
+
+.loader-counter {
+  font-family: 'DM Mono', 'Courier New', monospace;
+  font-weight: 300;
+  font-size: clamp(8rem, 20vw, 18rem);
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.04em;
+  font-variant-numeric: lining-nums;
+  font-feature-settings: "lnum" 1, "tnum" 1;
+  /* Fixed width prevents layout shift as digit count changes 00→100 */
+  min-width: 3ch;
+  text-align: center;
+  margin-bottom: 2rem;
+  /* Subtle entrance — content fades in after a tick to prevent flash */
+  animation: loader-in 0.6s ease 0.1s both;
+}
+
+
+/* ── Progress bar ────────────────────────────────────────────────────────── */
+
+.loader-bar {
+  width: min(500px, 80vw);
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 1.4rem;
+  animation: loader-in 0.6s ease 0.2s both;
+}
+
+.loader-bar-fill {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: 0%;
+  background: rgba(255, 255, 255, 0.9);
+  transition: width 0.5s ease;
+}
+
+
+/* ── Label ───────────────────────────────────────────────────────────────── */
+
+.loader-label {
+  font-family: 'DM Mono', 'Courier New', monospace;
+  font-weight: 300;
+  font-size: 0.55rem;
+  letter-spacing: 0.4em;
+  color: rgba(255, 255, 255, 0.35);
+  text-transform: uppercase;
+  animation: loader-in 0.6s ease 0.35s both;
+}
+
+
+/* ── Entrance animation ──────────────────────────────────────────────────── */
+
+@keyframes loader-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

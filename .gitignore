@@ -1,0 +1,9 @@
+node_modules/
+assets/frames-jpeg/
+assets/frames-webp/
+.claude/worktrees/
+*.log
+serve.log
+serve.err
+
+.vercel

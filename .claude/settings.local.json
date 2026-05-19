@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(ffprobe *)",
+      "Skill(agent-browser)",
+      "PowerShell(agent-browser *)",
+      "PowerShell(Start-Sleep -Seconds 2; Invoke-WebRequest -Uri \"http://localhost:3000\" -UseBasicParsing -TimeoutSec 5 | Select-Object StatusCode, StatusDescription)",
+      "PowerShell(Receive-Job *)",
+      "PowerShell($content = Get-Content \"D:\\\\portfolio\\\\.claude\\\\worktrees\\\\flamboyant-swanson-940dd2\\\\dist\\\\main.js\" -Raw; $found = [regex]::Matches\\($content, \"Frame resolution|generateMipmaps=!1|minFilter|magFilter\"\\); $found | ForEach-Object { $start = [Math]::Max\\(0, $_.Index - 30\\); $end = [Math]::Min\\($content.Length, $_.Index + 60\\); $content.Substring\\($start, $end - $start\\) })",
+      "PowerShell(Invoke-WebRequest -Uri \"http://localhost:3000\" -UseBasicParsing -TimeoutSec 5 | Select-Object StatusCode, StatusDescription)",
+      "PowerShell(Invoke-WebRequest -Uri \"http://localhost:3000\" -UseBasicParsing -TimeoutSec 5 | Select-Object StatusCode; Invoke-WebRequest -Uri \"http://localhost:3000/dist/main.js\" -UseBasicParsing -TimeoutSec 5 | Select-Object StatusCode, @{N='KB';E={[math]::Round\\($_.RawContentLength/1KB\\)}})",
+      "PowerShell(Invoke-WebRequest -Uri \"http://localhost:3000/dist/main.js\" -UseBasicParsing -TimeoutSec 5 | Select-Object @{N='KB';E={[math]::Round\\($_.RawContentLength/1KB\\)}})",
+      "Skill(frontend-design)",
+      "PowerShell(Get-ChildItem \"D:\\\\portfolio\" -Name | Where-Object { $_ -notmatch '^\\\\.' })",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git commit *)",
+      "Bash(npm run *)"
+    ]
+  }
+}

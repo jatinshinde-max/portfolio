@@ -1,0 +1,248 @@
+/* ─── Content Panels ─────────────────────────────────────────────────────── */
+
+#content-panels {
+  position: relative;
+  z-index: 50;
+  pointer-events: none;
+}
+
+/* All sections allow pointer events */
+#content-panels section {
+  pointer-events: auto;
+}
+
+/* ─── Shared layout ──────────────────────────────────────────────────────── */
+
+.cp-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 clamp(2rem, 6vw, 7rem);
+}
+
+.cp-eyebrow {
+  display: block;
+  font-family: 'DM Mono', monospace;
+  font-weight: 300;
+  font-size: clamp(0.6rem, 0.8vw, 0.75rem);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  margin-bottom: 2rem;
+}
+
+.cp-headline {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 200;
+  font-size: clamp(3rem, 7vw, 6.5rem);
+  letter-spacing: -0.02em;
+  line-height: 1.0;
+  color: #fff;
+  margin: 0 0 2.5rem;
+}
+
+.cp-headline--md {
+  font-size: clamp(2.5rem, 5.5vw, 5rem);
+}
+
+.cp-body {
+  font-family: 'DM Mono', monospace;
+  font-weight: 300;
+  font-size: clamp(0.75rem, 1vw, 0.875rem);
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0 0 1.5rem;
+  max-width: 52ch;
+}
+
+.cp-body:last-child {
+  margin-bottom: 0;
+}
+
+/* ─── World chapters ─────────────────────────────────────────────────────── */
+
+.cp-world {
+  padding: clamp(80px, 15vh, 160px) 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.cp-world-meta {
+  margin-bottom: clamp(3rem, 5vh, 5rem);
+}
+
+.cp-world-header {
+  margin-bottom: clamp(3.5rem, 6vh, 6rem);
+}
+
+/* ─── Project list ───────────────────────────────────────────────────────── */
+
+.cp-projects {
+  margin-top: clamp(2rem, 4vh, 4rem);
+}
+
+.cp-sep {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  transform-origin: left center;
+}
+
+.cp-project {
+  display: flex;
+  align-items: center;
+  gap: clamp(1.5rem, 3vw, 3.5rem);
+  padding: 28px 0;
+  cursor: default;
+  transition: opacity 0.3s ease;
+}
+
+.cp-project:hover {
+  opacity: 1;
+}
+
+.cp-project-num {
+  font-family: 'DM Mono', monospace;
+  font-weight: 300;
+  font-size: clamp(0.6rem, 0.75vw, 0.7rem);
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+  width: 2.5ch;
+}
+
+.cp-project-body {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(1.5rem, 3vw, 4rem);
+  flex: 1;
+}
+
+.cp-project-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 200;
+  font-size: clamp(1.4rem, 2.8vw, 2.5rem);
+  letter-spacing: -0.01em;
+  color: rgba(255, 255, 255, 0.85);
+  transition: color 0.35s ease;
+  flex-shrink: 0;
+}
+
+.cp-project-type {
+  font-family: 'DM Mono', monospace;
+  font-weight: 300;
+  font-size: clamp(0.6rem, 0.75vw, 0.7rem);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.25);
+  transition: color 0.35s ease;
+}
+
+/* ─── About section ──────────────────────────────────────────────────────── */
+
+.cp-about {
+  padding: clamp(80px, 15vh, 160px) 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.cp-about-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(4rem, 8vw, 10rem);
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .cp-about-inner {
+    grid-template-columns: 1fr;
+    gap: 4rem;
+  }
+}
+
+.cp-about-bio .cp-eyebrow {
+  margin-bottom: 1.5rem;
+}
+
+.cp-about-bio .cp-headline {
+  margin-bottom: 2.5rem;
+}
+
+.cp-about-tools .cp-eyebrow {
+  margin-bottom: 2rem;
+}
+
+/* ─── Tools list ─────────────────────────────────────────────────────────── */
+
+.cp-tools-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.cp-tool {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.cp-tool:first-child {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.cp-tool-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+.cp-tool-name {
+  font-family: 'DM Mono', monospace;
+  font-weight: 300;
+  font-size: clamp(0.65rem, 0.85vw, 0.78rem);
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ─── Contact section ────────────────────────────────────────────────────── */
+
+.cp-contact {
+  padding: clamp(80px, 15vh, 160px) 0 clamp(100px, 18vh, 180px);
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.cp-contact-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: clamp(2.5rem, 4vh, 4rem);
+}
+
+.cp-contact-headline {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 200;
+  font-size: clamp(4rem, 10vw, 9rem);
+  letter-spacing: -0.03em;
+  line-height: 1.0;
+  color: #fff;
+  margin: 0;
+}
+
+.cp-contact-cta {
+  font-family: 'DM Mono', monospace;
+  font-weight: 300;
+  font-size: clamp(0.7rem, 1vw, 0.875rem);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  text-decoration: none;
+  padding-bottom: 0.4em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  transition: color 0.35s ease, border-color 0.35s ease;
+}
+
+.cp-contact-cta:hover {
+  color: rgba(255, 255, 255, 0.85);
+  border-color: rgba(255, 255, 255, 0.5);
+}

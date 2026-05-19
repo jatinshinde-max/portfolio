@@ -1,0 +1,257 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   HUD  — five fixed UI elements over the canvas
+
+   All children use position:absolute within the fixed #hud shell.
+   pointer-events:none on #hud; interactive children set pointer-events:auto.
+   ───────────────────────────────────────────────────────────────────────── */
+
+
+/* ── Shell entrance ──────────────────────────────────────────────────────── */
+
+#hud {
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+
+#hud.is-visible {
+  opacity: 1;
+}
+
+
+/* ── Shared typography base ─────────────────────────────────────────────── */
+
+.hud-mono {
+  font-family: var(--font-mono);
+  font-weight: 300;
+}
+
+
+/* ── TOP LEFT — Name lockup ──────────────────────────────────────────────── */
+
+.hud-name {
+  position: absolute;
+  top: 44px;
+  left: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.hud-name-role {
+  font-family: var(--font-mono);
+  font-weight: 300;
+  font-size: 0.55rem;
+  letter-spacing: 0.35em;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+}
+
+.hud-name-title {
+  font-family: var(--font-mono);
+  font-weight: 300;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  color: #ffffff;
+}
+
+
+/* ── TOP RIGHT — Nav ─────────────────────────────────────────────────────── */
+
+.hud-nav {
+  position: absolute;
+  top: 48px;
+  right: 48px;
+  display: flex;
+  gap: 40px;
+  pointer-events: auto;
+}
+
+.hud-nav-link {
+  font-family: var(--font-mono);
+  font-weight: 300;
+  font-size: 0.58rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: none;
+  transition: color 0.3s ease;
+}
+
+.hud-nav-link:hover {
+  color: #ffffff;
+}
+
+
+/* ── BOTTOM LEFT — World indicator ───────────────────────────────────────── */
+
+.hud-world-indicator {
+  position: absolute;
+  bottom: 36px;
+  left: 40px;
+  line-height: 1;
+}
+
+/* Ghost number — near-invisible, large, editorial */
+.hud-world-number {
+  font-family: var(--font-display);
+  font-weight: 200;      /* lightest available in this Google Fonts load */
+  font-size: clamp(5rem, 10vw, 9rem);
+  color: rgba(255, 255, 255, 0.04);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  user-select: none;
+}
+
+/* World name — colored per world via JS */
+.hud-world-name {
+  font-family: var(--font-mono);
+  font-weight: 300;
+  font-size: 0.52rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  margin-top: 6px;
+  transition: color 0.6s ease;
+}
+
+
+/* ── BOTTOM CENTER — Scroll hint ─────────────────────────────────────────── */
+
+.hud-scroll-hint {
+  position: absolute;
+  bottom: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  opacity: 1;
+  transition: opacity 1s ease;
+}
+
+.hud-scroll-hint.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hud-scroll-label {
+  font-family: var(--font-mono);
+  font-weight: 300;
+  font-size: 0.5rem;
+  letter-spacing: 0.4em;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+}
+
+/* Animated line pulses downward */
+.hud-scroll-line {
+  width: 1px;
+  height: 28px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.4), transparent);
+  animation: scroll-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes scroll-pulse {
+  0%   { transform: translateY(-6px); opacity: 0; }
+  20%  { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { transform: translateY(10px); opacity: 0; }
+}
+
+
+/* ── BOTTOM RIGHT — World progress dots ──────────────────────────────────── */
+
+.hud-dots {
+  position: absolute;
+  bottom: 40px;
+  right: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 11px;
+}
+
+.hud-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  transition: background 0.4s ease, transform 0.4s ease;
+}
+
+.hud-dot.is-active {
+  background: #ffffff;
+  transform: scale(1.3);
+}
+
+
+/* ── CENTER — World title (scroll-triggered) ─────────────────────────────── */
+
+.hud-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  white-space: nowrap;    /* prevents wrapping mid-transition */
+  pointer-events: none;
+}
+
+/* Individual lines start hidden — entrance is staggered */
+.hud-center-chapter,
+.hud-center-title,
+.hud-center-subtitle {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+
+/* Reveal — enter from below */
+.hud-center.is-visible .hud-center-chapter {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0s;
+}
+
+.hud-center.is-visible .hud-center-title {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.1s;
+}
+
+.hud-center.is-visible .hud-center-subtitle {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.2s;
+}
+
+.hud-center-chapter {
+  font-family: var(--font-mono);
+  font-weight: 300;
+  font-size: 0.52rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  transition-delay: 0s;
+  /* color set per-world via JS */
+}
+
+.hud-center-title {
+  font-family: var(--font-display);
+  font-weight: 200;
+  font-size: clamp(2rem, 5vw, 4.5rem);
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+  white-space: pre-line;  /* respects <br> and \n */
+  text-shadow: 0 2px 40px rgba(0, 0, 0, 0.8);
+}
+
+.hud-center-subtitle {
+  font-family: var(--font-mono);
+  font-weight: 300;
+  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.15em;
+}
