@@ -212,4 +212,12 @@ D:\portfolio\
   (gallery/abstract/*.mp4). 3-col uniform grid, aspect-ratio 4/3 cells.
   Clay toggle feature removed. IntersectionObserver (threshold 0.3) drives
   abstract video play/pause.
+- [20/05/2026] Ads carousel visibility fixed: removed overflow:hidden from
+  .ads-section, changed bg to var(--bg-2) for visual contrast.
+- [20/05/2026] Chapter V updated: title "Forged in Golden Light", eyebrow
+  "Chapter V — Aurum", 3 projects added.
+- [20/05/2026] Gallery section title updated to "Renders. Abstract. Motion."
+  to reflect real content (14 render WebPs + 8 abstract MP4s).
+- [20/05/2026] Character filter button removed — no character assets uploaded yet.
+  Gallery filters now: All · Renders · Abstract.
 - [ ] Next: Phase 6 — Audio (AudioManager.js) or Mango Moments
