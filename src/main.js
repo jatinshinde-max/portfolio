@@ -24,7 +24,6 @@ async function init() {
     buildContentPanels(worlds);
     transition.init();
     scrollEngine.init(); // ScrollTrigger created HERE — after loader is gone
-    setTimeout(() => scrollEngine.activate(), 100); // allow init fires to settle
   });
   loader.init();
 

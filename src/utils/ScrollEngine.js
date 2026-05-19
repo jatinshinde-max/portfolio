@@ -14,13 +14,11 @@ export default class ScrollEngine {
     this.previousProgress = 0;
     this.smoothVelocity   = 0;
     this.lastTime         = 0;
-    this._ready           = false; // suppresses init-time onEnter fires
+    this._ready           = false;
   }
 
   init() {
     gsap.registerPlugin(ScrollTrigger);
-
-    // Seed lastTime so the first velocity delta isn't astronomically large.
     this.lastTime = performance.now();
 
     // ── Build DOM ────────────────────────────────────────────────────────────
@@ -37,14 +35,14 @@ export default class ScrollEngine {
     }
 
     document.getElementById('scroll-container').appendChild(wrapper);
-    console.log('[ScrollEngine] scroll-container:', document.getElementById('scroll-container'));
-    console.log('[ScrollEngine] world-section-0:', document.getElementById('world-section-0'));
-    console.log('[ScrollEngine] sections created');
 
-    // ── ScrollTriggers ───────────────────────────────────────────────────────
+    // ── ScrollTriggers — onUpdate only, no onEnter/onEnterBack ──────────────
+    // World changes are detected by tracking which section is active during
+    // real scroll movement. onEnter fires spuriously on init; onUpdate does not.
+    let lastReportedWorld = 0; // world 0 pre-loaded — skip its first fire
+
     for (let i = 0; i < WORLD_COUNT; i++) {
       const section = document.getElementById(`world-section-${i}`);
-      console.log('[ScrollEngine] trigger created for world', i, section);
 
       const trigger = ScrollTrigger.create({
         trigger: section,
@@ -52,20 +50,22 @@ export default class ScrollEngine {
         end:     'bottom bottom',
         scrub:   3,
 
-        onEnter:     () => { if (this._ready) this.onWorldChange(i); },
-        onEnterBack: () => { if (this._ready) this.onWorldChange(i); },
-
         onUpdate: (self) => {
+          if (!this._ready) return;
+
+          if (i !== lastReportedWorld) {
+            lastReportedWorld = i;
+            this.onWorldChange(i);
+          }
+
           const now   = performance.now();
           const delta = now - this.lastTime;
-
           if (delta > 0) {
             const rawVelocity = Math.abs(self.progress - this.previousProgress) / (delta / 1000);
             this.smoothVelocity += (Math.min(rawVelocity / 0.5, 1.0) - this.smoothVelocity) * 0.12;
             this.onVelocity(this.smoothVelocity);
           }
 
-          // Store the target progress — rAF loop in main.js reads and lerps it.
           this.onProgress(i, self.progress);
           this.previousProgress = self.progress;
           this.lastTime = now;
@@ -74,11 +74,9 @@ export default class ScrollEngine {
 
       this.triggers.push(trigger);
     }
-  }
 
-  // Call after ScrollTrigger's init fires have settled (~100ms after init())
-  activate() {
-    this._ready = true;
+    // 500ms window for ScrollTrigger to fire all init-time events silently
+    setTimeout(() => { this._ready = true; }, 500);
   }
 
   scrollToWorld(worldIndex) {
