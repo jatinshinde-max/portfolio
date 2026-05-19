@@ -42,12 +42,13 @@ async function init() {
   transition.init();
 
   // ── 5. Scroll engine ──────────────────────────────────────────────────────
-  let currentProgress = 0; // updated by ScrollTrigger; consumed by rAF
-  let hasInitialized  = false; // world 0 already loaded above — skip first onWorldChange
+  let currentProgress   = 0; // updated by ScrollTrigger; consumed by rAF
+  let currentWorldIndex = 0; // world 0 already loaded — skip any duplicate fires for it
 
   const scrollEngine = new ScrollEngine({
     onWorldChange: (worldIndex) => {
-      if (!hasInitialized) { hasInitialized = true; return; }
+      if (worldIndex === currentWorldIndex) return;
+      currentWorldIndex = worldIndex;
       transition.trigger(() => {
         frameScrubber.switchWorld(worldIndex, () => {});
         hud.updateWorld(worldIndex, worlds[worldIndex]);
