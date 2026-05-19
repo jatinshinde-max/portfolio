@@ -606,6 +606,98 @@ footer a:hover { color: var(--ink); }
 .reveal-delay-2 { transition-delay: 0.2s; }
 .reveal-delay-3 { transition-delay: 0.3s; }
 
+/* ─── SHOWREEL ──────────────────────────────────────────────── */
+.showreel-section {
+  padding: clamp(80px,12vh,140px) clamp(28px,7vw,100px);
+  background: var(--bg-1);
+  border-top: 1px solid var(--ink-ghost);
+}
+.showreel-inner {
+  display: grid;
+  grid-template-columns: 1.25fr 0.75fr;
+  gap: clamp(40px,6vw,100px);
+  align-items: center;
+}
+@media (max-width:900px) { .showreel-inner { grid-template-columns:1fr; } }
+
+.showreel-video {
+  position: relative;
+  aspect-ratio: 16/9;
+  background: var(--bg-2);
+  overflow: hidden;
+}
+.showreel-video video {
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+}
+.video-overlay {
+  position: absolute; inset:0;
+  background: linear-gradient(135deg, rgba(6,5,12,0.35) 0%, transparent 55%);
+  pointer-events: none; z-index:1;
+}
+.play-btn {
+  position: absolute; top:50%; left:50%; z-index:2;
+  transform: translate(-50%,-50%);
+  width: 72px; height: 72px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.28);
+  background: rgba(6,5,12,0.55);
+  backdrop-filter: blur(10px);
+  display: flex; align-items: center; justify-content: center;
+  cursor: none;
+  transition: border-color 0.3s, background 0.3s, opacity 0.3s,
+              transform 0.4s var(--ease-out);
+}
+.play-btn:hover {
+  border-color: rgba(255,255,255,0.65);
+  background: rgba(6,5,12,0.75);
+  transform: translate(-50%,-50%) scale(1.1);
+}
+.play-btn svg {
+  width: 20px; height: 20px;
+  fill: var(--ink);
+  margin-left: 4px;
+}
+.play-btn.playing {
+  opacity: 0; pointer-events: none;
+}
+.showreel-video:hover .play-btn.playing {
+  opacity: 1; pointer-events: auto;
+}
+
+.sr-eyebrow {
+  font-family: var(--f-semi);
+  font-size: 0.6rem; letter-spacing: 0.4em;
+  text-transform: uppercase; color: var(--ink-mute);
+  margin-bottom: 20px;
+}
+.sr-title {
+  font-family: var(--f-display);
+  font-size: clamp(2.5rem, 5vw, 5rem);
+  font-weight: 200; line-height: 0.95;
+  letter-spacing: -0.02em; margin-bottom: 28px;
+}
+.sr-body {
+  font-size: 0.95rem; line-height: 1.85;
+  color: var(--ink-dim); max-width: 46ch;
+  margin-bottom: 40px;
+}
+.sr-meta {
+  display: flex; flex-direction: column; gap: 14px;
+}
+.sr-meta-item {
+  display: flex; align-items: center; gap: 16px;
+  font-family: var(--f-semi);
+  font-size: 0.8rem; color: var(--ink-dim);
+}
+.sr-meta-item span {
+  font-family: var(--f-display);
+  font-size: 0.62rem; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--accent);
+  border: 1px solid rgba(232,213,176,0.25);
+  padding: 3px 9px; min-width: 42px; text-align: center;
+  flex-shrink: 0;
+}
+
 /* ─── RESPONSIVE ────────────────────────────────────────────── */
 @media (max-width: 640px) {
   .gallery-grid { grid-template-columns: 1fr 1fr; grid-auto-rows: 160px; }
@@ -641,7 +733,7 @@ footer a:hover { color: var(--ink); }
   </nav>
   <div class="hud-world">
     <div class="hud-world-num" id="h-num">01</div>
-    <div class="hud-world-name" id="h-name">World 01</div>
+    <div class="hud-world-name" id="h-name">Ashfall</div>
   </div>
   <div class="hud-dots" id="h-dots"></div>
   <div class="hud-scroll" id="h-scroll">
@@ -784,6 +876,31 @@ footer a:hover { color: var(--ink); }
     </div>
   </div>
 
+  <!-- SHOWREEL -->
+  <div class="showreel-section" id="showreel">
+    <div class="showreel-inner">
+      <div class="showreel-video reveal">
+        <video id="reel-video" loop muted playsinline preload="metadata">
+          <source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/showreel/character-reel.mp4" type="video/mp4">
+        </video>
+        <div class="video-overlay"></div>
+        <button class="play-btn" id="reel-play" aria-label="Play showreel">
+          <svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
+        </button>
+      </div>
+      <div class="showreel-text">
+        <div class="sr-eyebrow reveal">Character Work</div>
+        <h2 class="sr-title reveal reveal-delay-1">From Clay<br>to Skin</h2>
+        <p class="sr-body reveal reveal-delay-2">Full character pipeline: sculpting, retopology, UV mapping, texturing, rigging, and final render. Watch the transition from raw clay to fully textured skin across multiple angles and expressions.</p>
+        <div class="sr-meta reveal reveal-delay-3">
+          <div class="sr-meta-item"><span>CC4</span>Character Creator</div>
+          <div class="sr-meta-item"><span>SP</span>Substance Painter</div>
+          <div class="sr-meta-item"><span>UE5</span>Final Render</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- GALLERY -->
   <div class="gallery-section" id="gallery">
     <div class="s-head">
@@ -874,37 +991,37 @@ const CDN = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev';
 
 const WORLDS = [
   {
-    slug: 'world-01', name: 'World 01',
+    slug: 'world-01', name: 'Ashfall',
     chapter: 'Chapter I', title: 'Built From\nRuin',
     sub: 'Unreal Engine 5 · Blender · Lumen',
     accent: '#c46428', rgb: [196,100,40],
     frameCount: 111, stride: 5
   },
   {
-    slug: 'world-02', name: 'World 02',
+    slug: 'world-02', name: 'Luminara',
     chapter: 'Chapter II', title: 'Where Logic\nYields to Light',
     sub: 'Unreal Engine 5 · Substance 3D',
     accent: '#7c5cc4', rgb: [124,92,196],
     frameCount: 165, stride: 5
   },
   {
-    slug: 'world-03', name: 'World 03',
+    slug: 'world-03', name: 'Verdant',
     chapter: 'Chapter III', title: 'The Silence\nof Scale',
     sub: 'Unreal Engine 5 · Character Creator 4',
     accent: '#3a8c52', rgb: [58,140,82],
     frameCount: 124, stride: 5
   },
   {
-    slug: 'world-04', name: 'World 04',
+    slug: 'world-04', name: 'Helios',
     chapter: 'Chapter IV', title: 'Architectures\nof Tomorrow',
     sub: 'Unreal Engine 5 · Blender · Substance 3D',
     accent: '#2872c4', rgb: [40,114,196],
     frameCount: 179, stride: 5
   },
   {
-    slug: 'world-05', name: 'World 05',
-    chapter: 'Chapter V', title: 'World Five\nTitle Here',
-    sub: 'Unreal Engine 5',
+    slug: 'world-05', name: 'Aurum',
+    chapter: 'Chapter V', title: 'Void\nArchitecture',
+    sub: 'Unreal Engine 5 · Blender · Substance 3D',
     accent: '#c4a028', rgb: [196,160,40],
     frameCount: 375, stride: 8
   }
@@ -925,7 +1042,7 @@ document.addEventListener('mousemove', e => {
   ring.style.left = rx+'px'; ring.style.top = ry+'px';
   requestAnimationFrame(rl);
 })();
-document.querySelectorAll('a,button,.project-row,.g-cell').forEach(el => {
+document.querySelectorAll('a,button,.project-row,.g-cell,.showreel-video').forEach(el => {
   el.addEventListener('mouseenter', () => ring.classList.add('expand'));
   el.addEventListener('mouseleave', () => ring.classList.remove('expand'));
 });
@@ -1257,6 +1374,28 @@ const stage = document.getElementById('stage');
   stage.style.transform = `translate(${curPX}px, ${curPY}px) scale(1.04)`;
   requestAnimationFrame(pl);
 })();
+
+// ═══════════════════════════════════════════════════════
+//  SHOWREEL PLAY / PAUSE
+// ═══════════════════════════════════════════════════════
+const reelVideo = document.getElementById('reel-video');
+const reelPlay  = document.getElementById('reel-play');
+if (reelVideo && reelPlay) {
+  reelPlay.addEventListener('click', () => {
+    reelVideo.muted = false;
+    reelVideo.play();
+    reelPlay.classList.add('playing');
+  });
+  reelVideo.addEventListener('click', () => {
+    if (!reelVideo.paused) {
+      reelVideo.pause();
+      reelPlay.classList.remove('playing');
+    }
+  });
+  reelVideo.addEventListener('ended', () => {
+    reelPlay.classList.remove('playing');
+  });
+}
 
 // Initial HUD update
 updateHUD(0, 0);
