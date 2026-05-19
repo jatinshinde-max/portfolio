@@ -12,7 +12,7 @@ const worlds = [
     subtitle: 'Unreal Engine 5 · Blender · Substance 3D',
     accentColor: '#d4b896',        // TBD — warm amber placeholder
     accentRGB: [212, 184, 150],    // TBD
-    framesPath: 'assets/frames-webp/world-01/',
+    framesPath: 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-01/',
     frameCount: 111,
     sourcePattern: 'NewLevelSequence.Layer1.%04d.jpeg',
     sourceStart: 1,
@@ -46,7 +46,7 @@ const worlds = [
     subtitle: 'Unreal Engine 5 · Blender · Substance 3D',
     accentColor: '#96c4d4',        // TBD — cold steel placeholder
     accentRGB: [150, 196, 212],    // TBD
-    framesPath: 'assets/frames-webp/world-02/',
+    framesPath: 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-02/',
     frameCount: 165,
     sourcePattern: 'WAY.Layer1.%04d.jpeg',
     sourceStart: 0,
@@ -80,7 +80,7 @@ const worlds = [
     subtitle: 'Unreal Engine 5 · Blender · Substance 3D',
     accentColor: '#96d4b0',        // TBD — muted teal placeholder
     accentRGB: [150, 212, 176],    // TBD
-    framesPath: 'assets/frames-webp/world-03/',
+    framesPath: 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-03/',
     frameCount: 124,
     sourcePattern: 'NewLevel.%04d.jpeg',
     sourceStart: 0,
@@ -114,7 +114,7 @@ const worlds = [
     subtitle: 'Unreal Engine 5 · Blender · Substance 3D',
     accentColor: '#d4c896',        // TBD — pale gold placeholder
     accentRGB: [212, 200, 150],    // TBD
-    framesPath: 'assets/frames-webp/world-04/',
+    framesPath: 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-04/',
     frameCount: 179,
     sourcePattern: 'NewlSequence.Layer1.%04d.jpeg',
     sourceStart: 4,
@@ -148,7 +148,7 @@ const worlds = [
     subtitle: 'Unreal Engine 5 · Blender · Substance 3D',
     accentColor: '#c4a0a0',        // TBD — muted rose placeholder
     accentRGB: [196, 160, 160],    // TBD
-    framesPath: 'assets/frames-webp/world-05/',
+    framesPath: 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-05/',
     frameCount: 375,
     sourcePattern: 'NewLevelSequence1.Layer1.%04d.jpeg',
     sourceStart: 0,
