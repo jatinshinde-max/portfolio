@@ -181,4 +181,17 @@ D:\portfolio\
   world title center, progress dots, scroll hint
 - [18/05/2026] Phase 4.4: ContentPanels built — 5 world chapters,
   about, contact. Committed 0bf0de2.
-- [ ] Next: Phase 5 — World Transitions (WorldTransition.js)
+- [19/05/2026] Phase 5: WorldTransition built — black crossfade 0.6s in /
+  200ms hold / 0.8s out. Rift effect attempted and removed (artifacts).
+- [19/05/2026] All 5 worlds reconverted to 1920x1080 WebP. Canvas updated
+  to native resolution. Preloader STRIDE=5 (every 5th frame, ~191 requests).
+- [19/05/2026] Frames uploaded to Cloudflare R2 CDN. framesPath updated
+  in worlds.config.js. vercel.json cache headers added.
+- [19/05/2026] Site deployed to portfolio-p9cf.vercel.app
+- [19/05/2026] Quality pass: vignette, HUD spacing, scrub weight,
+  loader counter size, panels breathing room.
+- [19/05/2026] Architecture fixed: scrollEngine.init() moved into
+  loader onComplete — ScrollTrigger only fires after curtain exits.
+  currentWorldIndex guard prevents duplicate world loads. Only world-01
+  loads on init; others load on-demand. Committed c22adb8.
+- [ ] Next: Phase 6 — Audio (AudioManager.js) or Mango Moments
