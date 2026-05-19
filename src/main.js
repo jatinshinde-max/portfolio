@@ -43,9 +43,11 @@ async function init() {
 
   // ── 5. Scroll engine ──────────────────────────────────────────────────────
   let currentProgress = 0; // updated by ScrollTrigger; consumed by rAF
+  let hasInitialized  = false; // world 0 already loaded above — skip first onWorldChange
 
   const scrollEngine = new ScrollEngine({
     onWorldChange: (worldIndex) => {
+      if (!hasInitialized) { hasInitialized = true; return; }
       transition.trigger(() => {
         frameScrubber.switchWorld(worldIndex, () => {});
         hud.updateWorld(worldIndex, worlds[worldIndex]);
