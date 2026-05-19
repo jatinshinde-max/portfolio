@@ -1,6 +1,7 @@
 node_modules/
 assets/frames-jpeg/
 assets/frames-webp/
+assets/gallery/
 .claude/worktrees/
 *.log
 serve.log

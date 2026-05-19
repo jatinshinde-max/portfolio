@@ -1,17 +1,15 @@
 // Central data registry for all 5 worlds.
-// Accent colors and world names are placeholders — update after color analysis.
-// Titles and project data are placeholders — update when worlds are named.
 
 const worlds = [
   {
     id: 0,
     slug: 'world-01',
-    name: 'World 01',
+    name: 'Ashfall',
     chapter: 'Chapter I',
     title: 'Where Light\nStill Reaches',
     subtitle: 'Unreal Engine 5 · Blender · Substance 3D',
-    accentColor: '#d4b896',        // TBD — warm amber placeholder
-    accentRGB: [212, 184, 150],    // TBD
+    accentColor: '#c46428',
+    accentRGB: [196, 100, 40],
     framesPath: 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-01/',
     frameCount: 111,
     sourcePattern: 'NewLevelSequence.Layer1.%04d.jpeg',
@@ -40,12 +38,12 @@ const worlds = [
   {
     id: 1,
     slug: 'world-02',
-    name: 'World 02',
+    name: 'Luminara',
     chapter: 'Chapter II',
     title: 'The Hollow\nKingdom',
     subtitle: 'Unreal Engine 5 · Blender · Substance 3D',
-    accentColor: '#96c4d4',        // TBD — cold steel placeholder
-    accentRGB: [150, 196, 212],    // TBD
+    accentColor: '#7c5cc4',
+    accentRGB: [124, 92, 196],
     framesPath: 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-02/',
     frameCount: 165,
     sourcePattern: 'WAY.Layer1.%04d.jpeg',
@@ -74,12 +72,12 @@ const worlds = [
   {
     id: 2,
     slug: 'world-03',
-    name: 'World 03',
+    name: 'Verdant',
     chapter: 'Chapter III',
     title: 'Beyond The\nLast Ridge',
     subtitle: 'Unreal Engine 5 · Blender · Substance 3D',
-    accentColor: '#96d4b0',        // TBD — muted teal placeholder
-    accentRGB: [150, 212, 176],    // TBD
+    accentColor: '#3a8c52',
+    accentRGB: [58, 140, 82],
     framesPath: 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-03/',
     frameCount: 124,
     sourcePattern: 'NewLevel.%04d.jpeg',
@@ -108,12 +106,12 @@ const worlds = [
   {
     id: 3,
     slug: 'world-04',
-    name: 'World 04',
+    name: 'Helios',
     chapter: 'Chapter IV',
     title: 'The Burning\nDistrict',
     subtitle: 'Unreal Engine 5 · Blender · Substance 3D',
-    accentColor: '#d4c896',        // TBD — pale gold placeholder
-    accentRGB: [212, 200, 150],    // TBD
+    accentColor: '#2872c4',
+    accentRGB: [40, 114, 196],
     framesPath: 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-04/',
     frameCount: 179,
     sourcePattern: 'NewlSequence.Layer1.%04d.jpeg',
@@ -142,12 +140,12 @@ const worlds = [
   {
     id: 4,
     slug: 'world-05',
-    name: 'World 05',
+    name: 'Aurum',
     chapter: 'Chapter V',
     title: 'Void\nArchitecture',
     subtitle: 'Unreal Engine 5 · Blender · Substance 3D',
-    accentColor: '#c4a0a0',        // TBD — muted rose placeholder
-    accentRGB: [196, 160, 160],    // TBD
+    accentColor: '#c4a028',
+    accentRGB: [196, 160, 40],
     framesPath: 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-05/',
     frameCount: 375,
     sourcePattern: 'NewLevelSequence1.Layer1.%04d.jpeg',
