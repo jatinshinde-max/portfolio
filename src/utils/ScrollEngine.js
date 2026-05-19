@@ -14,6 +14,7 @@ export default class ScrollEngine {
     this.previousProgress = 0;
     this.smoothVelocity   = 0;
     this.lastTime         = 0;
+    this._ready           = false; // suppresses init-time onEnter fires
   }
 
   init() {
@@ -51,8 +52,8 @@ export default class ScrollEngine {
         end:     'bottom bottom',
         scrub:   3,
 
-        onEnter:     () => this.onWorldChange(i),
-        onEnterBack: () => this.onWorldChange(i),
+        onEnter:     () => { if (this._ready) this.onWorldChange(i); },
+        onEnterBack: () => { if (this._ready) this.onWorldChange(i); },
 
         onUpdate: (self) => {
           const now   = performance.now();
@@ -73,6 +74,11 @@ export default class ScrollEngine {
 
       this.triggers.push(trigger);
     }
+  }
+
+  // Call after ScrollTrigger's init fires have settled (~100ms after init())
+  activate() {
+    this._ready = true;
   }
 
   scrollToWorld(worldIndex) {

@@ -24,6 +24,7 @@ async function init() {
     buildContentPanels(worlds);
     transition.init();
     scrollEngine.init(); // ScrollTrigger created HERE — after loader is gone
+    setTimeout(() => scrollEngine.activate(), 100); // allow init fires to settle
   });
   loader.init();
 
@@ -40,13 +41,10 @@ async function init() {
   await frameScrubber.switchWorld(0, (progress) => loader.setProgress(progress));
 
   // ── 5. Scroll engine — constructed here, initialised in onComplete ─────────
-  let currentProgress   = 0;
-  let currentWorldIndex = 0; // world-01 already loaded — guard duplicate fires
+  let currentProgress = 0;
 
   const scrollEngine = new ScrollEngine({
     onWorldChange: (worldIndex) => {
-      if (worldIndex === currentWorldIndex) return;
-      currentWorldIndex = worldIndex;
       transition.trigger(() => {
         frameScrubber.switchWorld(worldIndex, () => {});
         hud.updateWorld(worldIndex, worlds[worldIndex]);
