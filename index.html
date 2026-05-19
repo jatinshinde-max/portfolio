@@ -1,33 +1,1266 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="CGI & VFX — Five worlds. Each one built. Each one earned." />
-  <title>Jatin Shinde — CGI & VFX</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jatin Shinde — CGI & VFX</title>
+<meta name="description" content="CGI & VFX Artist. Unreal Engine 5 environments, Blender characters, cinematic rendering.">
+<meta name="theme-color" content="#06050c">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,100;0,200;0,300;1,200;1,300&family=DM+Mono:wght@300;400&display=swap"
-    rel="stylesheet"
-  />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400&family=Barlow:ital,wght@0,300;0,400;0,500;1,300&family=Barlow+Semi+Condensed:wght@300;400;500&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="styles/base.css" />
-  <link rel="stylesheet" href="styles/loader.css" />
-  <link rel="stylesheet" href="styles/hud.css" />
-  <link rel="stylesheet" href="styles/panels.css" />
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.webgpu.js",
+    "three/webgpu": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.webgpu.js",
+    "three/tsl": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.tsl.js"
+  }
+}
+</script>
+
+<style>
+/* ─── TOKENS ───────────────────────────────────────────────── */
+:root {
+  --bg:       #06050c;
+  --bg-1:     #0b0a14;
+  --bg-2:     #100f1c;
+  --ink:      rgba(255,255,255,0.92);
+  --ink-dim:  rgba(255,255,255,0.45);
+  --ink-mute: rgba(255,255,255,0.2);
+  --ink-ghost:rgba(255,255,255,0.06);
+
+  --accent:   #e8d5b0;   /* warm gold — neutral default */
+  --a1: #c46428;  /* world 1 — burnt orange */
+  --a2: #7c5cc4;  /* world 2 — violet */
+  --a3: #3a8c52;  /* world 3 — forest */
+  --a4: #2872c4;  /* world 4 — cold blue */
+  --a5: #c4a028;  /* world 5 — gold */
+
+  --f-display: 'Barlow Condensed', sans-serif;
+  --f-body:    'Barlow', sans-serif;
+  --f-semi:    'Barlow Semi Condensed', sans-serif;
+
+  --ease-out:  cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in:   cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+/* ─── RESET ────────────────────────────────────────────────── */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: auto; font-size: 16px; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-weight: 300;
+  overflow-x: hidden;
+  cursor: none;
+  -webkit-font-smoothing: antialiased;
+}
+@media (hover:none),(pointer:coarse) { body { cursor:auto; } }
+
+/* ─── CURSOR ───────────────────────────────────────────────── */
+#c-dot, #c-ring {
+  position: fixed; top:0; left:0;
+  pointer-events: none; z-index: 9999;
+  transform: translate(-50%,-50%);
+  will-change: transform;
+}
+#c-dot {
+  width: 5px; height: 5px;
+  background: var(--ink);
+  border-radius: 50%;
+  mix-blend-mode: difference;
+  transition: transform 0.1s var(--ease-out);
+}
+#c-ring {
+  width: 34px; height: 34px;
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 50%;
+  transition: width 0.3s var(--ease-out), height 0.3s var(--ease-out),
+              border-color 0.3s, transform 0.12s var(--ease-out);
+}
+#c-ring.expand { width: 60px; height: 60px; border-color: rgba(255,255,255,0.8); }
+
+/* ─── LOADER ───────────────────────────────────────────────── */
+#loader {
+  position: fixed; inset:0; z-index: 9000;
+  background: var(--bg);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 32px;
+  transition: opacity 0.8s var(--ease-in);
+}
+#loader.out { opacity: 0; pointer-events: none; }
+.l-num {
+  font-family: var(--f-display);
+  font-size: clamp(7rem, 18vw, 16rem);
+  font-weight: 200;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.l-bar-wrap {
+  width: min(480px, 60vw); height: 1px;
+  background: var(--ink-ghost);
+}
+.l-bar {
+  height: 100%; width: 0%;
+  background: var(--ink);
+  transition: width 0.15s linear;
+}
+.l-label {
+  font-family: var(--f-semi);
+  font-size: 0.6rem;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+/* ─── CANVAS STAGE ─────────────────────────────────────────── */
+#stage {
+  position: sticky; top:0;
+  width: 100%; height: 100vh;
+  z-index: 1; overflow: hidden;
+}
+#stage canvas {
+  position: absolute; inset:0;
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+.vignette {
+  position: absolute; inset:0; pointer-events:none; z-index:2;
+  background: radial-gradient(ellipse 90% 90% at 50% 50%,
+    transparent 30%, rgba(6,5,12,0.55) 80%, rgba(6,5,12,0.9) 100%);
+}
+.top-fade {
+  position: absolute; inset:0; pointer-events:none; z-index:2;
+  background: linear-gradient(to bottom,
+    rgba(6,5,12,0.65) 0%, transparent 15%,
+    transparent 80%, rgba(6,5,12,0.65) 100%);
+}
+.grain {
+  position: absolute; inset:-50%; width:200%; height:200%;
+  pointer-events:none; z-index:3; opacity:0.25;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+  animation: grain-shift 0.12s steps(1) infinite;
+}
+@keyframes grain-shift {
+  0%   {transform:translate(0,0)}
+  25%  {transform:translate(-3%,-3%)}
+  50%  {transform:translate(3%,2%)}
+  75%  {transform:translate(-2%,3%)}
+  100% {transform:translate(2%,-2%)}
+}
+
+/* ─── HUD ───────────────────────────────────────────────────── */
+#hud {
+  position: fixed; inset:0;
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* Name — top left */
+.hud-name {
+  position: absolute; top: 32px; left: 36px;
+  pointer-events: auto;
+}
+.hud-name .role {
+  font-family: var(--f-semi);
+  font-size: 0.58rem; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--ink-mute);
+  margin-bottom: 3px;
+}
+.hud-name .name {
+  font-family: var(--f-display);
+  font-size: 1rem; font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--ink);
+}
+
+/* Nav — top right */
+.hud-nav {
+  position: absolute; top: 36px; right: 36px;
+  display: flex; gap: 32px;
+  pointer-events: auto;
+}
+.hud-nav a {
+  font-family: var(--f-semi);
+  font-size: 0.6rem; letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-dim); text-decoration: none;
+  transition: color 0.3s;
+}
+.hud-nav a:hover { color: var(--ink); }
+
+/* World number — bottom left */
+.hud-world {
+  position: absolute; bottom: 36px; left: 36px;
+}
+.hud-world-num {
+  font-family: var(--f-display);
+  font-size: clamp(4rem, 9vw, 8rem);
+  font-weight: 200; line-height: 1;
+  letter-spacing: -0.04em;
+  color: rgba(255,255,255,0.05);
+  transition: color 0.6s;
+}
+.hud-world-name {
+  font-family: var(--f-semi);
+  font-size: 0.55rem; letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--accent); margin-top: 2px;
+  transition: color 0.6s;
+}
+
+/* Progress dots — bottom right */
+.hud-dots {
+  position: absolute; bottom: 36px; right: 36px;
+  display: flex; flex-direction: column; gap: 7px;
+}
+.hud-dot {
+  width: 4px; height: 4px; border-radius: 50%;
+  background: rgba(255,255,255,0.18);
+  transition: background 0.4s, transform 0.4s;
+}
+.hud-dot.on { background: var(--ink); transform: scale(1.4); }
+
+/* Scroll hint — bottom center */
+.hud-scroll {
+  position: absolute; bottom: 36px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  transition: opacity 0.5s;
+}
+.hud-scroll.hide { opacity: 0; }
+.hud-scroll .s-txt {
+  font-family: var(--f-semi);
+  font-size: 0.5rem; letter-spacing: 0.4em;
+  text-transform: uppercase; color: var(--ink-mute);
+}
+.hud-scroll .s-line {
+  width: 1px; height: 36px;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.5), transparent);
+  animation: line-pulse 1.8s ease infinite;
+}
+@keyframes line-pulse {
+  0%,100% {transform:scaleY(1);opacity:0.5}
+  50% {transform:scaleY(1.4);opacity:1}
+}
+
+/* World title — center */
+.hud-title {
+  position: absolute; top:50%; left:50%;
+  transform: translate(-50%,-50%);
+  text-align: center;
+  transition: opacity 0.5s, transform 0.5s;
+  opacity: 0;
+  pointer-events: none;
+}
+.hud-title.show { opacity: 1; }
+.hud-title .t-chapter {
+  font-family: var(--f-semi);
+  font-size: 0.55rem; letter-spacing: 0.45em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 14px;
+  transition: color 0.6s;
+}
+.hud-title .t-main {
+  font-family: var(--f-display);
+  font-size: clamp(2.5rem, 6vw, 5.5rem);
+  font-weight: 200; line-height: 1.0;
+  letter-spacing: -0.01em; color: var(--ink);
+  text-shadow: 0 4px 40px rgba(0,0,0,0.6);
+}
+.hud-title .t-sub {
+  margin-top: 14px;
+  font-family: var(--f-semi);
+  font-size: 0.65rem; letter-spacing: 0.15em;
+  color: var(--ink-dim);
+}
+
+/* ─── SCROLL SECTIONS ───────────────────────────────────────── */
+#scroll-wrap { position: relative; z-index:0; }
+.world-section { height: 400vh; position: relative; }
+
+/* ─── CONTENT AREA ──────────────────────────────────────────── */
+#content { position: relative; z-index: 5; background: var(--bg); }
+
+/* Chapter header */
+.chapter-intro {
+  padding: clamp(80px,14vh,140px) clamp(28px,7vw,100px);
+  border-bottom: 1px solid var(--ink-ghost);
+}
+.ch-eyebrow {
+  font-family: var(--f-semi);
+  font-size: 0.6rem; letter-spacing: 0.4em;
+  text-transform: uppercase; margin-bottom: 20px;
+}
+.ch-title {
+  font-family: var(--f-display);
+  font-size: clamp(3rem, 7vw, 7rem);
+  font-weight: 200; line-height: 0.95;
+  letter-spacing: -0.02em;
+  max-width: 14ch;
+}
+.ch-body {
+  margin-top: 28px;
+  font-size: 0.95rem; line-height: 1.8;
+  color: var(--ink-dim); max-width: 50ch;
+}
+
+/* Projects list */
+.projects-list {
+  padding: clamp(40px,6vh,80px) clamp(28px,7vw,100px);
+  border-bottom: 1px solid var(--ink-ghost);
+}
+.project-row {
+  display: flex; align-items: baseline;
+  gap: 24px; padding: 20px 0;
+  border-bottom: 1px solid var(--ink-ghost);
+  cursor: none;
+  transition: gap 0.4s var(--ease-out);
+}
+.project-row:last-child { border-bottom: none; }
+.project-row:hover { gap: 32px; }
+.project-row:hover .pr-title { color: var(--accent); }
+.pr-num {
+  font-family: var(--f-display);
+  font-size: clamp(1.8rem, 3.5vw, 3rem);
+  font-weight: 200; color: rgba(255,255,255,0.08);
+  flex-shrink: 0; width: 3ch;
+  transition: color 0.4s;
+}
+.project-row:hover .pr-num { color: rgba(255,255,255,0.15); }
+.pr-info { flex: 1; }
+.pr-title {
+  font-family: var(--f-display);
+  font-size: clamp(1.2rem, 2.2vw, 1.8rem);
+  font-weight: 300; letter-spacing: 0.02em;
+  transition: color 0.4s;
+}
+.pr-type {
+  margin-top: 4px;
+  font-family: var(--f-semi);
+  font-size: 0.6rem; letter-spacing: 0.25em;
+  text-transform: uppercase; color: var(--ink-mute);
+}
+.pr-arrow {
+  font-size: 1.2rem; color: var(--ink-mute);
+  transition: transform 0.4s var(--ease-out), color 0.3s;
+}
+.project-row:hover .pr-arrow { transform: translateX(8px); color: var(--accent); }
+
+/* ─── GALLERY ───────────────────────────────────────────────── */
+.gallery-section {
+  padding: clamp(80px,12vh,140px) clamp(28px,7vw,100px);
+  background: var(--bg-1);
+}
+.gallery-section .s-head {
+  margin-bottom: 60px;
+}
+.s-eyebrow {
+  font-family: var(--f-semi);
+  font-size: 0.6rem; letter-spacing: 0.4em;
+  text-transform: uppercase; color: var(--ink-mute);
+  margin-bottom: 16px;
+}
+.s-title {
+  font-family: var(--f-display);
+  font-size: clamp(2.5rem, 5.5vw, 5.5rem);
+  font-weight: 200; line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-auto-rows: 200px;
+  gap: 8px;
+}
+.g-cell {
+  position: relative; overflow: hidden;
+  background: var(--bg-2);
+  cursor: none;
+  opacity: 0; transform: translateY(30px);
+  transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
+}
+.g-cell.vis { opacity: 1; transform: translateY(0); }
+.g-cell:nth-child(1) { grid-column: span 5; grid-row: span 2; }
+.g-cell:nth-child(2) { grid-column: span 4; }
+.g-cell:nth-child(3) { grid-column: span 3; }
+.g-cell:nth-child(4) { grid-column: span 4; }
+.g-cell:nth-child(5) { grid-column: span 3; grid-row: span 2; }
+.g-cell:nth-child(6) { grid-column: span 4; }
+.g-cell:nth-child(7) { grid-column: span 5; }
+.g-cell:nth-child(8) { grid-column: span 4; }
+.g-cell:nth-child(9) { grid-column: span 3; }
+.g-cell img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 1.2s var(--ease-out), filter 0.5s;
+  filter: saturate(0.9) brightness(0.85);
+}
+.g-cell:hover img {
+  transform: scale(1.06);
+  filter: saturate(1.05) brightness(0.95);
+}
+.g-cell-info {
+  position: absolute; bottom:0; left:0; right:0;
+  padding: 16px 18px;
+  background: linear-gradient(to top, rgba(6,5,12,0.9), transparent);
+  transform: translateY(4px);
+  transition: transform 0.4s var(--ease-out);
+}
+.g-cell:hover .g-cell-info { transform: translateY(0); }
+.g-cell-title {
+  font-family: var(--f-semi);
+  font-size: 0.85rem; font-weight: 400; color: var(--ink);
+}
+.g-cell-tag {
+  font-family: var(--f-semi);
+  font-size: 0.55rem; letter-spacing: 0.25em;
+  text-transform: uppercase; color: var(--ink-dim);
+  margin-top: 3px;
+}
+
+/* Placeholder canvas in gallery cells */
+.g-canvas {
+  width: 100%; height: 100%;
+  display: block;
+}
+
+/* ─── TOOLS/SKILLS ──────────────────────────────────────────── */
+.tools-section {
+  padding: clamp(80px,12vh,140px) clamp(28px,7vw,100px);
+  background: var(--bg);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(40px,8vw,120px);
+  align-items: start;
+}
+@media (max-width:800px) { .tools-section { grid-template-columns:1fr; } }
+
+.tools-list {
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--ink-ghost);
+  border: 1px solid var(--ink-ghost);
+}
+.tool-item {
+  background: var(--bg);
+  padding: 14px 18px;
+  font-family: var(--f-semi);
+  font-size: 0.72rem; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--ink-dim);
+  display: flex; align-items: center; gap: 10px;
+  transition: background 0.3s, color 0.3s;
+}
+.tool-item:hover { background: var(--bg-1); color: var(--ink); }
+.tool-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); flex-shrink:0; }
+
+.stats-row {
+  margin-top: 40px;
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1px; background: var(--ink-ghost);
+  border: 1px solid var(--ink-ghost);
+}
+.stat-cell {
+  background: var(--bg); padding: 24px 20px;
+  text-align: center;
+}
+.stat-n {
+  font-family: var(--f-display);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 200; color: var(--ink);
+  letter-spacing: -0.02em;
+}
+.stat-l {
+  font-family: var(--f-semi);
+  font-size: 0.55rem; letter-spacing: 0.3em;
+  text-transform: uppercase; color: var(--ink-mute);
+  margin-top: 6px;
+}
+
+/* ─── ABOUT ─────────────────────────────────────────────────── */
+.about-section {
+  padding: clamp(80px,12vh,140px) clamp(28px,7vw,100px);
+  background: var(--bg-1);
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: clamp(40px,8vw,120px);
+  align-items: center;
+}
+@media (max-width:800px) { .about-section { grid-template-columns:1fr; } }
+
+.about-visual {
+  aspect-ratio: 3/4;
+  background: var(--bg-2);
+  position: relative; overflow: hidden;
+}
+.about-visual canvas { width:100%; height:100%; display:block; }
+.about-visual .av-label {
+  position: absolute; bottom: 20px; left: 20px;
+  font-family: var(--f-semi);
+  font-size: 0.55rem; letter-spacing: 0.3em;
+  text-transform: uppercase; color: var(--ink-dim);
+}
+
+.about-text .a-eyebrow {
+  font-family: var(--f-semi);
+  font-size: 0.6rem; letter-spacing: 0.4em;
+  text-transform: uppercase; color: var(--ink-mute);
+  margin-bottom: 20px;
+}
+.about-text .a-headline {
+  font-family: var(--f-display);
+  font-size: clamp(2rem, 4.5vw, 4.5rem);
+  font-weight: 200; line-height: 1.0;
+  letter-spacing: -0.02em; margin-bottom: 28px;
+}
+.about-text .a-body {
+  font-size: 1rem; line-height: 1.85;
+  color: var(--ink-dim); max-width: 46ch;
+}
+
+/* ─── CONTACT ───────────────────────────────────────────────── */
+.contact-section {
+  padding: clamp(100px,16vh,180px) clamp(28px,7vw,100px);
+  background: var(--bg);
+  text-align: center;
+  position: relative; overflow: hidden;
+}
+.contact-section::before {
+  content: 'JATIN';
+  position: absolute; top:50%; left:50%;
+  transform: translate(-50%,-50%);
+  font-family: var(--f-display);
+  font-size: clamp(8rem, 25vw, 22rem);
+  font-weight: 700; letter-spacing: -0.04em;
+  color: rgba(255,255,255,0.025);
+  pointer-events: none; white-space: nowrap;
+}
+.c-eyebrow {
+  font-family: var(--f-semi);
+  font-size: 0.6rem; letter-spacing: 0.4em;
+  text-transform: uppercase; color: var(--ink-mute);
+  margin-bottom: 24px;
+}
+.c-headline {
+  font-family: var(--f-display);
+  font-size: clamp(3rem, 8vw, 9rem);
+  font-weight: 200; letter-spacing: -0.03em; line-height: 0.95;
+  margin-bottom: 48px;
+}
+.c-btn {
+  display: inline-flex; align-items: center; gap: 14px;
+  padding: 16px 36px;
+  border: 1px solid rgba(255,255,255,0.2);
+  font-family: var(--f-semi);
+  font-size: 0.62rem; letter-spacing: 0.3em;
+  text-transform: uppercase; color: var(--ink);
+  text-decoration: none; cursor: none;
+  transition: border-color 0.3s, background 0.3s;
+  position: relative; z-index: 1;
+}
+.c-btn:hover { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.04); }
+.c-btn span { transition: transform 0.3s var(--ease-out); }
+.c-btn:hover span { transform: translateX(6px); }
+
+/* ─── FOOTER ────────────────────────────────────────────────── */
+footer {
+  padding: 28px clamp(28px,7vw,100px);
+  background: var(--bg);
+  border-top: 1px solid var(--ink-ghost);
+  display: flex; justify-content: space-between; align-items: center;
+}
+footer .f-left {
+  font-family: var(--f-semi);
+  font-size: 0.6rem; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--ink-mute);
+}
+footer .f-right {
+  display: flex; gap: 24px;
+}
+footer a {
+  font-family: var(--f-semi);
+  font-size: 0.6rem; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--ink-mute);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+footer a:hover { color: var(--ink); }
+
+/* ─── SCROLL REVEALS ────────────────────────────────────────── */
+.reveal {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity 0.9s var(--ease-out), transform 0.9s var(--ease-out);
+}
+.reveal.vis { opacity: 1; transform: translateY(0); }
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+
+/* ─── RESPONSIVE ────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .gallery-grid { grid-template-columns: 1fr 1fr; grid-auto-rows: 160px; }
+  .g-cell { grid-column: span 1 !important; grid-row: span 1 !important; }
+  .stats-row { grid-template-columns: 1fr; }
+}
+</style>
 </head>
 <body>
 
-  <div id="canvas-container"></div>
+<!-- CURSOR -->
+<div id="c-dot"></div>
+<div id="c-ring"></div>
 
-  <div id="vignette"></div>
+<!-- LOADER -->
+<div id="loader">
+  <div class="l-num" id="l-num">00</div>
+  <div class="l-bar-wrap"><div class="l-bar" id="l-bar"></div></div>
+  <div class="l-label">Rendering Worlds</div>
+</div>
 
-  <div id="scroll-container"></div>
+<!-- HUD -->
+<div id="hud">
+  <div class="hud-name">
+    <div class="role">CGI &amp; VFX</div>
+    <div class="name">Jatin Shinde</div>
+  </div>
+  <nav class="hud-nav">
+    <a href="#worlds">Worlds</a>
+    <a href="#gallery">Work</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+  </nav>
+  <div class="hud-world">
+    <div class="hud-world-num" id="h-num">01</div>
+    <div class="hud-world-name" id="h-name">World 01</div>
+  </div>
+  <div class="hud-dots" id="h-dots"></div>
+  <div class="hud-scroll" id="h-scroll">
+    <div class="s-txt">Scroll</div>
+    <div class="s-line"></div>
+  </div>
+  <div class="hud-title" id="h-title">
+    <div class="t-chapter" id="h-chapter">Chapter I</div>
+    <div class="t-main" id="h-main">World Title</div>
+    <div class="t-sub" id="h-sub">Unreal Engine 5</div>
+  </div>
+</div>
 
-  <div id="hud"></div>
+<!-- SCROLL ARCHITECTURE -->
+<div id="scroll-wrap">
+  <!-- STICKY CANVAS -->
+  <div id="stage">
+    <canvas id="main-canvas"></canvas>
+    <div class="vignette"></div>
+    <div class="top-fade"></div>
+    <div class="grain"></div>
+  </div>
 
-  <script type="module" src="dist/main.js"></script>
+  <!-- 5 WORLD SCROLL SECTIONS -->
+  <div id="worlds">
+    <div class="world-section" data-world="0"></div>
+    <div class="world-section" data-world="1"></div>
+    <div class="world-section" data-world="2"></div>
+    <div class="world-section" data-world="3"></div>
+    <div class="world-section" data-world="4"></div>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div id="content">
+
+  <!-- WORLD CHAPTERS -->
+  <div id="chapter-0" class="chapter-intro">
+    <div class="ch-eyebrow reveal" style="color:var(--a1)">Chapter I — Post-Apocalyptic</div>
+    <h2 class="ch-title reveal reveal-delay-1">Built From<br>Ruin</h2>
+    <p class="ch-body reveal reveal-delay-2">Every collapsed skyline earned its fractures. Lighting designed the way a cinematographer would — not a realtime renderer. Crafted in Unreal Engine 5 with Lumen global illumination and Nanite geometry.</p>
+    <div class="projects-list reveal reveal-delay-3">
+      <div class="project-row">
+        <div class="pr-num">01</div>
+        <div class="pr-info"><div class="pr-title">The Last District</div><div class="pr-type">Environment · UE5 · Lumen</div></div>
+        <div class="pr-arrow">→</div>
+      </div>
+      <div class="project-row">
+        <div class="pr-num">02</div>
+        <div class="pr-info"><div class="pr-title">Broken Meridian</div><div class="pr-type">Cinematic · UE5 · After Effects</div></div>
+        <div class="pr-arrow">→</div>
+      </div>
+      <div class="project-row">
+        <div class="pr-num">03</div>
+        <div class="pr-info"><div class="pr-title">Dust City</div><div class="pr-type">Environment · UE5 · DaVinci Resolve</div></div>
+        <div class="pr-arrow">→</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="chapter-1" class="chapter-intro">
+    <div class="ch-eyebrow reveal" style="color:var(--a2)">Chapter II — Fantasy / Mystical</div>
+    <h2 class="ch-title reveal reveal-delay-1">Where Logic<br>Yields to Light</h2>
+    <p class="ch-body reveal reveal-delay-2">Ancient forests lit by sources that don't exist in physics. Materials sculpted in Substance 3D Painter, geometry built in Blender, atmospheres rendered in Unreal Engine 5.</p>
+    <div class="projects-list reveal reveal-delay-3">
+      <div class="project-row">
+        <div class="pr-num">01</div>
+        <div class="pr-info"><div class="pr-title">The Hollow Kingdom</div><div class="pr-type">Environment · UE5 · Substance 3D</div></div>
+        <div class="pr-arrow">→</div>
+      </div>
+      <div class="project-row">
+        <div class="pr-num">02</div>
+        <div class="pr-info"><div class="pr-title">Arcanewood</div><div class="pr-type">Cinematic · Blender · UE5</div></div>
+        <div class="pr-arrow">→</div>
+      </div>
+      <div class="project-row">
+        <div class="pr-num">03</div>
+        <div class="pr-info"><div class="pr-title">Veil Crossing</div><div class="pr-type">Environment · Character Creator 4</div></div>
+        <div class="pr-arrow">→</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="chapter-2" class="chapter-intro">
+    <div class="ch-eyebrow reveal" style="color:var(--a3)">Chapter III — Nature / Landscape</div>
+    <h2 class="ch-title reveal reveal-delay-1">The Silence<br>of Scale</h2>
+    <p class="ch-body reveal reveal-delay-2">Landscapes that dwarf the viewer. Distance haze, volumetric clouds, wind-driven foliage — every atmospheric layer considered, every horizon composed with cinematic intent.</p>
+    <div class="projects-list reveal reveal-delay-3">
+      <div class="project-row">
+        <div class="pr-num">01</div>
+        <div class="pr-info"><div class="pr-title">Glacial Descent</div><div class="pr-type">Environment · UE5 · Lumen</div></div>
+        <div class="pr-arrow">→</div>
+      </div>
+      <div class="project-row">
+        <div class="pr-num">02</div>
+        <div class="pr-info"><div class="pr-title">The High Plane</div><div class="pr-type">Cinematic · UE5 · After Effects</div></div>
+        <div class="pr-arrow">→</div>
+      </div>
+      <div class="project-row">
+        <div class="pr-num">03</div>
+        <div class="pr-info"><div class="pr-title">Everfall</div><div class="pr-type">Environment · Marvelous Designer</div></div>
+        <div class="pr-arrow">→</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="chapter-3" class="chapter-intro">
+    <div class="ch-eyebrow reveal" style="color:var(--a4)">Chapter IV — Sci-Fi / Futuristic</div>
+    <h2 class="ch-title reveal reveal-delay-1">Architectures<br>of Tomorrow</h2>
+    <p class="ch-body reveal reveal-delay-2">Megastructures, neon corridors, orbital vistas. Hard-surface modelling, procedural material systems built in Substance 3D Painter, rendered in Unreal Engine 5.</p>
+    <div class="projects-list reveal reveal-delay-3">
+      <div class="project-row">
+        <div class="pr-num">01</div>
+        <div class="pr-info"><div class="pr-title">Nexus Station</div><div class="pr-type">Environment · UE5 · Blender</div></div>
+        <div class="pr-arrow">→</div>
+      </div>
+      <div class="project-row">
+        <div class="pr-num">02</div>
+        <div class="pr-info"><div class="pr-title">The Orbital</div><div class="pr-type">Cinematic · UE5 · After Effects</div></div>
+        <div class="pr-arrow">→</div>
+      </div>
+      <div class="project-row">
+        <div class="pr-num">03</div>
+        <div class="pr-info"><div class="pr-title">Deep Array</div><div class="pr-type">Environment · Substance 3D</div></div>
+        <div class="pr-arrow">→</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="chapter-4" class="chapter-intro">
+    <div class="ch-eyebrow reveal" style="color:var(--a5)">Chapter V</div>
+    <h2 class="ch-title reveal reveal-delay-1">World Five<br>Title Here</h2>
+    <p class="ch-body reveal reveal-delay-2">Description of this world. Update once you name it.</p>
+    <div class="projects-list reveal reveal-delay-3">
+      <div class="project-row">
+        <div class="pr-num">01</div>
+        <div class="pr-info"><div class="pr-title">Project One</div><div class="pr-type">Environment · UE5</div></div>
+        <div class="pr-arrow">→</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GALLERY -->
+  <div class="gallery-section" id="gallery">
+    <div class="s-head">
+      <div class="s-eyebrow reveal">Selected Works</div>
+      <h2 class="s-title reveal reveal-delay-1">Blender.<br>Characters.<br>Product.</h2>
+    </div>
+    <div class="gallery-grid" id="g-grid">
+      <!-- Gallery cells generated by JS -->
+    </div>
+  </div>
+
+  <!-- TOOLS & SKILLS -->
+  <div class="tools-section" id="skills">
+    <div>
+      <div class="s-eyebrow reveal">Production Stack</div>
+      <h2 class="s-title reveal reveal-delay-1">Every<br>Tool,<br>Mastered.</h2>
+      <div class="stats-row reveal reveal-delay-2">
+        <div class="stat-cell">
+          <div class="stat-n">5+</div>
+          <div class="stat-l">Years</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-n">104</div>
+          <div class="stat-l">Projects</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-n">5K+</div>
+          <div class="stat-l">Frames</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="tools-list reveal">
+        <div class="tool-item"><span class="tool-dot"></span>Unreal Engine 5</div>
+        <div class="tool-item"><span class="tool-dot"></span>Blender</div>
+        <div class="tool-item"><span class="tool-dot"></span>After Effects</div>
+        <div class="tool-item"><span class="tool-dot"></span>Substance 3D</div>
+        <div class="tool-item"><span class="tool-dot"></span>Photoshop</div>
+        <div class="tool-item"><span class="tool-dot"></span>Premier Pro</div>
+        <div class="tool-item"><span class="tool-dot"></span>Illustrator</div>
+        <div class="tool-item"><span class="tool-dot"></span>Character Creator 4</div>
+        <div class="tool-item"><span class="tool-dot"></span>DaVinci Resolve</div>
+        <div class="tool-item"><span class="tool-dot"></span>Marvelous Designer</div>
+        <div class="tool-item"><span class="tool-dot"></span>Audition</div>
+        <div class="tool-item"><span class="tool-dot"></span>Corel Draw</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <div class="about-section" id="about">
+    <div class="about-visual reveal">
+      <canvas class="g-canvas" id="about-canvas"></canvas>
+      <div class="av-label">CGI & VFX · India</div>
+    </div>
+    <div class="about-text">
+      <div class="a-eyebrow reveal">About</div>
+      <h2 class="a-headline reveal reveal-delay-1">CGI &amp; VFX<br>Artist with a<br>Proven Track<br>Record.</h2>
+      <p class="a-body reveal reveal-delay-2">Leading graphic designers and video editors. Expertise in merging creative vision with technical prowess to produce compelling visual content. Skilled in team management, fostering collaboration, and delivering impactful, innovative work across environments, characters, product visualisation and cinematic rendering.</p>
+    </div>
+  </div>
+
+  <!-- CONTACT -->
+  <div class="contact-section" id="contact">
+    <div class="c-eyebrow reveal">Open to Collaboration</div>
+    <h2 class="c-headline reveal reveal-delay-1">Let's Build<br>a World.</h2>
+    <a href="mailto:jatinshinde118@gmail.com" class="c-btn reveal reveal-delay-2">
+      Get in Touch <span>→</span>
+    </a>
+  </div>
+
+  <footer>
+    <div class="f-left">© 2026 Jatin Shinde — CGI & VFX</div>
+    <div class="f-right">
+      <a href="#">Instagram</a>
+      <a href="#">Behance</a>
+      <a href="#">LinkedIn</a>
+    </div>
+  </footer>
+
+</div><!-- end #content -->
+
+<script type="module">
+// ═══════════════════════════════════════════════════════
+//  CONFIGURATION
+// ═══════════════════════════════════════════════════════
+const CDN = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev';
+
+const WORLDS = [
+  {
+    slug: 'world-01', name: 'World 01',
+    chapter: 'Chapter I', title: 'Built From\nRuin',
+    sub: 'Unreal Engine 5 · Blender · Lumen',
+    accent: '#c46428', rgb: [196,100,40],
+    frameCount: 111, stride: 5
+  },
+  {
+    slug: 'world-02', name: 'World 02',
+    chapter: 'Chapter II', title: 'Where Logic\nYields to Light',
+    sub: 'Unreal Engine 5 · Substance 3D',
+    accent: '#7c5cc4', rgb: [124,92,196],
+    frameCount: 165, stride: 5
+  },
+  {
+    slug: 'world-03', name: 'World 03',
+    chapter: 'Chapter III', title: 'The Silence\nof Scale',
+    sub: 'Unreal Engine 5 · Character Creator 4',
+    accent: '#3a8c52', rgb: [58,140,82],
+    frameCount: 124, stride: 5
+  },
+  {
+    slug: 'world-04', name: 'World 04',
+    chapter: 'Chapter IV', title: 'Architectures\nof Tomorrow',
+    sub: 'Unreal Engine 5 · Blender · Substance 3D',
+    accent: '#2872c4', rgb: [40,114,196],
+    frameCount: 179, stride: 5
+  },
+  {
+    slug: 'world-05', name: 'World 05',
+    chapter: 'Chapter V', title: 'World Five\nTitle Here',
+    sub: 'Unreal Engine 5',
+    accent: '#c4a028', rgb: [196,160,40],
+    frameCount: 375, stride: 8
+  }
+];
+
+// ═══════════════════════════════════════════════════════
+//  CURSOR
+// ═══════════════════════════════════════════════════════
+const dot = document.getElementById('c-dot');
+const ring = document.getElementById('c-ring');
+let mx=0, my=0, rx=0, ry=0;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  dot.style.left = mx+'px'; dot.style.top = my+'px';
+});
+(function rl() {
+  rx += (mx-rx)*0.12; ry += (my-ry)*0.12;
+  ring.style.left = rx+'px'; ring.style.top = ry+'px';
+  requestAnimationFrame(rl);
+})();
+document.querySelectorAll('a,button,.project-row,.g-cell').forEach(el => {
+  el.addEventListener('mouseenter', () => ring.classList.add('expand'));
+  el.addEventListener('mouseleave', () => ring.classList.remove('expand'));
+});
+
+// ═══════════════════════════════════════════════════════
+//  CANVAS FRAME RENDERER (simulate or load real frames)
+// ═══════════════════════════════════════════════════════
+const canvas = document.getElementById('main-canvas');
+const ctx = canvas.getContext('2d');
+let W, H;
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+// Frame storage per world
+const frameCache = new Map(); // worldIndex -> Map(frameNum -> ImageBitmap)
+const worldLoading = new Map(); // worldIndex -> Promise
+let activeWorld = 0;
+let activeFrame = null;
+let lastFrameData = null;
+
+async function loadWorld(worldIndex, onProgress) {
+  if (worldLoading.has(worldIndex)) return worldLoading.get(worldIndex);
+  const w = WORLDS[worldIndex];
+  const cache = new Map();
+  frameCache.set(worldIndex, cache);
+
+  const promise = (async () => {
+    const STRIDE = w.stride;
+    const CHUNK = 4;
+    let loaded = 0;
+    const urls = [];
+    for (let i = 1; i <= w.frameCount; i += STRIDE) {
+      const n = String(i).padStart(4,'0');
+      urls.push({ url: `${CDN}/${w.slug}/frame_${n}.webp`, num: i });
+    }
+    const total = urls.length;
+
+    for (let c = 0; c < urls.length; c += CHUNK) {
+      const chunk = urls.slice(c, c + CHUNK);
+      await Promise.all(chunk.map(async ({ url, num }) => {
+        try {
+          const res = await fetch(url);
+          if (!res.ok) return;
+          const blob = await res.blob();
+          const bmp = await createImageBitmap(blob);
+          cache.set(num, bmp);
+        } catch {}
+        loaded++;
+        onProgress && onProgress(loaded / total);
+      }));
+    }
+  })();
+
+  worldLoading.set(worldIndex, promise);
+  return promise;
+}
+
+function getFrameForProgress(worldIndex, progress) {
+  const w = WORLDS[worldIndex];
+  const cache = frameCache.get(worldIndex);
+  if (!cache || cache.size === 0) return null;
+  const keys = [...cache.keys()].sort((a,b) => a-b);
+  const idx = Math.min(Math.round(progress * (keys.length-1)), keys.length-1);
+  return cache.get(keys[idx]) || null;
+}
+
+// ─── FALLBACK RENDERER (when frames not loaded yet) ───
+function drawFallback(worldIndex, progress, time) {
+  const w = WORLDS[worldIndex];
+  const [r,g,b] = w.rgb;
+  const p = Math.max(0, Math.min(1, progress));
+
+  const gr = ctx.createLinearGradient(0,0,0,H);
+  gr.addColorStop(0, `rgb(${Math.round(r*0.12)},${Math.round(g*0.1)},${Math.round(b*0.18)},1)`);
+  gr.addColorStop(0.5, `rgb(${Math.round(r*0.08)},${Math.round(g*0.06)},${Math.round(b*0.12)},1)`);
+  gr.addColorStop(1, 'rgb(4,3,8)');
+  ctx.fillStyle = gr;
+  ctx.fillRect(0,0,W,H);
+
+  const horizX = W * (0.3 + p*0.4);
+  const horizY = H * (0.45 + p*0.08);
+  const glow = ctx.createRadialGradient(horizX,horizY,0,horizX,horizY,W*0.5);
+  glow.addColorStop(0, `rgba(${r},${g},${b},${0.12+p*0.06})`);
+  glow.addColorStop(0.5, `rgba(${r},${g},${b},0.03)`);
+  glow.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0,0,W,H);
+
+  const groundY = H * (0.54 + p*0.04);
+  const gg = ctx.createLinearGradient(0,groundY,0,H);
+  gg.addColorStop(0, `rgba(${Math.round(r*0.15)},${Math.round(g*0.12)},${Math.round(b*0.2)},1)`);
+  gg.addColorStop(1, 'rgb(4,3,8)');
+  ctx.fillStyle = gg;
+  ctx.fillRect(0,groundY,W,H-groundY);
+}
+
+// ─── MAIN DRAW ────────────────────────────────────────
+let currentProgress = 0;
+let currentWorldIndex = 0;
+let animTime = 0;
+
+function draw(ts) {
+  animTime = ts / 1000;
+  const frame = getFrameForProgress(currentWorldIndex, currentProgress);
+  if (frame) {
+    // Draw real UE5 frame — cover mode
+    const fAspect = frame.width / frame.height;
+    const vAspect = W / H;
+    let sw=frame.width, sh=frame.height, sx=0, sy=0;
+    if (vAspect > fAspect) {
+      sh = frame.width / vAspect; sy = (frame.height - sh) / 2;
+    } else {
+      sw = frame.height * vAspect; sx = (frame.width - sw) / 2;
+    }
+    ctx.drawImage(frame, sx, sy, sw, sh, 0, 0, W, H);
+  } else {
+    drawFallback(currentWorldIndex, currentProgress, animTime);
+  }
+  requestAnimationFrame(draw);
+}
+requestAnimationFrame(draw);
+
+// ═══════════════════════════════════════════════════════
+//  HUD
+// ═══════════════════════════════════════════════════════
+const hNum   = document.getElementById('h-num');
+const hName  = document.getElementById('h-name');
+const hTitle = document.getElementById('h-title');
+const hChap  = document.getElementById('h-chapter');
+const hMain  = document.getElementById('h-main');
+const hSub   = document.getElementById('h-sub');
+const hScroll= document.getElementById('h-scroll');
+const hDots  = document.getElementById('h-dots');
+
+// Build dots
+WORLDS.forEach((_,i) => {
+  const d = document.createElement('div');
+  d.className = 'hud-dot' + (i===0?' on':'');
+  d.id = `hd-${i}`;
+  hDots.appendChild(d);
+});
+
+function updateHUD(worldIndex, progress) {
+  const w = WORLDS[worldIndex];
+  hNum.textContent = String(worldIndex+1).padStart(2,'0');
+  hName.textContent = w.name;
+  hName.style.color = w.accent;
+
+  WORLDS.forEach((_,i) => {
+    document.getElementById(`hd-${i}`)?.classList.toggle('on', i===worldIndex);
+  });
+
+  hScroll.classList.toggle('hide', window.scrollY > 80);
+
+  const show = progress > 0.15 && progress < 0.5;
+  hTitle.classList.toggle('show', show);
+  hChap.textContent = w.chapter;
+  hChap.style.color = w.accent;
+  hMain.innerHTML = w.title.replace('\n','<br>');
+  hSub.textContent = w.sub;
+
+  // Update chapter panel accent
+  document.querySelectorAll('.chapter-intro .ch-eyebrow').forEach((el,i) => {
+    el.style.color = WORLDS[i]?.accent || 'var(--ink-mute)';
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  SCROLL ENGINE
+// ═══════════════════════════════════════════════════════
+function getScrollState() {
+  const sections = document.querySelectorAll('.world-section');
+  const scrollY = window.scrollY;
+  for (let i = 0; i < sections.length; i++) {
+    const el = sections[i];
+    const top = el.offsetTop;
+    const bot = top + el.offsetHeight;
+    if (scrollY >= top && scrollY < bot) {
+      return { world: i, progress: (scrollY - top) / el.offsetHeight };
+    }
+  }
+  return { world: 0, progress: 0 };
+}
+
+window.addEventListener('scroll', () => {
+  const { world, progress } = getScrollState();
+  if (world !== currentWorldIndex) {
+    // World changed — switch (frames load if not yet loaded)
+    currentWorldIndex = world;
+    if (!frameCache.has(world)) {
+      loadWorld(world, () => {});
+    }
+    // Preload next world quietly
+    if (world + 1 < WORLDS.length && !frameCache.has(world+1)) {
+      setTimeout(() => loadWorld(world+1, ()=>{}), 1000);
+    }
+  }
+  currentProgress = progress;
+  updateHUD(world, progress);
+}, { passive: true });
+
+// ═══════════════════════════════════════════════════════
+//  LOADER
+// ═══════════════════════════════════════════════════════
+const lNum = document.getElementById('l-num');
+const lBar = document.getElementById('l-bar');
+const lEl  = document.getElementById('loader');
+
+lEl.style.display = 'flex';
+
+// Load world 0, update counter
+loadWorld(0, (p) => {
+  const pct = Math.round(p * 100);
+  lNum.textContent = String(pct).padStart(2,'0');
+  lBar.style.width = (p * 100) + '%';
+}).then(() => {
+  lNum.textContent = '100';
+  lBar.style.width = '100%';
+  setTimeout(() => {
+    lEl.classList.add('out');
+    setTimeout(() => {
+      lEl.style.display = 'none';
+      updateHUD(0, 0);
+    }, 900);
+  }, 300);
+});
+
+// ═══════════════════════════════════════════════════════
+//  GALLERY CELLS (placeholder canvases — replace with real images)
+// ═══════════════════════════════════════════════════════
+const GALLERY_ITEMS = [
+  { title: 'Dragon — Character', tag: 'Blender · Character Creator 4', world: 0 },
+  { title: 'Galaxy Blob', tag: 'Blender · After Effects', world: 1 },
+  { title: 'Sci-Fi Room', tag: 'Blender · Substance 3D', world: 3 },
+  { title: 'Earth Render', tag: 'Blender · Compositing', world: 2 },
+  { title: 'Fluid Simulation', tag: 'Blender · Cycles', world: 1 },
+  { title: 'Product — Orb', tag: 'Blender · After Effects', world: 3 },
+  { title: 'Cave Walk', tag: 'UE5 · Cinematic', world: 0 },
+  { title: 'Ocean Render', tag: 'Blender · HDRI', world: 2 },
+  { title: 'Rings World', tag: 'Blender · Geometry Nodes', world: 4 },
+];
+
+const gGrid = document.getElementById('g-grid');
+GALLERY_ITEMS.forEach((item, i) => {
+  const cell = document.createElement('div');
+  cell.className = 'g-cell';
+  const cvs = document.createElement('canvas');
+  cvs.className = 'g-canvas';
+  const info = document.createElement('div');
+  info.className = 'g-cell-info';
+  info.innerHTML = `<div class="g-cell-title">${item.title}</div><div class="g-cell-tag">${item.tag}</div>`;
+  cell.appendChild(cvs);
+  cell.appendChild(info);
+  gGrid.appendChild(cell);
+
+  // Draw placeholder
+  requestAnimationFrame(() => {
+    cvs.width = cvs.offsetWidth || 300;
+    cvs.height = cvs.offsetHeight || 200;
+    const c = cvs.getContext('2d');
+    const [r,g,b] = WORLDS[item.world].rgb;
+    const grad = c.createLinearGradient(0,0,cvs.width,cvs.height);
+    grad.addColorStop(0, `rgba(${r*0.15},${g*0.12},${b*0.2},1)`);
+    grad.addColorStop(1, 'rgb(6,5,12)');
+    c.fillStyle = grad;
+    c.fillRect(0,0,cvs.width,cvs.height);
+    const glow = c.createRadialGradient(cvs.width*0.4,cvs.height*0.4,0,cvs.width*0.4,cvs.height*0.4,cvs.width*0.5);
+    glow.addColorStop(0, `rgba(${r},${g},${b},0.2)`);
+    glow.addColorStop(1,'rgba(0,0,0,0)');
+    c.fillStyle = glow;
+    c.fillRect(0,0,cvs.width,cvs.height);
+  });
+});
+
+// About canvas
+const aCanvas = document.getElementById('about-canvas');
+if (aCanvas) {
+  requestAnimationFrame(() => {
+    aCanvas.width = aCanvas.offsetWidth || 400;
+    aCanvas.height = aCanvas.offsetHeight || 500;
+    const ac = aCanvas.getContext('2d');
+    const ag = ac.createLinearGradient(0,0,aCanvas.width,aCanvas.height);
+    ag.addColorStop(0,'rgb(20,16,30)');
+    ag.addColorStop(1,'rgb(6,5,12)');
+    ac.fillStyle = ag;
+    ac.fillRect(0,0,aCanvas.width,aCanvas.height);
+    const aglow = ac.createRadialGradient(aCanvas.width*0.5,aCanvas.height*0.3,0,aCanvas.width*0.5,aCanvas.height*0.3,aCanvas.width*0.6);
+    aglow.addColorStop(0,'rgba(124,92,196,0.15)');
+    aglow.addColorStop(1,'rgba(0,0,0,0)');
+    ac.fillStyle = aglow;
+    ac.fillRect(0,0,aCanvas.width,aCanvas.height);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  SCROLL REVEAL (IntersectionObserver)
+// ═══════════════════════════════════════════════════════
+const revealObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('vis');
+    }
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.reveal,.g-cell').forEach(el => revealObs.observe(el));
+
+// ═══════════════════════════════════════════════════════
+//  MOUSE PARALLAX ON CANVAS
+// ═══════════════════════════════════════════════════════
+// Subtle camera-like parallax — the stage shifts slightly with mouse
+let targetPX = 0, targetPY = 0, curPX = 0, curPY = 0;
+const MAX_SHIFT = 14; // px
+
+document.addEventListener('mousemove', e => {
+  targetPX = ((e.clientX / window.innerWidth) - 0.5) * MAX_SHIFT;
+  targetPY = ((e.clientY / window.innerHeight) - 0.5) * MAX_SHIFT * 0.6;
+});
+
+const stage = document.getElementById('stage');
+(function pl() {
+  curPX += (targetPX - curPX) * 0.05;
+  curPY += (targetPY - curPY) * 0.05;
+  stage.style.transform = `translate(${curPX}px, ${curPY}px) scale(1.04)`;
+  requestAnimationFrame(pl);
+})();
+
+// Initial HUD update
+updateHUD(0, 0);
+</script>
+
 </body>
 </html>
