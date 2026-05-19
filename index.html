@@ -377,11 +377,11 @@ body {
 
 .gallery-grid {
   display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  grid-auto-rows: 200px;
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
 }
 .g-cell {
+  aspect-ratio: 4/3;
   position: relative; overflow: hidden;
   background: var(--bg-2);
   cursor: none;
@@ -389,24 +389,18 @@ body {
   transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
 }
 .g-cell.vis { opacity: 1; transform: translateY(0); }
-.g-cell:nth-child(1) { grid-column: span 5; grid-row: span 2; }
-.g-cell:nth-child(2) { grid-column: span 4; }
-.g-cell:nth-child(3) { grid-column: span 3; }
-.g-cell:nth-child(4) { grid-column: span 4; }
-.g-cell:nth-child(5) { grid-column: span 3; grid-row: span 2; }
-.g-cell:nth-child(6) { grid-column: span 4; }
-.g-cell:nth-child(7) { grid-column: span 5; }
-.g-cell:nth-child(8) { grid-column: span 4; }
-.g-cell:nth-child(9) { grid-column: span 3; }
-.g-cell img {
+.g-cell img,
+.g-cell video {
+  position: absolute; inset: 0;
   width: 100%; height: 100%;
-  object-fit: cover;
+  object-fit: cover; display: block;
   transition: transform 1.2s var(--ease-out), filter 0.5s;
-  filter: saturate(0.9) brightness(0.85);
+  filter: saturate(0.9) brightness(0.82);
 }
-.g-cell:hover img {
-  transform: scale(1.06);
-  filter: saturate(1.05) brightness(0.95);
+.g-cell:hover img,
+.g-cell:hover video {
+  transform: scale(1.05);
+  filter: saturate(1.0) brightness(0.92);
 }
 .g-cell-info {
   position: absolute; bottom:0; left:0; right:0;
@@ -450,47 +444,7 @@ body {
   background: rgba(255,255,255,0.04);
 }
 
-/* Uniform 4-span grid when a category is active */
-.gallery-grid.filtered .g-cell:not(.g-hidden) {
-  grid-column: span 4 !important;
-  grid-row: span 1 !important;
-}
 .g-cell.g-hidden { display: none; }
-
-/* ─── BEFORE / AFTER CLAY TOGGLE ───────────────────────────── */
-.g-cell[data-before-after] .img-before,
-.g-cell[data-before-after] .img-after {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-  object-fit: cover;
-  transition: opacity 0.5s var(--ease-out),
-              transform 1.2s var(--ease-out),
-              filter 0.5s;
-}
-/* Default: show clay (before), hide textured (after) */
-.g-cell[data-before-after] .img-after { opacity: 0; }
-/* .show-textured: flip */
-.g-cell.show-textured .img-before { opacity: 0; }
-.g-cell.show-textured .img-after  { opacity: 1; }
-
-.ba-toggle {
-  position: absolute; top: 12px; right: 12px; z-index: 4;
-  font-family: var(--f-semi);
-  font-size: 0.5rem; letter-spacing: 0.3em;
-  text-transform: uppercase;
-  padding: 6px 13px;
-  border: 1px solid rgba(255,255,255,0.25);
-  background: rgba(6,5,12,0.6);
-  backdrop-filter: blur(10px);
-  color: var(--ink-dim);
-  cursor: none;
-  transition: border-color 0.25s, color 0.25s, background 0.25s;
-}
-.ba-toggle:hover {
-  border-color: rgba(255,255,255,0.55);
-  color: var(--ink);
-  background: rgba(6,5,12,0.82);
-}
 
 /* Placeholder canvas in gallery cells */
 .g-canvas {
@@ -785,19 +739,20 @@ footer a:hover { color: var(--ink); }
 
 .ad-card {
   flex-shrink: 0;
-  width: clamp(260px, 32vw, 400px);
+  width: clamp(240px, 26vw, 360px);
+  aspect-ratio: 3/4;
   position: relative; overflow: hidden;
   background: var(--bg-2);
 }
-.ad-card img {
-  width: 100%;
-  aspect-ratio: 4/3;
+.ad-card video {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
   object-fit: cover; display: block;
-  filter: saturate(0.8) brightness(0.78);
+  filter: saturate(0.85) brightness(0.8);
   transition: transform 1.2s var(--ease-out), filter 0.5s;
   pointer-events: none;
 }
-.ad-card:hover img {
+.ad-card:hover video {
   transform: scale(1.05);
   filter: saturate(1.0) brightness(0.9);
 }
@@ -830,8 +785,7 @@ footer a:hover { color: var(--ink); }
 
 /* ─── RESPONSIVE ────────────────────────────────────────────── */
 @media (max-width: 640px) {
-  .gallery-grid { grid-template-columns: 1fr 1fr; grid-auto-rows: 160px; }
-  .g-cell { grid-column: span 1 !important; grid-row: span 1 !important; }
+  .gallery-grid { grid-template-columns: 1fr 1fr; }
   .stats-row { grid-template-columns: 1fr; }
 }
 </style>
@@ -1038,11 +992,15 @@ footer a:hover { color: var(--ink); }
       <h2 class="s-title reveal reveal-delay-1">Product.<br>Advertising.<br>Cinematic.</h2>
     </div>
     <div class="ads-track" id="ads-track">
-      <div class="ad-card"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/car-01.webp" alt="Automotive" loading="lazy"><div class="ad-card-info"><div class="ad-card-title">Automotive Concept</div><div class="ad-card-tag">Product · Blender</div></div></div>
-      <div class="ad-card"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/cosmetics-01.webp" alt="Cosmetics" loading="lazy"><div class="ad-card-info"><div class="ad-card-title">Cosmetics Campaign</div><div class="ad-card-tag">Product · Substance 3D</div></div></div>
-      <div class="ad-card"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/pepsi-01.webp" alt="Pepsi" loading="lazy"><div class="ad-card-info"><div class="ad-card-title">Pepsi Commercial</div><div class="ad-card-tag">Advertising · After Effects</div></div></div>
-      <div class="ad-card"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/watch-01.webp" alt="Watch" loading="lazy"><div class="ad-card-info"><div class="ad-card-title">Luxury Timepiece</div><div class="ad-card-tag">Product · Blender</div></div></div>
-      <div class="ad-card"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/shoe-01.webp" alt="Shoe" loading="lazy"><div class="ad-card-info"><div class="ad-card-title">Sneaker Render</div><div class="ad-card-tag">Product · Substance 3D</div></div></div>
+      <div class="ad-card"><video autoplay muted loop playsinline preload="none"><source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/car-commercial.mp4" type="video/mp4"></video><div class="ad-card-info"><div class="ad-card-title">Automotive Concept</div><div class="ad-card-tag">Product · Blender</div></div></div>
+      <div class="ad-card"><video autoplay muted loop playsinline preload="none"><source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/car-commercial-2.mp4" type="video/mp4"></video><div class="ad-card-info"><div class="ad-card-title">Automotive Interior</div><div class="ad-card-tag">Product · Blender</div></div></div>
+      <div class="ad-card"><video autoplay muted loop playsinline preload="none"><source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/chocolate-bar.mp4" type="video/mp4"></video><div class="ad-card-info"><div class="ad-card-title">Chocolate Bar</div><div class="ad-card-tag">Product · Blender</div></div></div>
+      <div class="ad-card"><video autoplay muted loop playsinline preload="none"><source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/earbuds.mp4" type="video/mp4"></video><div class="ad-card-info"><div class="ad-card-title">EarBuds</div><div class="ad-card-tag">Product · After Effects</div></div></div>
+      <div class="ad-card"><video autoplay muted loop playsinline preload="none"><source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/facewash.mp4" type="video/mp4"></video><div class="ad-card-info"><div class="ad-card-title">Facewash</div><div class="ad-card-tag">Product · Substance 3D</div></div></div>
+      <div class="ad-card"><video autoplay muted loop playsinline preload="none"><source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/pepsi.mp4" type="video/mp4"></video><div class="ad-card-info"><div class="ad-card-title">Pepsi Commercial</div><div class="ad-card-tag">Advertising · After Effects</div></div></div>
+      <div class="ad-card"><video autoplay muted loop playsinline preload="none"><source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/shoe.mp4" type="video/mp4"></video><div class="ad-card-info"><div class="ad-card-title">Sneaker Render</div><div class="ad-card-tag">Product · Substance 3D</div></div></div>
+      <div class="ad-card"><video autoplay muted loop playsinline preload="none"><source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/smart-watch.mp4" type="video/mp4"></video><div class="ad-card-info"><div class="ad-card-title">Smart Watch</div><div class="ad-card-tag">Product · Blender</div></div></div>
+      <div class="ad-card"><video autoplay muted loop playsinline preload="none"><source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/serum.mp4" type="video/mp4"></video><div class="ad-card-info"><div class="ad-card-title">Serum</div><div class="ad-card-tag">Product · Substance 3D</div></div></div>
     </div>
     <div class="ads-drag-hint reveal">Drag to explore</div>
   </div>
@@ -1428,77 +1386,56 @@ loadWorld(0, (p) => {
 });
 
 // ═══════════════════════════════════════════════════════
-//  GALLERY CELLS (placeholder canvases — replace with real images)
+//  GALLERY CELLS
 // ═══════════════════════════════════════════════════════
 const GALLERY_ITEMS = [
-  { title: 'Dragon — Character', tag: 'Blender · Character Creator 4', world: 0, cat: 'character' },
-  { title: 'Galaxy Blob',        tag: 'Blender · After Effects',       world: 1, cat: 'abstract'  },
-  { title: 'Sci-Fi Room',        tag: 'Blender · Substance 3D',        world: 3, cat: 'renders',
-    ba: { before: null, after: `${CDN}/gallery/renders/03.png` } },
-  { title: 'Earth Render',       tag: 'Blender · Compositing',         world: 2, cat: 'renders',
-    ba: { before: null, after: `${CDN}/gallery/renders/01.png` } },
-  { title: 'Fluid Simulation',   tag: 'Blender · Cycles',              world: 1, cat: 'abstract'  },
-  { title: 'Product — Orb',      tag: 'Blender · After Effects',       world: 3, cat: 'renders',
-    ba: { before: null, after: `${CDN}/gallery/renders/05.png` } },
-  { title: 'Cave Walk',          tag: 'UE5 · Cinematic',               world: 0, cat: 'renders'   },
-  { title: 'Ocean Render',       tag: 'Blender · HDRI',                world: 2, cat: 'renders',
-    ba: { before: null, after: `${CDN}/gallery/renders/07.png` } },
-  { title: 'Rings World',        tag: 'Blender · Geometry Nodes',      world: 4, cat: 'abstract'  },
+  // ── RENDERS (14 WebP images) ──────────────────────────
+  { title: 'Render 01', tag: 'UE5 · Lumen',            cat: 'renders', src: `${CDN}/gallery/renders/01.webp` },
+  { title: 'Render 02', tag: 'Blender · Cycles',        cat: 'renders', src: `${CDN}/gallery/renders/02.webp` },
+  { title: 'Render 03', tag: 'UE5 · Nanite',            cat: 'renders', src: `${CDN}/gallery/renders/03.webp` },
+  { title: 'Render 04', tag: 'Blender · HDRI',          cat: 'renders', src: `${CDN}/gallery/renders/04.webp` },
+  { title: 'Render 05', tag: 'Substance 3D · Blender',  cat: 'renders', src: `${CDN}/gallery/renders/05.webp` },
+  { title: 'Render 06', tag: 'UE5 · Lumen',             cat: 'renders', src: `${CDN}/gallery/renders/06.webp` },
+  { title: 'Render 07', tag: 'Blender · Cycles',        cat: 'renders', src: `${CDN}/gallery/renders/07.webp` },
+  { title: 'Render 08', tag: 'UE5 · Nanite',            cat: 'renders', src: `${CDN}/gallery/renders/08.webp` },
+  { title: 'Render 09', tag: 'Blender · HDRI',          cat: 'renders', src: `${CDN}/gallery/renders/09.webp` },
+  { title: 'Render 10', tag: 'Substance 3D',            cat: 'renders', src: `${CDN}/gallery/renders/10.webp` },
+  { title: 'Render 11', tag: 'UE5 · Lumen',             cat: 'renders', src: `${CDN}/gallery/renders/11.webp` },
+  { title: 'Render 12', tag: 'Blender · Cycles',        cat: 'renders', src: `${CDN}/gallery/renders/12.webp` },
+  { title: 'Render 13', tag: 'UE5 · Nanite',            cat: 'renders', src: `${CDN}/gallery/renders/13.webp` },
+  { title: 'Render 14', tag: 'Blender · Compositing',   cat: 'renders', src: `${CDN}/gallery/renders/14.webp` },
+  // ── ABSTRACT (8 MP4 videos) ───────────────────────────
+  { title: 'Captured Cloud',  tag: 'Blender · Simulation',     cat: 'abstract', video: `${CDN}/gallery/abstract/captured-cloud.mp4`  },
+  { title: 'Volume Collider', tag: 'Blender · Geometry Nodes', cat: 'abstract', video: `${CDN}/gallery/abstract/volume-collider.mp4` },
+  { title: 'Fluid Blob',      tag: 'Blender · Fluid Sim',      cat: 'abstract', video: `${CDN}/gallery/abstract/fluid-blob.mp4`      },
+  { title: 'Laser Eyes',      tag: 'Blender · VFX',            cat: 'abstract', video: `${CDN}/gallery/abstract/laser-eyes.mp4`      },
+  { title: 'Burning Earth',   tag: 'Blender · Simulation',     cat: 'abstract', video: `${CDN}/gallery/abstract/burning-earth.mp4`   },
+  { title: 'Water Cube',      tag: 'Blender · Fluid Sim',      cat: 'abstract', video: `${CDN}/gallery/abstract/water-cube.mp4`      },
+  { title: 'Fur Dance',       tag: 'Blender · Simulation',     cat: 'abstract', video: `${CDN}/gallery/abstract/fur-dance.mp4`       },
+  { title: 'Cave Loop',       tag: 'UE5 · Cinematic',          cat: 'abstract', video: `${CDN}/gallery/abstract/cave-loop.mp4`       },
 ];
 
 const gGrid = document.getElementById('g-grid');
-GALLERY_ITEMS.forEach((item, i) => {
+GALLERY_ITEMS.forEach(item => {
   const cell = document.createElement('div');
   cell.className = 'g-cell';
   cell.dataset.category = item.cat;
 
+  if (item.src) {
+    const img = document.createElement('img');
+    img.src = item.src; img.alt = item.title; img.loading = 'lazy';
+    cell.appendChild(img);
+  } else if (item.video) {
+    const vid = document.createElement('video');
+    vid.muted = true; vid.loop = true; vid.playsInline = true; vid.preload = 'none';
+    const s = document.createElement('source');
+    s.src = item.video; s.type = 'video/mp4';
+    vid.appendChild(s); cell.appendChild(vid);
+  }
+
   const info = document.createElement('div');
   info.className = 'g-cell-info';
   info.innerHTML = `<div class="g-cell-title">${item.title}</div><div class="g-cell-tag">${item.tag}</div>`;
-
-  if (item.ba) {
-    // Before/after cell — two stacked images with clay toggle
-    cell.classList.add('show-textured');
-    cell.setAttribute('data-before-after', '');
-    const imgBefore = document.createElement('img');
-    imgBefore.className = 'img-before';
-    imgBefore.alt = item.title + ' — clay';
-    imgBefore.loading = 'lazy';
-    if (item.ba.before) imgBefore.src = item.ba.before;
-    const imgAfter = document.createElement('img');
-    imgAfter.className = 'img-after';
-    imgAfter.alt = item.title;
-    imgAfter.loading = 'lazy';
-    if (item.ba.after) imgAfter.src = item.ba.after;
-    const baBtn = document.createElement('button');
-    baBtn.className = 'ba-toggle';
-    baBtn.textContent = 'Clay';
-    cell.appendChild(imgBefore);
-    cell.appendChild(imgAfter);
-    cell.appendChild(baBtn);
-  } else {
-    // Placeholder canvas
-    const cvs = document.createElement('canvas');
-    cvs.className = 'g-canvas';
-    cell.appendChild(cvs);
-    requestAnimationFrame(() => {
-      cvs.width = cvs.offsetWidth || 300;
-      cvs.height = cvs.offsetHeight || 200;
-      const c = cvs.getContext('2d');
-      const [r,g,b] = WORLDS[item.world].rgb;
-      const grad = c.createLinearGradient(0,0,cvs.width,cvs.height);
-      grad.addColorStop(0, `rgba(${r*0.15},${g*0.12},${b*0.2},1)`);
-      grad.addColorStop(1, 'rgb(6,5,12)');
-      c.fillStyle = grad;
-      c.fillRect(0,0,cvs.width,cvs.height);
-      const glow = c.createRadialGradient(cvs.width*0.4,cvs.height*0.4,0,cvs.width*0.4,cvs.height*0.4,cvs.width*0.5);
-      glow.addColorStop(0, `rgba(${r},${g},${b},0.2)`);
-      glow.addColorStop(1,'rgba(0,0,0,0)');
-      c.fillStyle = glow;
-      c.fillRect(0,0,cvs.width,cvs.height);
-    });
-  }
-
   cell.appendChild(info);
   gGrid.appendChild(cell);
 });
@@ -1532,13 +1469,25 @@ document.querySelectorAll('.g-filter').forEach(btn => {
   });
 });
 
-// ─── BEFORE/AFTER TOGGLE (event delegation) ──────────────────
-gGrid.addEventListener('click', e => {
-  const btn = e.target.closest('.ba-toggle');
-  if (!btn) return;
-  const cell = btn.closest('.g-cell');
-  const isNowTextured = cell.classList.toggle('show-textured');
-  btn.textContent = isNowTextured ? 'Clay' : 'Textured';
+// ─── VIDEO AUTOPLAY OBSERVER ─────────────────────────────────
+const videoObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) e.target.play().catch(() => {});
+    else e.target.pause();
+  });
+}, { threshold: 0.3 });
+
+// Abstract gallery videos + showreel (muted autoplay; play btn handles unmute)
+document.querySelectorAll('.g-cell video').forEach(v => videoObs.observe(v));
+const srVid = document.getElementById('reel-video');
+if (srVid) videoObs.observe(srVid);
+
+// Ad cards: hover-driven play/pause
+document.querySelectorAll('.ad-card').forEach(card => {
+  const v = card.querySelector('video');
+  if (!v) return;
+  card.addEventListener('mouseenter', () => v.play().catch(() => {}));
+  card.addEventListener('mouseleave', () => v.pause());
 });
 
 // About canvas
