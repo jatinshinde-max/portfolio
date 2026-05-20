@@ -234,4 +234,15 @@ D:\portfolio\
 - [20/05/2026] Footer social links updated: Instagram → imaginators.studio,
   YouTube (renamed from Behance) → @imaginatorsstudio, LinkedIn → jatin-shinde.
   All open in new tab with rel=noopener.
+- [20/05/2026] SEO pass: updated <title>, added <link rel=canonical>,
+  favicon.svg ("J" glyph, Barlow Condensed, white on #06050c), Open Graph
+  (og:title/description/url/type/image) and Twitter Card meta tags.
+  OG image: gallery/renders/01.webp from R2.
+- [20/05/2026] Mobile-first responsive pass (375px–768px):
+  HUD nav hidden on mobile, hamburger #mob-menu + full-screen #mob-nav overlay.
+  Showreel: full-bleed video (section padding removed), text gets own padding.
+  Ads carousel: 70vw cards, touchstart/touchmove swipe events added.
+  Gallery: 2-col ≤768px, 1-col ≤400px. Tools/About: single-column stack.
+  Contact: smaller watermark clamp, full-width button. Footer: stacked + centered.
+  Custom cursor hidden on pointer:coarse. Body text 1rem minimum.
 - [ ] Next: Phase 6 — Audio (AudioManager.js) or Mango Moments
