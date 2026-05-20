@@ -313,19 +313,27 @@ body {
 }
 
 .gallery-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  columns: 3;
+  column-gap: 7px;
 }
 .g-cell {
+  break-inside: avoid;
+  display: block;
+  margin-bottom: 7px;
   aspect-ratio: 4/3;
   position: relative; overflow: hidden;
   background: var(--bg-2);
+  border-radius: 2px;
   cursor: none;
-  opacity: 0; transform: translateY(30px);
+  opacity: 0; transform: translateY(24px);
   transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
 }
 .g-cell.vis { opacity: 1; transform: translateY(0); }
+.g-cell[data-size="medium"],
+.g-cell[data-size="wide"]   { aspect-ratio: 16/9; }
+.g-cell[data-size="tall"]   { aspect-ratio: 9/16; }
+/* Every 6th cell gets a subtle lift for visual rhythm */
+.g-cell:nth-child(6n+1) { filter: brightness(1.04); }
 .g-cell img,
 .g-cell video {
   position: absolute; inset: 0;
@@ -336,7 +344,7 @@ body {
 }
 .g-cell:hover img,
 .g-cell:hover video {
-  transform: scale(1.05);
+  transform: scale(1.03);
   filter: saturate(1.0) brightness(0.92);
 }
 .g-cell-info {
@@ -766,7 +774,8 @@ footer a:hover { color: var(--ink); }
 
   /* Gallery */
   .gallery-section { padding-left: clamp(16px,5vw,40px); padding-right: clamp(16px,5vw,40px); }
-  .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+  .gallery-grid { columns: 2; column-gap: 6px; }
+  .g-cell[data-size="tall"] { max-height: 70vh; }
 
   /* Tools */
   .tools-section { grid-template-columns: 1fr; }
@@ -789,7 +798,7 @@ footer a:hover { color: var(--ink); }
 
 /* ≤400px — very small phones */
 @media (max-width: 400px) {
-  .gallery-grid { grid-template-columns: 1fr; }
+  .gallery-grid { columns: 1; }
   .stats-row { grid-template-columns: 1fr; }
   .hud-title .t-main { font-size: clamp(1.5rem, 9vw, 2.2rem); }
 }
@@ -1350,6 +1359,7 @@ GALLERY_ITEMS.forEach(item => {
   const cell = document.createElement('div');
   cell.className = 'g-cell';
   cell.dataset.category = item.cat;
+  if (item.size) cell.dataset.size = item.size;
 
   if (item.src) {
     const img = document.createElement('img');
@@ -1593,26 +1603,12 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined' && typeo
   ScrollTrigger.create({
     trigger: '#g-grid', start: 'top 78%', once: true,
     onEnter: () => gsap.fromTo(gCells,
-      { opacity: 0, y: 30, scale: 0.95 },
-      { opacity: 1, y: 0, scale: 1, duration: 0.85, stagger: 0.07, ease: EASE,
+      { opacity: 0, y: 24, scale: 0.97 },
+      { opacity: 1, y: 0, scale: 1, duration: 0.85, stagger: 0.05, ease: EASE,
         clearProps: 'scale' }
     ),
   });
 
-  // 5. GALLERY CELL PARALLAX (desktop only)
-  // Media element extends 15% taller than cell; GSAP translates it on scroll
-  if (!isMob) {
-    gCells.forEach(cell => {
-      const m = cell.querySelector('img,video');
-      if (!m) return;
-      Object.assign(m.style, {
-        top: '-7.5%', bottom: 'auto', height: '115%', willChange: 'transform',
-      });
-      gsap.to(m, { y: '12%', ease: 'none',
-        scrollTrigger: { trigger: cell, start: 'top bottom', end: 'bottom top', scrub: true }
-      });
-    });
-  }
 
   // 6. AD CARDS STAGGERED REVEAL
   const adCards = [...document.querySelectorAll('.ad-card')];
