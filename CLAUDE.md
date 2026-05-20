@@ -228,4 +228,10 @@ D:\portfolio\
   hover. Verified live via browser screenshot — carousel showing real video.
 - [20/05/2026] Gallery verified live: 14 render WebPs + 8 abstract MP4s all
   loading. Filters, 3-col grid, and reveal animations confirmed working.
+- [20/05/2026] Removed all 5 chapter-intro sections (chapter-0 through chapter-4)
+  and all associated CSS (.chapter-intro, .ch-*, .projects-list, .project-row,
+  .pr-*) and JS references. Content flows directly from world scroll into showreel.
+- [20/05/2026] Footer social links updated: Instagram → imaginators.studio,
+  YouTube (renamed from Behance) → @imaginatorsstudio, LinkedIn → jatin-shinde.
+  All open in new tab with rel=noopener.
 - [ ] Next: Phase 6 — Audio (AudioManager.js) or Mango Moments
