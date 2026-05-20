@@ -289,70 +289,6 @@ body {
 /* ─── CONTENT AREA ──────────────────────────────────────────── */
 #content { position: relative; z-index: 5; background: var(--bg); }
 
-/* Chapter header */
-.chapter-intro {
-  padding: clamp(80px,14vh,140px) clamp(28px,7vw,100px);
-  border-bottom: 1px solid var(--ink-ghost);
-}
-.ch-eyebrow {
-  font-family: var(--f-semi);
-  font-size: 0.6rem; letter-spacing: 0.4em;
-  text-transform: uppercase; margin-bottom: 20px;
-}
-.ch-title {
-  font-family: var(--f-display);
-  font-size: clamp(3rem, 7vw, 7rem);
-  font-weight: 200; line-height: 0.95;
-  letter-spacing: -0.02em;
-  max-width: 14ch;
-}
-.ch-body {
-  margin-top: 28px;
-  font-size: 0.95rem; line-height: 1.8;
-  color: var(--ink-dim); max-width: 50ch;
-}
-
-/* Projects list */
-.projects-list {
-  padding: clamp(40px,6vh,80px) clamp(28px,7vw,100px);
-  border-bottom: 1px solid var(--ink-ghost);
-}
-.project-row {
-  display: flex; align-items: baseline;
-  gap: 24px; padding: 20px 0;
-  border-bottom: 1px solid var(--ink-ghost);
-  cursor: none;
-  transition: gap 0.4s var(--ease-out);
-}
-.project-row:last-child { border-bottom: none; }
-.project-row:hover { gap: 32px; }
-.project-row:hover .pr-title { color: var(--accent); }
-.pr-num {
-  font-family: var(--f-display);
-  font-size: clamp(1.8rem, 3.5vw, 3rem);
-  font-weight: 200; color: rgba(255,255,255,0.08);
-  flex-shrink: 0; width: 3ch;
-  transition: color 0.4s;
-}
-.project-row:hover .pr-num { color: rgba(255,255,255,0.15); }
-.pr-info { flex: 1; }
-.pr-title {
-  font-family: var(--f-display);
-  font-size: clamp(1.2rem, 2.2vw, 1.8rem);
-  font-weight: 300; letter-spacing: 0.02em;
-  transition: color 0.4s;
-}
-.pr-type {
-  margin-top: 4px;
-  font-family: var(--f-semi);
-  font-size: 0.6rem; letter-spacing: 0.25em;
-  text-transform: uppercase; color: var(--ink-mute);
-}
-.pr-arrow {
-  font-size: 1.2rem; color: var(--ink-mute);
-  transition: transform 0.4s var(--ease-out), color 0.3s;
-}
-.project-row:hover .pr-arrow { transform: translateX(8px); color: var(--accent); }
 
 /* ─── GALLERY ───────────────────────────────────────────────── */
 .gallery-section {
@@ -856,122 +792,6 @@ footer a:hover { color: var(--ink); }
 <!-- CONTENT -->
 <div id="content">
 
-  <!-- WORLD CHAPTERS -->
-  <div id="chapter-0" class="chapter-intro">
-    <div class="ch-eyebrow reveal" style="color:var(--a1)">Chapter I — Post-Apocalyptic</div>
-    <h2 class="ch-title reveal reveal-delay-1">Built From<br>Ruin</h2>
-    <p class="ch-body reveal reveal-delay-2">Every collapsed skyline earned its fractures. Lighting designed the way a cinematographer would — not a realtime renderer. Crafted in Unreal Engine 5 with Lumen global illumination and Nanite geometry.</p>
-    <div class="projects-list reveal reveal-delay-3">
-      <div class="project-row">
-        <div class="pr-num">01</div>
-        <div class="pr-info"><div class="pr-title">The Last District</div><div class="pr-type">Environment · UE5 · Lumen</div></div>
-        <div class="pr-arrow">→</div>
-      </div>
-      <div class="project-row">
-        <div class="pr-num">02</div>
-        <div class="pr-info"><div class="pr-title">Broken Meridian</div><div class="pr-type">Cinematic · UE5 · After Effects</div></div>
-        <div class="pr-arrow">→</div>
-      </div>
-      <div class="project-row">
-        <div class="pr-num">03</div>
-        <div class="pr-info"><div class="pr-title">Dust City</div><div class="pr-type">Environment · UE5 · DaVinci Resolve</div></div>
-        <div class="pr-arrow">→</div>
-      </div>
-    </div>
-  </div>
-
-  <div id="chapter-1" class="chapter-intro">
-    <div class="ch-eyebrow reveal" style="color:var(--a2)">Chapter II — Fantasy / Mystical</div>
-    <h2 class="ch-title reveal reveal-delay-1">Where Logic<br>Yields to Light</h2>
-    <p class="ch-body reveal reveal-delay-2">Ancient forests lit by sources that don't exist in physics. Materials sculpted in Substance 3D Painter, geometry built in Blender, atmospheres rendered in Unreal Engine 5.</p>
-    <div class="projects-list reveal reveal-delay-3">
-      <div class="project-row">
-        <div class="pr-num">01</div>
-        <div class="pr-info"><div class="pr-title">The Hollow Kingdom</div><div class="pr-type">Environment · UE5 · Substance 3D</div></div>
-        <div class="pr-arrow">→</div>
-      </div>
-      <div class="project-row">
-        <div class="pr-num">02</div>
-        <div class="pr-info"><div class="pr-title">Arcanewood</div><div class="pr-type">Cinematic · Blender · UE5</div></div>
-        <div class="pr-arrow">→</div>
-      </div>
-      <div class="project-row">
-        <div class="pr-num">03</div>
-        <div class="pr-info"><div class="pr-title">Veil Crossing</div><div class="pr-type">Environment · Character Creator 4</div></div>
-        <div class="pr-arrow">→</div>
-      </div>
-    </div>
-  </div>
-
-  <div id="chapter-2" class="chapter-intro">
-    <div class="ch-eyebrow reveal" style="color:var(--a3)">Chapter III — Nature / Landscape</div>
-    <h2 class="ch-title reveal reveal-delay-1">The Silence<br>of Scale</h2>
-    <p class="ch-body reveal reveal-delay-2">Landscapes that dwarf the viewer. Distance haze, volumetric clouds, wind-driven foliage — every atmospheric layer considered, every horizon composed with cinematic intent.</p>
-    <div class="projects-list reveal reveal-delay-3">
-      <div class="project-row">
-        <div class="pr-num">01</div>
-        <div class="pr-info"><div class="pr-title">Glacial Descent</div><div class="pr-type">Environment · UE5 · Lumen</div></div>
-        <div class="pr-arrow">→</div>
-      </div>
-      <div class="project-row">
-        <div class="pr-num">02</div>
-        <div class="pr-info"><div class="pr-title">The High Plane</div><div class="pr-type">Cinematic · UE5 · After Effects</div></div>
-        <div class="pr-arrow">→</div>
-      </div>
-      <div class="project-row">
-        <div class="pr-num">03</div>
-        <div class="pr-info"><div class="pr-title">Everfall</div><div class="pr-type">Environment · Marvelous Designer</div></div>
-        <div class="pr-arrow">→</div>
-      </div>
-    </div>
-  </div>
-
-  <div id="chapter-3" class="chapter-intro">
-    <div class="ch-eyebrow reveal" style="color:var(--a4)">Chapter IV — Sci-Fi / Futuristic</div>
-    <h2 class="ch-title reveal reveal-delay-1">Architectures<br>of Tomorrow</h2>
-    <p class="ch-body reveal reveal-delay-2">Megastructures, neon corridors, orbital vistas. Hard-surface modelling, procedural material systems built in Substance 3D Painter, rendered in Unreal Engine 5.</p>
-    <div class="projects-list reveal reveal-delay-3">
-      <div class="project-row">
-        <div class="pr-num">01</div>
-        <div class="pr-info"><div class="pr-title">Nexus Station</div><div class="pr-type">Environment · UE5 · Blender</div></div>
-        <div class="pr-arrow">→</div>
-      </div>
-      <div class="project-row">
-        <div class="pr-num">02</div>
-        <div class="pr-info"><div class="pr-title">The Orbital</div><div class="pr-type">Cinematic · UE5 · After Effects</div></div>
-        <div class="pr-arrow">→</div>
-      </div>
-      <div class="project-row">
-        <div class="pr-num">03</div>
-        <div class="pr-info"><div class="pr-title">Deep Array</div><div class="pr-type">Environment · Substance 3D</div></div>
-        <div class="pr-arrow">→</div>
-      </div>
-    </div>
-  </div>
-
-  <div id="chapter-4" class="chapter-intro">
-    <div class="ch-eyebrow reveal" style="color:var(--a5)">Chapter V — Aurum</div>
-    <h2 class="ch-title reveal reveal-delay-1">Forged in<br>Golden Light</h2>
-    <p class="ch-body reveal reveal-delay-2">Void architecture suspended in amber. Hard-surface forms built in Blender, textured in Substance 3D Painter, and rendered in Unreal Engine 5 with Lumen illumination saturating every surface in gold.</p>
-    <div class="projects-list reveal reveal-delay-3">
-      <div class="project-row">
-        <div class="pr-num">01</div>
-        <div class="pr-info"><div class="pr-title">Void Architecture</div><div class="pr-type">Environment · UE5 · Nanite</div></div>
-        <div class="pr-arrow">→</div>
-      </div>
-      <div class="project-row">
-        <div class="pr-num">02</div>
-        <div class="pr-info"><div class="pr-title">Golden Meridian</div><div class="pr-type">Cinematic · Blender · Substance 3D</div></div>
-        <div class="pr-arrow">→</div>
-      </div>
-      <div class="project-row">
-        <div class="pr-num">03</div>
-        <div class="pr-info"><div class="pr-title">Aurum Light Study</div><div class="pr-type">Lighting · UE5 · Lumen</div></div>
-        <div class="pr-arrow">→</div>
-      </div>
-    </div>
-  </div>
-
   <!-- SHOWREEL -->
   <div class="showreel-section" id="showreel">
     <div class="showreel-inner">
@@ -1163,7 +983,7 @@ document.addEventListener('mousemove', e => {
   ring.style.left = rx+'px'; ring.style.top = ry+'px';
   requestAnimationFrame(rl);
 })();
-document.querySelectorAll('a,button,.project-row,.g-cell,.showreel-video').forEach(el => {
+document.querySelectorAll('a,button,.g-cell,.showreel-video').forEach(el => {
   el.addEventListener('mouseenter', () => ring.classList.add('expand'));
   el.addEventListener('mouseleave', () => ring.classList.remove('expand'));
 });
@@ -1330,10 +1150,6 @@ function updateHUD(worldIndex, progress) {
   hMain.innerHTML = w.title.replace('\n','<br>');
   hSub.textContent = w.sub;
 
-  // Update chapter panel accent
-  document.querySelectorAll('.chapter-intro .ch-eyebrow').forEach((el,i) => {
-    el.style.color = WORLDS[i]?.accent || 'var(--ink-mute)';
-  });
 }
 
 // ═══════════════════════════════════════════════════════
