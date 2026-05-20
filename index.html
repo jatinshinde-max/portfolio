@@ -190,13 +190,13 @@ body {
 }
 .hud-name .role {
   font-family: var(--f-semi);
-  font-size: 0.58rem; letter-spacing: 0.32em;
+  font-size: 0.7rem; letter-spacing: 0.32em;
   text-transform: uppercase; color: var(--ink-mute);
   margin-bottom: 3px;
 }
 .hud-name .name {
   font-family: var(--f-display);
-  font-size: 1rem; font-weight: 400;
+  font-size: 1.2rem; font-weight: 400;
   letter-spacing: 0.12em;
   text-transform: uppercase; color: var(--ink);
 }
@@ -217,25 +217,6 @@ body {
 .hud-nav a:hover { color: var(--ink); }
 
 /* World number — bottom left */
-.hud-world {
-  position: absolute; bottom: 36px; left: 36px;
-}
-.hud-world-num {
-  font-family: var(--f-display);
-  font-size: clamp(4rem, 9vw, 8rem);
-  font-weight: 200; line-height: 1;
-  letter-spacing: -0.04em;
-  color: rgba(255,255,255,0.05);
-  transition: color 0.6s;
-}
-.hud-world-name {
-  font-family: var(--f-semi);
-  font-size: 0.55rem; letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--accent); margin-top: 2px;
-  transition: color 0.6s;
-}
-
 /* Progress dots — bottom right */
 .hud-dots {
   position: absolute; bottom: 36px; right: 36px;
@@ -795,9 +776,6 @@ footer a:hover { color: var(--ink); }
   .hud-name .role { display: none; }
   .hud-nav { display: none; }
   #mob-menu { display: flex; }
-  .hud-world { bottom: 24px; left: 20px; }
-  .hud-world-num { font-size: clamp(2.8rem, 12vw, 5rem); }
-  .hud-world-name { font-size: 0.46rem; }
   .hud-dots { bottom: 24px; right: 20px; }
   .hud-scroll { display: none; }
   .hud-title .t-main { font-size: clamp(1.8rem, 8vw, 3rem); }
@@ -884,10 +862,6 @@ footer a:hover { color: var(--ink); }
   <button id="mob-menu" aria-label="Open menu">
     <span></span><span></span><span></span>
   </button>
-  <div class="hud-world">
-    <div class="hud-world-num" id="h-num">01</div>
-    <div class="hud-world-name" id="h-name">Ashfall</div>
-  </div>
   <div class="hud-dots" id="h-dots"></div>
   <div class="hud-scroll" id="h-scroll">
     <div class="s-txt">Scroll</div>
@@ -1245,8 +1219,6 @@ requestAnimationFrame(draw);
 // ═══════════════════════════════════════════════════════
 //  HUD
 // ═══════════════════════════════════════════════════════
-const hNum   = document.getElementById('h-num');
-const hName  = document.getElementById('h-name');
 const hTitle = document.getElementById('h-title');
 const hChap  = document.getElementById('h-chapter');
 const hMain  = document.getElementById('h-main');
@@ -1264,10 +1236,6 @@ WORLDS.forEach((_,i) => {
 
 function updateHUD(worldIndex, progress) {
   const w = WORLDS[worldIndex];
-  hNum.textContent = String(worldIndex+1).padStart(2,'0');
-  hName.textContent = w.name;
-  hName.style.color = w.accent;
-
   WORLDS.forEach((_,i) => {
     document.getElementById(`hd-${i}`)?.classList.toggle('on', i===worldIndex);
   });
