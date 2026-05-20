@@ -1357,16 +1357,18 @@ GALLERY_ITEMS.forEach(item => {
     cell.appendChild(img);
   } else if (item.video) {
     const vid = document.createElement('video');
-    vid.autoplay = true; vid.muted = true; vid.loop = true; vid.playsInline = true; vid.preload = 'metadata';
+    vid.setAttribute('autoplay', ''); vid.muted = true; vid.loop = true; vid.playsInline = true; vid.preload = 'metadata';
     const s = document.createElement('source');
     s.src = item.video; s.type = 'video/mp4';
     vid.appendChild(s); cell.appendChild(vid);
   }
 
-  const info = document.createElement('div');
-  info.className = 'g-cell-info';
-  info.innerHTML = `<div class="g-cell-title">${item.title}</div><div class="g-cell-tag">${item.tag}</div>`;
-  cell.appendChild(info);
+  if (item.title) {
+    const info = document.createElement('div');
+    info.className = 'g-cell-info';
+    info.innerHTML = `<div class="g-cell-title">${item.title}</div><div class="g-cell-tag">${item.tag}</div>`;
+    cell.appendChild(info);
+  }
   gGrid.appendChild(cell);
 });
 
