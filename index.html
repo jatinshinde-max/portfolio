@@ -26,6 +26,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400&family=Barlow:ital,wght@0,300;0,400;0,500;1,300&family=Barlow+Semi+Condensed:wght@300;400;500&display=swap" rel="stylesheet">
 
+<!-- Animation libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js" defer></script>
+
 <script type="importmap">
 {
   "imports": {
@@ -1474,7 +1479,11 @@ const revealObs = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.12 });
 
-document.querySelectorAll('.reveal,.g-cell').forEach(el => revealObs.observe(el));
+// Titles and gallery cells handled by GSAP — exclude from IntersectionObserver
+document.querySelectorAll('.reveal').forEach(el => {
+  if (!el.matches('.s-title,.sr-title,.a-headline,.c-headline')) revealObs.observe(el);
+});
+// g-cells revealed via GSAP stagger (not IntersectionObserver)
 
 // ═══════════════════════════════════════════════════════
 //  MOUSE PARALLAX ON CANVAS
@@ -1570,6 +1579,123 @@ if (reelVideo && reelPlay) {
     reelPlay.classList.remove('playing');
   });
 }
+
+// ═══════════════════════════════════════════════════════
+//  CINEMATIC SCROLL ANIMATIONS
+//  Lenis · GSAP ScrollTrigger
+// ═══════════════════════════════════════════════════════
+if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined' && typeof Lenis !== 'undefined') {
+
+  gsap.registerPlugin(ScrollTrigger);
+  const EASE = 'cubic-bezier(0.23, 1, 0.32, 1)';
+  const isMob = matchMedia('(max-width:768px)').matches;
+
+  // 1. LENIS SMOOTH SCROLL
+  const lenis = new Lenis({
+    duration: 0.9,
+    easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    smoothWheel: true,
+    wheelMultiplier: 1.1,
+  });
+  // Share RAF with GSAP — no double loop
+  gsap.ticker.add(t => lenis.raf(t * 1000));
+  gsap.ticker.lagSmoothing(0);
+  // Keep ScrollTrigger scroll position in sync with Lenis
+  lenis.on('scroll', ScrollTrigger.update);
+
+  // 2. CANVAS → CONTENT CROSSFADE
+  // Fixed black overlay fades in at world scroll end, fades out as content enters
+  const cover = document.createElement('div');
+  cover.style.cssText = 'position:fixed;inset:0;background:#06050c;pointer-events:none;z-index:4;opacity:0;';
+  document.body.appendChild(cover);
+
+  gsap.to(cover, { opacity: 1, ease: 'none',
+    scrollTrigger: { trigger: '#worlds', start: 'bottom 65%', end: 'bottom top', scrub: 0.5 }
+  });
+  gsap.to(cover, { opacity: 0, ease: 'none',
+    scrollTrigger: { trigger: '#content', start: 'top 95%', end: 'top 25%', scrub: 0.5 }
+  });
+
+  // 3. TITLE LINE-BY-LINE REVEALS
+  // Split each headline into <br>-separated lines and clip-reveal each
+  document.querySelectorAll('.s-title,.sr-title,.a-headline,.c-headline').forEach(el => {
+    el.style.opacity = '1'; // override .reveal opacity:0 — clip handles hiding
+    el.innerHTML = el.innerHTML
+      .split(/<br\s*\/?>/i)
+      .map(l => `<span style="display:block;overflow:hidden;line-height:1.08"><span class="tl" style="display:block;will-change:transform">${l}</span></span>`)
+      .join('');
+    gsap.fromTo(el.querySelectorAll('.tl'),
+      { y: '108%' },
+      { y: '0%', duration: 1.0, stagger: 0.11, ease: EASE,
+        scrollTrigger: { trigger: el, start: 'top 87%' } }
+    );
+  });
+
+  // 4. GALLERY STAGGERED REVEAL
+  // Cells start at opacity:0 y:30 scale:0.95 (CSS), GSAP reveals them with stagger
+  const gCells = [...document.querySelectorAll('.g-cell')];
+  ScrollTrigger.create({
+    trigger: '#g-grid', start: 'top 78%', once: true,
+    onEnter: () => gsap.fromTo(gCells,
+      { opacity: 0, y: 30, scale: 0.95 },
+      { opacity: 1, y: 0, scale: 1, duration: 0.85, stagger: 0.07, ease: EASE,
+        clearProps: 'scale' }
+    ),
+  });
+
+  // 5. GALLERY CELL PARALLAX (desktop only)
+  // Media element extends 15% taller than cell; GSAP translates it on scroll
+  if (!isMob) {
+    gCells.forEach(cell => {
+      const m = cell.querySelector('img,video');
+      if (!m) return;
+      Object.assign(m.style, {
+        top: '-7.5%', bottom: 'auto', height: '115%', willChange: 'transform',
+      });
+      gsap.to(m, { y: '12%', ease: 'none',
+        scrollTrigger: { trigger: cell, start: 'top bottom', end: 'bottom top', scrub: true }
+      });
+    });
+  }
+
+  // 6. AD CARDS STAGGERED REVEAL
+  const adCards = [...document.querySelectorAll('.ad-card')];
+  gsap.set(adCards, { opacity: 0, y: 22 });
+  ScrollTrigger.create({
+    trigger: '.ads-track', start: 'top 82%', once: true,
+    onEnter: () => gsap.to(adCards,
+      { opacity: 1, y: 0, duration: 0.8, stagger: 0.09, ease: EASE }
+    ),
+  });
+
+  // 7. SHOWREEL PARALLAX (desktop only)
+  // Video panel drifts at slightly different speed than text panel
+  if (!isMob) {
+    const srV = document.querySelector('.showreel-video');
+    const srT = document.querySelector('.showreel-text');
+    const srCfg = { trigger: '.showreel-section', start: 'top bottom', end: 'bottom top', scrub: 1.0 };
+    if (srV) { srV.style.willChange = 'transform'; gsap.to(srV, { y: '-8%', ease: 'none', scrollTrigger: srCfg }); }
+    if (srT) { srT.style.willChange = 'transform'; gsap.to(srT, { y: '-3%', ease: 'none', scrollTrigger: { ...srCfg } }); }
+  }
+
+  // 8. SCROLL-DRIVEN ACCENT COLOR SHIFT
+  // Small elements (dots, eyebrow text) shift accent color as user scrolls through content
+  const root = document.documentElement;
+  [
+    ['showreel', WORLDS[4].accent],
+    ['ads',      WORLDS[3].accent],
+    ['gallery',  WORLDS[2].accent],
+    ['skills',   WORLDS[1].accent],
+    ['about',    WORLDS[0].accent],
+    ['contact',  '#e8d5b0'],
+  ].forEach(([id, color]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const setAccent = () => root.style.setProperty('--accent', color);
+    ScrollTrigger.create({ trigger: el, start: 'top 55%', onEnter: setAccent, onEnterBack: setAccent });
+  });
+
+} // end animation guard
 
 // Initial HUD update
 updateHUD(0, 0);
