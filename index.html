@@ -591,34 +591,6 @@ footer a:hover { color: var(--ink); }
   background: linear-gradient(135deg, rgba(6,5,12,0.35) 0%, transparent 55%);
   pointer-events: none; z-index:1;
 }
-.play-btn {
-  position: absolute; top:50%; left:50%; z-index:2;
-  transform: translate(-50%,-50%);
-  width: 72px; height: 72px; border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.28);
-  background: rgba(6,5,12,0.55);
-  backdrop-filter: blur(10px);
-  display: flex; align-items: center; justify-content: center;
-  cursor: none;
-  transition: border-color 0.3s, background 0.3s, opacity 0.3s,
-              transform 0.4s var(--ease-out);
-}
-.play-btn:hover {
-  border-color: rgba(255,255,255,0.65);
-  background: rgba(6,5,12,0.75);
-  transform: translate(-50%,-50%) scale(1.1);
-}
-.play-btn svg {
-  width: 20px; height: 20px;
-  fill: var(--ink);
-  margin-left: 4px;
-}
-.play-btn.playing {
-  opacity: 0; pointer-events: none;
-}
-.showreel-video:hover .play-btn.playing {
-  opacity: 1; pointer-events: auto;
-}
 
 .sr-eyebrow {
   font-family: var(--f-semi);
@@ -786,9 +758,7 @@ footer a:hover { color: var(--ink); }
   .showreel-inner { display: flex; flex-direction: column; gap: 0; }
   .showreel-video { width: 100%; aspect-ratio: 16/9; }
   .showreel-text { padding: 40px clamp(24px,6vw,48px) 0; }
-  .play-btn { width: 54px; height: 54px; }
-  .play-btn svg { width: 16px; height: 16px; }
-  .sr-body { font-size: 1rem; max-width: 100%; }
+.sr-body { font-size: 1rem; max-width: 100%; }
 
   /* Ads carousel */
   .ad-card { width: 70vw; }
@@ -905,9 +875,6 @@ footer a:hover { color: var(--ink); }
           <source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/showreel/character-reel.mp4" type="video/mp4">
         </video>
         <div class="video-overlay"></div>
-        <button class="play-btn" id="reel-play" aria-label="Play showreel">
-          <svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
-        </button>
       </div>
       <div class="showreel-text">
         <div class="sr-eyebrow reveal">Character Work</div>
@@ -1529,24 +1496,6 @@ if (mobMenu && mobNav) {
 // ═══════════════════════════════════════════════════════
 //  SHOWREEL PLAY / PAUSE
 // ═══════════════════════════════════════════════════════
-const reelVideo = document.getElementById('reel-video');
-const reelPlay  = document.getElementById('reel-play');
-if (reelVideo && reelPlay) {
-  reelPlay.addEventListener('click', () => {
-    reelVideo.muted = false;
-    reelVideo.play();
-    reelPlay.classList.add('playing');
-  });
-  reelVideo.addEventListener('click', () => {
-    if (!reelVideo.paused) {
-      reelVideo.pause();
-      reelPlay.classList.remove('playing');
-    }
-  });
-  reelVideo.addEventListener('ended', () => {
-    reelPlay.classList.remove('playing');
-  });
-}
 
 // ═══════════════════════════════════════════════════════
 //  CINEMATIC SCROLL ANIMATIONS
