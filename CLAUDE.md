@@ -245,4 +245,14 @@ D:\portfolio\
   Gallery: 2-col ≤768px, 1-col ≤400px. Tools/About: single-column stack.
   Contact: smaller watermark clamp, full-width button. Footer: stacked + centered.
   Custom cursor hidden on pointer:coarse. Body text 1rem minimum.
+- [20/05/2026] Cinematic scroll animations added (Lenis + GSAP ScrollTrigger):
+  Lenis smooth scroll (duration 0.9) synced with GSAP ticker via shared RAF.
+  Canvas-to-content black crossfade overlay (scrub 0.5) on world scroll end.
+  Title line-by-line clip reveals (y:108%→0%, stagger 0.11s, EASE out).
+  Gallery staggered reveal (opacity+y+scale, stagger 0.07s, once:true).
+  Gallery cell parallax (media -7.5% to +12%, desktop only).
+  Ad cards staggered reveal (opacity+y, stagger 0.09s, once:true).
+  Showreel split parallax (video -8%, text -3%, desktop only).
+  Scroll-driven accent --accent color shift per content section.
+  Committed f65dd1e.
 - [ ] Next: Phase 6 — Audio (AudioManager.js) or Mango Moments
