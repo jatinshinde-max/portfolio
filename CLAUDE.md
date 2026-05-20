@@ -220,4 +220,12 @@ D:\portfolio\
   to reflect real content (14 render WebPs + 8 abstract MP4s).
 - [20/05/2026] Character filter button removed — no character assets uploaded yet.
   Gallery filters now: All · Renders · Abstract.
+- [20/05/2026] Ads carousel fully fixed: root cause was R2 paths were wrong
+  (normalized names like car-commercial.mp4 but files on R2 had original names
+  with spaces). web-ready/ folder uploaded to portfolio-frames R2 bucket.
+  .ads-section bg changed to --bg-1 so cards (--bg-2) contrast. Added card
+  border. Changed preload=none → preload=metadata so first frame shows without
+  hover. Verified live via browser screenshot — carousel showing real video.
+- [20/05/2026] Gallery verified live: 14 render WebPs + 8 abstract MP4s all
+  loading. Filters, 3-col grid, and reveal animations confirmed working.
 - [ ] Next: Phase 6 — Audio (AudioManager.js) or Mango Moments
