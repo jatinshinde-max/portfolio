@@ -1914,10 +1914,10 @@ await (async () => {
     const renderer = await makeRenderer(canvas, true); // alpha:true — CSS gradient bg shows
 
     const midY = box.min.y + sz.y * 0.5;
-    const dist = sz.y * 1.35;
-    const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.01, 50);
-    camera.position.set(ctr.x, midY + sz.y * 0.05, dist);
-    camera.lookAt(ctr.x, midY, ctr.z);
+    const dist = sz.y * 1.9;
+    const camera = new THREE.PerspectiveCamera(36, window.innerWidth / window.innerHeight, 0.01, 50);
+    camera.position.set(ctr.x, midY + sz.y * 0.08, dist);
+    camera.lookAt(ctr.x, midY + sz.y * 0.05, ctr.z);
 
     function resizeB() {
       renderer.setSize(window.innerWidth, window.innerHeight, false);
