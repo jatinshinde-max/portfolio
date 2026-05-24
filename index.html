@@ -1804,20 +1804,22 @@ async function makeRenderer(canvas, alpha) {
   return r;
 }
 
-// Additive offsets applied AFTER mixer.update() — mixer resets each frame from
-// keyframes, so += preserves the animation while adding breathing / head-look.
+// Called AFTER mixer.update(). The mixer has already written bone quaternions
+// from the animation keyframes. Reading bone.rotation reads the Euler converted
+// from that quaternion. += adds our offset on top without overwriting.
 function addBoneOffsets(bones, t, headX, headY) {
-  function a(n, axis, v) { if (bones[n]) bones[n].rotation[axis] += v; }
-  a('mixamorigSpine1',        'x', Math.sin(t * 1.2) * 0.008);
-  a('mixamorigSpine2',        'x', Math.sin(t * 1.2 + 0.3) * 0.005);
-  a('mixamorigHips',          'z', Math.sin(t * 0.4) * 0.003);
-  a('mixamorigHips',          'y', Math.sin(t * 0.3) * 0.002);
-  a('mixamorigLeftShoulder',  'z', Math.sin(t * 1.2 + 1.5) * 0.003);
-  a('mixamorigRightShoulder', 'z', Math.sin(t * 1.2 + 1.5) * 0.003);
-  a('mixamorigHead',          'y', headY);
-  a('mixamorigHead',          'x', headX);
-  a('mixamorigNeck',          'y', headY * 0.4);
-  a('mixamorigNeck',          'x', headX * 0.4);
+  function add(name, axis, v) {
+    const b = bones[name];
+    if (b) b.rotation[axis] += v;
+  }
+  // Subtle breathing — spine only, keeps wave animation intact on arms/shoulders
+  add('mixamorigSpine1', 'x', Math.sin(t * 1.2) * 0.008);
+  add('mixamorigSpine2', 'x', Math.sin(t * 1.2 + 0.3) * 0.005);
+  // Head/neck mouse tracking — wave animation doesn't control these bones
+  add('mixamorigHead', 'y', headY);
+  add('mixamorigHead', 'x', headX);
+  add('mixamorigNeck', 'y', headY * 0.4);
+  add('mixamorigNeck', 'x', headX * 0.4);
 }
 
 function hideSpinner(id) {
@@ -1876,10 +1878,13 @@ await (async () => {
     const clkA = new THREE.Clock();
     (function tick() {
       requestAnimationFrame(tick);
+      // Always drain delta — prevents mixer jump after off-screen pause
+      const delta = Math.min(clkA.getDelta(), 0.05);
+      const t     = clkA.elapsedTime; // already updated by getDelta(), no double-tick
       if (!visA) return;
-      const delta = clkA.getDelta();
-      const t     = clkA.getElapsedTime();
+      // 1. Mixer writes keyframe values to bone quaternions
       mixerA.update(delta);
+      // 2. Our offsets add on top of whatever the mixer set
       hx += (-nMY * 10 * DEG - hx) * 0.05;
       hy += (nMX *  20 * DEG - hy) * 0.05;
       addBoneOffsets(bones, t, hx, hy);
@@ -1947,16 +1952,18 @@ await (async () => {
     const clkB = new THREE.Clock();
     (function tick() {
       requestAnimationFrame(tick);
+      // Always drain delta — prevents mixer jump after off-screen pause
+      const delta = Math.min(clkB.getDelta(), 0.05);
+      const t     = clkB.elapsedTime; // already updated by getDelta(), no double-tick
       if (!visB) return;
-      const delta = clkB.getDelta();
-      const t     = clkB.getElapsedTime();
+      // 1. Mixer writes keyframe values to bone quaternions
       mixerB.update(delta);
-      // Orbit centered 12° to character's left (three-quarter view), ±3° sway
+      // 2. Camera orbit
       const orb = 12 * DEG + Math.sin(t * 0.2) * 3 * DEG;
       camera.position.x = ctr.x + Math.sin(orb) * dist;
       camera.position.z = ctr.z + Math.cos(orb) * dist;
       camera.lookAt(ctr.x, midY, ctr.z);
-      // Head mouse-tracking + breathing (additive on top of wave animation)
+      // 3. Our offsets add on top of whatever the mixer set
       hx += (-nMY * 10 * DEG - hx) * 0.05;
       hy += (nMX *  20 * DEG - hy) * 0.05;
       addBoneOffsets(bones, t, hx, hy);
