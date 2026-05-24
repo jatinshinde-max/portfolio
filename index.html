@@ -1738,7 +1738,7 @@ updateHUD(0, 0);
 
 <script type="module">
 // ═══════════════════════════════════════════════════════
-//  CHARACTER SYSTEM — JON_stand.glb
+//  CHARACTER SYSTEM — JON_wave.glb
 //  Scene A: About section (chest-up, portrait canvas)
 //  Scene B: Hero section (full-body, full viewport)
 // ═══════════════════════════════════════════════════════
@@ -1746,7 +1746,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { clone as skeletonClone } from 'three/addons/utils/SkeletonUtils.js';
 
-const MODEL_URL = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/models/JON%20stand.glb';
+const MODEL_URL = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/models/JON%20wave.glb';
 const DEG = Math.PI / 180;
 
 // ── Shared normalised mouse (-1..1) ───────────────────────────
@@ -1771,12 +1771,6 @@ function getBones(root) {
   const m = {};
   root.traverse(o => { if (o.isBone) m[o.name] = o; });
   return m;
-}
-
-function storeDefaults(bones) {
-  const d = {};
-  for (const n in bones) d[n] = { x: bones[n].rotation.x, y: bones[n].rotation.y, z: bones[n].rotation.z };
-  return d;
 }
 
 function getEyeMeshes(root) {
@@ -1810,20 +1804,20 @@ async function makeRenderer(canvas, alpha) {
   return r;
 }
 
-function tickBones(bones, defs, t, headX, headY) {
-  function s(n, axis, v) {
-    if (bones[n] && defs[n]) bones[n].rotation[axis] = defs[n][axis] + v;
-  }
-  s('mixamorigSpine1',        'x', Math.sin(t * 1.2) * 0.008);
-  s('mixamorigSpine2',        'x', Math.sin(t * 1.2 + 0.3) * 0.005);
-  s('mixamorigHips',          'z', Math.sin(t * 0.4) * 0.003);
-  s('mixamorigHips',          'y', Math.sin(t * 0.3) * 0.002);
-  s('mixamorigLeftShoulder',  'z', Math.sin(t * 1.2 + 1.5) * 0.003);
-  s('mixamorigRightShoulder', 'z', Math.sin(t * 1.2 + 1.5) * 0.003);
-  s('mixamorigHead',          'y', headY);
-  s('mixamorigHead',          'x', headX);
-  s('mixamorigNeck',          'y', headY * 0.4);
-  s('mixamorigNeck',          'x', headX * 0.4);
+// Additive offsets applied AFTER mixer.update() — mixer resets each frame from
+// keyframes, so += preserves the animation while adding breathing / head-look.
+function addBoneOffsets(bones, t, headX, headY) {
+  function a(n, axis, v) { if (bones[n]) bones[n].rotation[axis] += v; }
+  a('mixamorigSpine1',        'x', Math.sin(t * 1.2) * 0.008);
+  a('mixamorigSpine2',        'x', Math.sin(t * 1.2 + 0.3) * 0.005);
+  a('mixamorigHips',          'z', Math.sin(t * 0.4) * 0.003);
+  a('mixamorigHips',          'y', Math.sin(t * 0.3) * 0.002);
+  a('mixamorigLeftShoulder',  'z', Math.sin(t * 1.2 + 1.5) * 0.003);
+  a('mixamorigRightShoulder', 'z', Math.sin(t * 1.2 + 1.5) * 0.003);
+  a('mixamorigHead',          'y', headY);
+  a('mixamorigHead',          'x', headX);
+  a('mixamorigNeck',          'y', headY * 0.4);
+  a('mixamorigNeck',          'x', headX * 0.4);
 }
 
 function hideSpinner(id) {
@@ -1869,8 +1863,9 @@ await (async () => {
     new ResizeObserver(resizeA).observe(canvas.parentElement);
 
     const bones = getBones(model);
-    const defs  = storeDefaults(bones);
     const eyes  = getEyeMeshes(model);
+    const mixerA = new THREE.AnimationMixer(model);
+    if (srcGltf.animations.length > 0) mixerA.clipAction(srcGltf.animations[0]).play();
     let hx = 0, hy = 0;
 
     let visA = false;
@@ -1881,10 +1876,12 @@ await (async () => {
     (function tick() {
       requestAnimationFrame(tick);
       if (!visA) return;
-      const t = clkA.getElapsedTime();
+      const delta = clkA.getDelta();
+      const t     = clkA.getElapsedTime();
+      mixerA.update(delta);
       hx += (nMY *  10 * DEG - hx) * 0.05;
       hy += (nMX *  20 * DEG - hy) * 0.05;
-      tickBones(bones, defs, t, hx, hy);
+      addBoneOffsets(bones, t, hx, hy);
       const pv = 0.3 + Math.sin(t * 0.5) * 0.1;
       eyes.forEach(m => {
         const i = m.morphTargetDictionary['Pupil · Size'];
@@ -1937,8 +1934,9 @@ await (async () => {
     }, { passive: true });
 
     const bones = getBones(model);
-    const defs  = storeDefaults(bones);
     const eyes  = getEyeMeshes(model);
+    const mixerB = new THREE.AnimationMixer(model);
+    if (srcGltf.animations.length > 0) mixerB.clipAction(srcGltf.animations[0]).play();
     let hx = 0, hy = 0;
 
     let visB = false;
@@ -1949,16 +1947,18 @@ await (async () => {
     (function tick() {
       requestAnimationFrame(tick);
       if (!visB) return;
-      const t = clkB.getElapsedTime();
+      const delta = clkB.getDelta();
+      const t     = clkB.getElapsedTime();
+      mixerB.update(delta);
       // Gentle auto-orbit ±3° on Y
-      const a = Math.sin(t * 0.2) * 3 * DEG;
-      camera.position.x = ctr.x + Math.sin(a) * dist;
-      camera.position.z = ctr.z + Math.cos(a) * dist;
+      const orb = Math.sin(t * 0.2) * 3 * DEG;
+      camera.position.x = ctr.x + Math.sin(orb) * dist;
+      camera.position.z = ctr.z + Math.cos(orb) * dist;
       camera.lookAt(ctr.x, midY, ctr.z);
-      // Head mouse-tracking
+      // Head mouse-tracking + breathing (additive on top of wave animation)
       hx += (nMY *  10 * DEG - hx) * 0.05;
       hy += (nMX *  20 * DEG - hy) * 0.05;
-      tickBones(bones, defs, t, hx, hy);
+      addBoneOffsets(bones, t, hx, hy);
       const pv = 0.3 + Math.sin(t * 0.5) * 0.1;
       eyes.forEach(m => {
         const i = m.morphTargetDictionary['Pupil · Size'];
