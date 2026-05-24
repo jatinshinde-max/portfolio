@@ -1851,11 +1851,9 @@ await (async () => {
     const renderer = await makeRenderer(canvas, false);
     const camera = new THREE.PerspectiveCamera(32, 0.75, 0.01, 50);
 
-    // Chest-up: camera near shoulder height, look at chest centre
-    const shoulderY = box.min.y + sz.y * 0.73;
-    const chestY    = box.min.y + sz.y * 0.60;
-    camera.position.set(ctr.x, shoulderY, sz.y * 0.72);
-    camera.lookAt(ctr.x, chestY, ctr.z);
+    // Chest-up: fixed world-space offsets from feet — shows face clearly
+    camera.position.set(ctr.x, box.min.y + 1.5, ctr.z + 2);
+    camera.lookAt(ctr.x, box.min.y + 1.4, ctr.z);
 
     function resizeA() {
       const w = canvas.clientWidth, h = canvas.clientHeight;
@@ -1914,10 +1912,10 @@ await (async () => {
     const renderer = await makeRenderer(canvas, true); // alpha:true — CSS gradient bg shows
 
     const midY = box.min.y + sz.y * 0.5;
-    const dist = sz.y * 1.9;
+    const dist = sz.y * 2.0;
     const camera = new THREE.PerspectiveCamera(36, window.innerWidth / window.innerHeight, 0.01, 50);
-    camera.position.set(ctr.x, midY + sz.y * 0.08, dist);
-    camera.lookAt(ctr.x, midY + sz.y * 0.05, ctr.z);
+    camera.position.set(ctr.x, midY, dist);
+    camera.lookAt(ctr.x, midY, ctr.z);
 
     function resizeB() {
       renderer.setSize(window.innerWidth, window.innerHeight, false);
