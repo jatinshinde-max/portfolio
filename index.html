@@ -1744,7 +1744,6 @@ updateHUD(0, 0);
 // ═══════════════════════════════════════════════════════
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { SkeletonUtils } from 'three/addons/utils/SkeletonUtils.js';
 
 const MODEL_URL = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/models/JON%20stand.glb';
 const DEG = Math.PI / 180;
@@ -1838,7 +1837,7 @@ function hideSpinner(id) {
 {
   const canvas = document.getElementById('about-canvas');
   if (canvas) {
-    const model = SkeletonUtils.clone(srcGltf.scene);
+    const model = srcGltf.scene.clone(true);
     const box = new THREE.Box3().setFromObject(model);
     const sz  = box.getSize(new THREE.Vector3());
     const ctr = box.getCenter(new THREE.Vector3());
@@ -1902,7 +1901,7 @@ function hideSpinner(id) {
 {
   const canvas = document.getElementById('hero-canvas');
   if (canvas) {
-    const model = SkeletonUtils.clone(srcGltf.scene);
+    const model = srcGltf.scene.clone(true);
     const box = new THREE.Box3().setFromObject(model);
     const sz  = box.getSize(new THREE.Vector3());
     const ctr = box.getCenter(new THREE.Vector3());
