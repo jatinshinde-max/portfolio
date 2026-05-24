@@ -36,7 +36,8 @@
   "imports": {
     "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.webgpu.js",
     "three/webgpu": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.webgpu.js",
-    "three/tsl": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.tsl.js"
+    "three/tsl": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.tsl.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
   }
 }
 </script>
@@ -802,6 +803,90 @@ footer a:hover { color: var(--ink); }
   .stats-row { grid-template-columns: 1fr; }
   .hud-title .t-main { font-size: clamp(1.5rem, 9vw, 2.2rem); }
 }
+
+/* ─── HERO CHARACTER SECTION ────────────────────────────────── */
+.hero-char-section {
+  position: relative;
+  height: 100vh;
+  background: linear-gradient(to bottom, var(--bg) 0%, var(--bg-2) 50%, var(--bg) 100%);
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  border-top: 1px solid var(--ink-ghost);
+}
+#hero-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  will-change: transform;
+}
+.hero-char-ui {
+  position: relative;
+  z-index: 10;
+  padding: 0 clamp(28px, 7vw, 100px) clamp(60px, 10vh, 120px);
+  pointer-events: none;
+}
+.hc-eyebrow {
+  font-family: var(--f-semi);
+  font-size: 0.6rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 14px;
+}
+.hc-title {
+  font-family: var(--f-display);
+  font-size: clamp(3rem, 8vw, 9rem);
+  font-weight: 200;
+  letter-spacing: -0.03em;
+  line-height: 0.9;
+  color: var(--ink);
+  margin-bottom: 16px;
+}
+.hc-desc {
+  font-family: var(--f-semi);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+/* ─── CHARACTER SPINNER ─────────────────────────────────────── */
+.char-spinner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  z-index: 20;
+  pointer-events: none;
+  transition: opacity 0.5s;
+}
+.char-spinner.hidden { opacity: 0; }
+.cs-ring {
+  width: 36px; height: 36px;
+  border: 1px solid var(--ink-ghost);
+  border-top-color: var(--ink-dim);
+  border-radius: 50%;
+  animation: cs-spin 1s linear infinite;
+}
+@keyframes cs-spin { to { transform: rotate(360deg); } }
+.cs-label {
+  font-family: var(--f-semi);
+  font-size: 0.5rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+@media (max-width: 768px) {
+  .hc-title { font-size: clamp(2.5rem, 10vw, 4.5rem); }
+  .hero-char-ui { padding-bottom: clamp(40px, 8vh, 80px); }
+}
 </style>
 </head>
 <body>
@@ -872,6 +957,20 @@ footer a:hover { color: var(--ink); }
     <div class="world-section" data-world="4"></div>
   </div>
 </div>
+
+<!-- CHARACTER HERO -->
+<section id="hero-char" class="hero-char-section">
+  <div class="char-spinner" id="hero-spinner">
+    <div class="cs-ring"></div>
+    <span class="cs-label">Loading Character</span>
+  </div>
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-char-ui">
+    <div class="hc-eyebrow">Character Pipeline</div>
+    <h2 class="hc-title">Built<br>to Move</h2>
+    <p class="hc-desc">86K vertices · Mixamo rig · CC4</p>
+  </div>
+</section>
 
 <!-- CONTENT -->
 <div id="content">
@@ -975,6 +1074,10 @@ footer a:hover { color: var(--ink); }
   <!-- ABOUT -->
   <div class="about-section" id="about">
     <div class="about-visual reveal">
+      <div class="char-spinner" id="about-spinner">
+        <div class="cs-ring"></div>
+        <span class="cs-label">Loading</span>
+      </div>
       <canvas class="g-canvas" id="about-canvas"></canvas>
       <div class="av-label">CGI & VFX · India</div>
     </div>
@@ -1432,26 +1535,6 @@ document.querySelectorAll('.ad-card').forEach(card => {
   card.addEventListener('mouseleave', () => v.pause());
 });
 
-// About canvas
-const aCanvas = document.getElementById('about-canvas');
-if (aCanvas) {
-  requestAnimationFrame(() => {
-    aCanvas.width = aCanvas.offsetWidth || 400;
-    aCanvas.height = aCanvas.offsetHeight || 500;
-    const ac = aCanvas.getContext('2d');
-    const ag = ac.createLinearGradient(0,0,aCanvas.width,aCanvas.height);
-    ag.addColorStop(0,'rgb(20,16,30)');
-    ag.addColorStop(1,'rgb(6,5,12)');
-    ac.fillStyle = ag;
-    ac.fillRect(0,0,aCanvas.width,aCanvas.height);
-    const aglow = ac.createRadialGradient(aCanvas.width*0.5,aCanvas.height*0.3,0,aCanvas.width*0.5,aCanvas.height*0.3,aCanvas.width*0.6);
-    aglow.addColorStop(0,'rgba(124,92,196,0.15)');
-    aglow.addColorStop(1,'rgba(0,0,0,0)');
-    ac.fillStyle = aglow;
-    ac.fillRect(0,0,aCanvas.width,aCanvas.height);
-  });
-}
-
 // ═══════════════════════════════════════════════════════
 //  SCROLL REVEAL (IntersectionObserver)
 // ═══════════════════════════════════════════════════════
@@ -1651,6 +1734,241 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined' && typeo
 
 // Initial HUD update
 updateHUD(0, 0);
+</script>
+
+<script type="module">
+// ═══════════════════════════════════════════════════════
+//  CHARACTER SYSTEM — JON_stand.glb
+//  Scene A: About section (chest-up, portrait canvas)
+//  Scene B: Hero section (full-body, full viewport)
+// ═══════════════════════════════════════════════════════
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { SkeletonUtils } from 'three/addons/utils/SkeletonUtils.js';
+
+const MODEL_URL = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/models/JON_stand.glb';
+const DEG = Math.PI / 180;
+
+// ── Shared normalised mouse (-1..1) ───────────────────────────
+let nMX = 0, nMY = 0;
+document.addEventListener('mousemove', e => {
+  nMX = (e.clientX / window.innerWidth)  * 2 - 1;
+  nMY = -((e.clientY / window.innerHeight) * 2 - 1);
+});
+
+// ── Load source GLB once ──────────────────────────────────────
+let srcGltf;
+try {
+  srcGltf = await new Promise((res, rej) => new GLTFLoader().load(MODEL_URL, res, undefined, rej));
+} catch (err) {
+  console.warn('Character: GLB load failed', err);
+  document.querySelectorAll('.char-spinner').forEach(sp => sp.remove());
+}
+if (!srcGltf) throw new Error('abort');
+
+// ── Helpers ───────────────────────────────────────────────────
+function getBones(root) {
+  const m = {};
+  root.traverse(o => { if (o.isBone) m[o.name] = o; });
+  return m;
+}
+
+function storeDefaults(bones) {
+  const d = {};
+  for (const n in bones) d[n] = { x: bones[n].rotation.x, y: bones[n].rotation.y, z: bones[n].rotation.z };
+  return d;
+}
+
+function getEyeMeshes(root) {
+  const out = [];
+  root.traverse(o => {
+    if (o.isMesh && o.morphTargetDictionary && 'Pupil · Size' in o.morphTargetDictionary) out.push(o);
+  });
+  return out;
+}
+
+function addLights(scene, dramatic) {
+  const key = new THREE.DirectionalLight(0xffd4a0, dramatic ? 2.4 : 1.8);
+  key.position.set(1.5, 2.5, 1.5);
+  scene.add(key);
+  const fill = new THREE.DirectionalLight(0xa8c8ff, dramatic ? 0.45 : 0.6);
+  fill.position.set(-2, 1, 1);
+  scene.add(fill);
+  const rim = new THREE.DirectionalLight(0xffffff, dramatic ? 0.7 : 0.35);
+  rim.position.set(0, 2, -2.5);
+  scene.add(rim);
+  scene.add(new THREE.AmbientLight(0x08081a, 0.45));
+}
+
+function makeRenderer(canvas, alpha) {
+  const r = new THREE.WebGLRenderer({ canvas, antialias: true, alpha });
+  r.setPixelRatio(Math.min(devicePixelRatio, 2));
+  r.toneMapping = THREE.ACESFilmicToneMapping;
+  r.toneMappingExposure = 1.2;
+  r.outputColorSpace = THREE.SRGBColorSpace;
+  return r;
+}
+
+function tickBones(bones, defs, t, headX, headY) {
+  function s(n, axis, v) {
+    if (bones[n] && defs[n]) bones[n].rotation[axis] = defs[n][axis] + v;
+  }
+  s('mixamorig:Spine1',        'x', Math.sin(t * 1.2) * 0.008);
+  s('mixamorig:Spine2',        'x', Math.sin(t * 1.2 + 0.3) * 0.005);
+  s('mixamorig:Hips',          'z', Math.sin(t * 0.4) * 0.003);
+  s('mixamorig:Hips',          'y', Math.sin(t * 0.3) * 0.002);
+  s('mixamorig:LeftShoulder',  'z', Math.sin(t * 1.2 + 1.5) * 0.003);
+  s('mixamorig:RightShoulder', 'z', Math.sin(t * 1.2 + 1.5) * 0.003);
+  s('mixamorig:Head',          'y', headY);
+  s('mixamorig:Head',          'x', headX);
+  s('mixamorig:Neck',          'y', headY * 0.4);
+  s('mixamorig:Neck',          'x', headX * 0.4);
+}
+
+function hideSpinner(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.add('hidden');
+  setTimeout(() => el.remove(), 600);
+}
+
+// ══════════════════════════════════════════════════════════════
+//  SCENE A — About section (chest-up, portrait canvas)
+// ══════════════════════════════════════════════════════════════
+{
+  const canvas = document.getElementById('about-canvas');
+  if (canvas) {
+    const model = SkeletonUtils.clone(srcGltf.scene);
+    const box = new THREE.Box3().setFromObject(model);
+    const sz  = box.getSize(new THREE.Vector3());
+    const ctr = box.getCenter(new THREE.Vector3());
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x100f1c);
+    scene.add(model);
+    addLights(scene, false);
+
+    const renderer = makeRenderer(canvas, false);
+    const camera = new THREE.PerspectiveCamera(32, 0.75, 0.01, 50);
+
+    // Chest-up: camera near shoulder height, look at chest centre
+    const shoulderY = box.min.y + sz.y * 0.73;
+    const chestY    = box.min.y + sz.y * 0.60;
+    camera.position.set(ctr.x, shoulderY, sz.y * 0.72);
+    camera.lookAt(ctr.x, chestY, ctr.z);
+
+    function resizeA() {
+      const w = canvas.clientWidth, h = canvas.clientHeight;
+      if (!w || !h) return;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    resizeA();
+    new ResizeObserver(resizeA).observe(canvas.parentElement);
+
+    const bones = getBones(model);
+    const defs  = storeDefaults(bones);
+    const eyes  = getEyeMeshes(model);
+    let hx = 0, hy = 0;
+
+    let visA = false;
+    new IntersectionObserver(([e]) => { visA = e.isIntersecting; }, { threshold: 0.05 })
+      .observe(document.getElementById('about') || canvas.parentElement);
+
+    const clkA = new THREE.Clock();
+    (function tick() {
+      requestAnimationFrame(tick);
+      if (!visA) return;
+      const t = clkA.getElapsedTime();
+      hx += (nMY *  10 * DEG - hx) * 0.05;
+      hy += (nMX *  20 * DEG - hy) * 0.05;
+      tickBones(bones, defs, t, hx, hy);
+      const pv = 0.3 + Math.sin(t * 0.5) * 0.1;
+      eyes.forEach(m => {
+        const i = m.morphTargetDictionary['Pupil · Size'];
+        if (i !== undefined) m.morphTargetInfluences[i] = pv;
+      });
+      renderer.render(scene, camera);
+    })();
+
+    hideSpinner('about-spinner');
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  SCENE B — Hero section (full-body, full viewport)
+// ══════════════════════════════════════════════════════════════
+{
+  const canvas = document.getElementById('hero-canvas');
+  if (canvas) {
+    const model = SkeletonUtils.clone(srcGltf.scene);
+    const box = new THREE.Box3().setFromObject(model);
+    const sz  = box.getSize(new THREE.Vector3());
+    const ctr = box.getCenter(new THREE.Vector3());
+
+    const scene = new THREE.Scene();
+    scene.add(model);
+    addLights(scene, true);
+
+    const renderer = makeRenderer(canvas, true); // alpha:true — CSS gradient bg shows
+
+    const midY = box.min.y + sz.y * 0.5;
+    const dist = sz.y * 1.35;
+    const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.01, 50);
+    camera.position.set(ctr.x, midY + sz.y * 0.05, dist);
+    camera.lookAt(ctr.x, midY, ctr.z);
+
+    function resizeB() {
+      renderer.setSize(window.innerWidth, window.innerHeight, false);
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+    }
+    resizeB();
+    window.addEventListener('resize', resizeB);
+
+    // Scroll parallax — character floats up slower than page
+    const section = document.getElementById('hero-char');
+    window.addEventListener('scroll', () => {
+      if (!section) return;
+      const prog = Math.max(0, -section.getBoundingClientRect().top / section.offsetHeight);
+      canvas.style.transform = `translateY(${prog * -8}%)`;
+    }, { passive: true });
+
+    const bones = getBones(model);
+    const defs  = storeDefaults(bones);
+    const eyes  = getEyeMeshes(model);
+    let hx = 0, hy = 0;
+
+    let visB = false;
+    new IntersectionObserver(([e]) => { visB = e.isIntersecting; }, { threshold: 0.02 })
+      .observe(section || canvas);
+
+    const clkB = new THREE.Clock();
+    (function tick() {
+      requestAnimationFrame(tick);
+      if (!visB) return;
+      const t = clkB.getElapsedTime();
+      // Gentle auto-orbit ±3° on Y
+      const a = Math.sin(t * 0.2) * 3 * DEG;
+      camera.position.x = ctr.x + Math.sin(a) * dist;
+      camera.position.z = ctr.z + Math.cos(a) * dist;
+      camera.lookAt(ctr.x, midY, ctr.z);
+      // Head mouse-tracking
+      hx += (nMY *  10 * DEG - hx) * 0.05;
+      hy += (nMX *  20 * DEG - hy) * 0.05;
+      tickBones(bones, defs, t, hx, hy);
+      const pv = 0.3 + Math.sin(t * 0.5) * 0.1;
+      eyes.forEach(m => {
+        const i = m.morphTargetDictionary['Pupil · Size'];
+        if (i !== undefined) m.morphTargetInfluences[i] = pv;
+      });
+      renderer.render(scene, camera);
+    })();
+
+    hideSpinner('hero-spinner');
+  }
+}
 </script>
 
 </body>
