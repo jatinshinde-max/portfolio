@@ -1799,8 +1799,9 @@ function addLights(scene, dramatic) {
   scene.add(new THREE.AmbientLight(0x08081a, 0.45));
 }
 
-function makeRenderer(canvas, alpha) {
-  const r = new THREE.WebGLRenderer({ canvas, antialias: true, alpha });
+async function makeRenderer(canvas, alpha) {
+  const r = new THREE.WebGPURenderer({ canvas, antialias: true, alpha, forceWebGL: false });
+  await r.init();
   r.setPixelRatio(Math.min(devicePixelRatio, 2));
   r.toneMapping = THREE.ACESFilmicToneMapping;
   r.toneMappingExposure = 1.2;
@@ -1834,7 +1835,7 @@ function hideSpinner(id) {
 // ══════════════════════════════════════════════════════════════
 //  SCENE A — About section (chest-up, portrait canvas)
 // ══════════════════════════════════════════════════════════════
-{
+await (async () => {
   const canvas = document.getElementById('about-canvas');
   if (canvas) {
     const model = srcGltf.scene.clone(true);
@@ -1847,7 +1848,7 @@ function hideSpinner(id) {
     scene.add(model);
     addLights(scene, false);
 
-    const renderer = makeRenderer(canvas, false);
+    const renderer = await makeRenderer(canvas, false);
     const camera = new THREE.PerspectiveCamera(32, 0.75, 0.01, 50);
 
     // Chest-up: camera near shoulder height, look at chest centre
@@ -1893,12 +1894,12 @@ function hideSpinner(id) {
 
     hideSpinner('about-spinner');
   }
-}
+})();
 
 // ══════════════════════════════════════════════════════════════
 //  SCENE B — Hero section (full-body, full viewport)
 // ══════════════════════════════════════════════════════════════
-{
+await (async () => {
   const canvas = document.getElementById('hero-canvas');
   if (canvas) {
     const model = srcGltf.scene.clone(true);
@@ -1910,7 +1911,7 @@ function hideSpinner(id) {
     scene.add(model);
     addLights(scene, true);
 
-    const renderer = makeRenderer(canvas, true); // alpha:true — CSS gradient bg shows
+    const renderer = await makeRenderer(canvas, true); // alpha:true — CSS gradient bg shows
 
     const midY = box.min.y + sz.y * 0.5;
     const dist = sz.y * 1.35;
@@ -1967,7 +1968,7 @@ function hideSpinner(id) {
 
     hideSpinner('hero-spinner');
   }
-}
+})();
 </script>
 
 </body>
