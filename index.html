@@ -1744,6 +1744,7 @@ updateHUD(0, 0);
 // ═══════════════════════════════════════════════════════
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { clone as skeletonClone } from 'three/addons/utils/SkeletonUtils.js';
 
 const MODEL_URL = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/models/JON%20stand.glb';
 const DEG = Math.PI / 180;
@@ -1764,6 +1765,10 @@ try {
   document.querySelectorAll('.char-spinner').forEach(sp => sp.remove());
 }
 if (!srcGltf) throw new Error('abort');
+
+// DEBUG: log all bone names so we can confirm correct names
+console.log('[Char] GLB loaded. Bone names:');
+srcGltf.scene.traverse(child => { if (child.isBone) console.log('  Bone:', child.name); });
 
 // ── Helpers ───────────────────────────────────────────────────
 function getBones(root) {
@@ -1838,7 +1843,9 @@ function hideSpinner(id) {
 await (async () => {
   const canvas = document.getElementById('about-canvas');
   if (canvas) {
-    const model = srcGltf.scene.clone(true);
+    // skeletonClone properly rebinds the skeleton to the cloned bones
+    // (scene.clone(true) shares the original skeleton — bone edits have no effect)
+    const model = skeletonClone(srcGltf.scene);
     const box = new THREE.Box3().setFromObject(model);
     const sz  = box.getSize(new THREE.Vector3());
     const ctr = box.getCenter(new THREE.Vector3());
@@ -1868,6 +1875,7 @@ await (async () => {
     const bones = getBones(model);
     const defs  = storeDefaults(bones);
     const eyes  = getEyeMeshes(model);
+    console.log('[About] bones found:', Object.keys(bones).length, '| Head:', bones['mixamorig:Head'] ? 'YES' : 'NO — check bone names above');
     let hx = 0, hy = 0;
 
     let visA = false;
@@ -1875,8 +1883,10 @@ await (async () => {
       .observe(document.getElementById('about') || canvas.parentElement);
 
     const clkA = new THREE.Clock();
+    let _framesA = 0;
     (function tick() {
       requestAnimationFrame(tick);
+      if (_framesA < 3) { console.log('[About] RAF tick', ++_framesA); }
       if (!visA) return;
       const t = clkA.getElapsedTime();
       hx += (nMY *  10 * DEG - hx) * 0.05;
@@ -1900,7 +1910,7 @@ await (async () => {
 await (async () => {
   const canvas = document.getElementById('hero-canvas');
   if (canvas) {
-    const model = srcGltf.scene.clone(true);
+    const model = skeletonClone(srcGltf.scene);
     const box = new THREE.Box3().setFromObject(model);
     const sz  = box.getSize(new THREE.Vector3());
     const ctr = box.getCenter(new THREE.Vector3());
@@ -1936,6 +1946,7 @@ await (async () => {
     const bones = getBones(model);
     const defs  = storeDefaults(bones);
     const eyes  = getEyeMeshes(model);
+    console.log('[Hero] bones found:', Object.keys(bones).length, '| Head:', bones['mixamorig:Head'] ? 'YES' : 'NO — check bone names above');
     let hx = 0, hy = 0;
 
     let visB = false;
@@ -1943,8 +1954,10 @@ await (async () => {
       .observe(section || canvas);
 
     const clkB = new THREE.Clock();
+    let _framesB = 0;
     (function tick() {
       requestAnimationFrame(tick);
+      if (_framesB < 3) { console.log('[Hero] RAF tick', ++_framesB); }
       if (!visB) return;
       const t = clkB.getElapsedTime();
       // Gentle auto-orbit ±3° on Y
