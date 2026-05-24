@@ -1766,10 +1766,6 @@ try {
 }
 if (!srcGltf) throw new Error('abort');
 
-// DEBUG: log all bone names so we can confirm correct names
-console.log('[Char] GLB loaded. Bone names:');
-srcGltf.scene.traverse(child => { if (child.isBone) console.log('  Bone:', child.name); });
-
 // ── Helpers ───────────────────────────────────────────────────
 function getBones(root) {
   const m = {};
@@ -1818,16 +1814,16 @@ function tickBones(bones, defs, t, headX, headY) {
   function s(n, axis, v) {
     if (bones[n] && defs[n]) bones[n].rotation[axis] = defs[n][axis] + v;
   }
-  s('mixamorig:Spine1',        'x', Math.sin(t * 1.2) * 0.008);
-  s('mixamorig:Spine2',        'x', Math.sin(t * 1.2 + 0.3) * 0.005);
-  s('mixamorig:Hips',          'z', Math.sin(t * 0.4) * 0.003);
-  s('mixamorig:Hips',          'y', Math.sin(t * 0.3) * 0.002);
-  s('mixamorig:LeftShoulder',  'z', Math.sin(t * 1.2 + 1.5) * 0.003);
-  s('mixamorig:RightShoulder', 'z', Math.sin(t * 1.2 + 1.5) * 0.003);
-  s('mixamorig:Head',          'y', headY);
-  s('mixamorig:Head',          'x', headX);
-  s('mixamorig:Neck',          'y', headY * 0.4);
-  s('mixamorig:Neck',          'x', headX * 0.4);
+  s('mixamorigSpine1',        'x', Math.sin(t * 1.2) * 0.008);
+  s('mixamorigSpine2',        'x', Math.sin(t * 1.2 + 0.3) * 0.005);
+  s('mixamorigHips',          'z', Math.sin(t * 0.4) * 0.003);
+  s('mixamorigHips',          'y', Math.sin(t * 0.3) * 0.002);
+  s('mixamorigLeftShoulder',  'z', Math.sin(t * 1.2 + 1.5) * 0.003);
+  s('mixamorigRightShoulder', 'z', Math.sin(t * 1.2 + 1.5) * 0.003);
+  s('mixamorigHead',          'y', headY);
+  s('mixamorigHead',          'x', headX);
+  s('mixamorigNeck',          'y', headY * 0.4);
+  s('mixamorigNeck',          'x', headX * 0.4);
 }
 
 function hideSpinner(id) {
@@ -1875,7 +1871,6 @@ await (async () => {
     const bones = getBones(model);
     const defs  = storeDefaults(bones);
     const eyes  = getEyeMeshes(model);
-    console.log('[About] bones found:', Object.keys(bones).length, '| Head:', bones['mixamorig:Head'] ? 'YES' : 'NO — check bone names above');
     let hx = 0, hy = 0;
 
     let visA = false;
@@ -1883,10 +1878,8 @@ await (async () => {
       .observe(document.getElementById('about') || canvas.parentElement);
 
     const clkA = new THREE.Clock();
-    let _framesA = 0;
     (function tick() {
       requestAnimationFrame(tick);
-      if (_framesA < 3) { console.log('[About] RAF tick', ++_framesA); }
       if (!visA) return;
       const t = clkA.getElapsedTime();
       hx += (nMY *  10 * DEG - hx) * 0.05;
@@ -1946,7 +1939,6 @@ await (async () => {
     const bones = getBones(model);
     const defs  = storeDefaults(bones);
     const eyes  = getEyeMeshes(model);
-    console.log('[Hero] bones found:', Object.keys(bones).length, '| Head:', bones['mixamorig:Head'] ? 'YES' : 'NO — check bone names above');
     let hx = 0, hy = 0;
 
     let visB = false;
@@ -1954,10 +1946,8 @@ await (async () => {
       .observe(section || canvas);
 
     const clkB = new THREE.Clock();
-    let _framesB = 0;
     (function tick() {
       requestAnimationFrame(tick);
-      if (_framesB < 3) { console.log('[Hero] RAF tick', ++_framesB); }
       if (!visB) return;
       const t = clkB.getElapsedTime();
       // Gentle auto-orbit ±3° on Y
