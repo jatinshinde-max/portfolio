@@ -1848,8 +1848,9 @@ await (async () => {
     const renderer = await makeRenderer(canvas, false);
     const camera = new THREE.PerspectiveCamera(32, 0.75, 0.01, 50);
 
-    // Chest-up: fixed world-space offsets from feet — shows face clearly
-    camera.position.set(ctr.x, box.min.y + 1.5, ctr.z + 2);
+    // Chest-up: 12° three-quarter view toward character's left (waving hand side)
+    const ANG_A = 12 * DEG;
+    camera.position.set(ctr.x + Math.sin(ANG_A) * 2, box.min.y + 1.5, ctr.z + Math.cos(ANG_A) * 2);
     camera.lookAt(ctr.x, box.min.y + 1.4, ctr.z);
 
     function resizeA() {
@@ -1879,7 +1880,7 @@ await (async () => {
       const delta = clkA.getDelta();
       const t     = clkA.getElapsedTime();
       mixerA.update(delta);
-      hx += (nMY *  10 * DEG - hx) * 0.05;
+      hx += (-nMY * 10 * DEG - hx) * 0.05;
       hy += (nMX *  20 * DEG - hy) * 0.05;
       addBoneOffsets(bones, t, hx, hy);
       const pv = 0.3 + Math.sin(t * 0.5) * 0.1;
@@ -1950,13 +1951,13 @@ await (async () => {
       const delta = clkB.getDelta();
       const t     = clkB.getElapsedTime();
       mixerB.update(delta);
-      // Gentle auto-orbit ±3° on Y
-      const orb = Math.sin(t * 0.2) * 3 * DEG;
+      // Orbit centered 12° to character's left (three-quarter view), ±3° sway
+      const orb = 12 * DEG + Math.sin(t * 0.2) * 3 * DEG;
       camera.position.x = ctr.x + Math.sin(orb) * dist;
       camera.position.z = ctr.z + Math.cos(orb) * dist;
       camera.lookAt(ctr.x, midY, ctr.z);
       // Head mouse-tracking + breathing (additive on top of wave animation)
-      hx += (nMY *  10 * DEG - hx) * 0.05;
+      hx += (-nMY * 10 * DEG - hx) * 0.05;
       hy += (nMX *  20 * DEG - hy) * 0.05;
       addBoneOffsets(bones, t, hx, hy);
       const pv = 0.3 + Math.sin(t * 0.5) * 0.1;
