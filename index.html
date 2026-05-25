@@ -1774,17 +1774,27 @@ function getBones(root) {
 }
 
 
-function addLights(scene, dramatic) {
-  const key = new THREE.DirectionalLight(0xffd4a0, dramatic ? 2.4 : 1.8);
-  key.position.set(1.5, 2.5, 1.5);
+function addLights(scene) {
+  // Key — warm, top-right, main light source
+  const key = new THREE.DirectionalLight(0xffd4a6, 2.5);
+  key.position.set(3, 4, 2);
+  key.castShadow = true;
+  key.shadow.mapSize.set(1024, 1024);
+  key.shadow.bias = -0.0005;
   scene.add(key);
-  const fill = new THREE.DirectionalLight(0xa8c8ff, dramatic ? 0.45 : 0.6);
-  fill.position.set(-2, 1, 1);
+
+  // Fill — cool, left side, softens key shadows
+  const fill = new THREE.DirectionalLight(0xa6c8ff, 0.8);
+  fill.position.set(-3, 2, 1);
   scene.add(fill);
-  const rim = new THREE.DirectionalLight(0xffffff, dramatic ? 0.7 : 0.35);
-  rim.position.set(0, 2, -2.5);
+
+  // Rim — white, behind and above, edge separation from background
+  const rim = new THREE.DirectionalLight(0xffffff, 1.8);
+  rim.position.set(-1, 3, -3);
   scene.add(rim);
-  scene.add(new THREE.AmbientLight(0x08081a, 0.45));
+
+  // Ambient — near-black, prevents pure-black shadows
+  scene.add(new THREE.AmbientLight(0x1a1a2e, 0.3));
 }
 
 async function makeRenderer(canvas, alpha) {
@@ -1792,7 +1802,7 @@ async function makeRenderer(canvas, alpha) {
   await r.init();
   r.setPixelRatio(Math.min(devicePixelRatio, 2));
   r.toneMapping = THREE.ACESFilmicToneMapping;
-  r.toneMappingExposure = 1.2;
+  r.toneMappingExposure = 1.1;
   r.outputColorSpace = THREE.SRGBColorSpace;
   return r;
 }
@@ -1821,7 +1831,7 @@ await (async () => {
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x100f1c);
     scene.add(model);
-    addLights(scene, false);
+    addLights(scene);
 
     const renderer = await makeRenderer(canvas, false);
     const camera = new THREE.PerspectiveCamera(32, 0.75, 0.01, 50);
@@ -1902,7 +1912,7 @@ await (async () => {
 
     const scene = new THREE.Scene();
     scene.add(model);
-    addLights(scene, true);
+    addLights(scene);
 
     const renderer = await makeRenderer(canvas, true); // alpha:true — CSS gradient bg shows
 
