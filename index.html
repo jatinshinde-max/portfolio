@@ -1851,7 +1851,13 @@ await (async () => {
 
     const bones = getBones(model);
     const mixerA = new THREE.AnimationMixer(model);
-    if (srcGltf.animations.length > 0) mixerA.clipAction(srcGltf.animations[0]).play();
+    if (srcGltf.animations.length > 0) {
+      const actionA = mixerA.clipAction(srcGltf.animations[0]);
+      actionA.loop = THREE.LoopPingPong;
+      actionA.clampWhenFinished = false;
+      actionA.timeScale = 0.7;
+      actionA.play();
+    }
     let hx = 0, hy = 0;
 
     let visA = false;
@@ -1915,7 +1921,13 @@ await (async () => {
 
     const bones = getBones(model);
     const mixerB = new THREE.AnimationMixer(model);
-    if (srcGltf.animations.length > 0) mixerB.clipAction(srcGltf.animations[0]).play();
+    if (srcGltf.animations.length > 0) {
+      const actionB = mixerB.clipAction(srcGltf.animations[0]);
+      actionB.loop = THREE.LoopPingPong;
+      actionB.clampWhenFinished = false;
+      actionB.timeScale = 0.7;
+      actionB.play();
+    }
     let hx = 0, hy = 0;
 
     let visB = false;
