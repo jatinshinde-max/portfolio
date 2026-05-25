@@ -1847,6 +1847,8 @@ await (async () => {
       const actionA = mixerA.clipAction(srcGltf.animations[0]);
       actionA.loop = THREE.LoopRepeat;
       actionA.clampWhenFinished = false;
+      actionA.zeroSlopeAtStart = true;
+      actionA.zeroSlopeAtEnd = true;
       actionA.timeScale = 0.7;
       actionA.play();
     }
@@ -1869,14 +1871,14 @@ await (async () => {
       const headA = bones['mixamorigHead'];
       const neckA = bones['mixamorigNeck'];
       if (headA) {
-        smHeadY += (headA.rotation.y - smHeadY) * 0.15;
-        smHeadX += (headA.rotation.x - smHeadX) * 0.15;
+        smHeadY += (headA.rotation.y - smHeadY) * 0.05;
+        smHeadX += (headA.rotation.x - smHeadX) * 0.05;
         headA.rotation.y = smHeadY + hy;
         headA.rotation.x = smHeadX + hx;
       }
       if (neckA) {
-        smNeckY += (neckA.rotation.y - smNeckY) * 0.15;
-        smNeckX += (neckA.rotation.x - smNeckX) * 0.15;
+        smNeckY += (neckA.rotation.y - smNeckY) * 0.05;
+        smNeckX += (neckA.rotation.x - smNeckX) * 0.05;
         neckA.rotation.y = smNeckY + hy * 0.3;
         neckA.rotation.x = smNeckX + hx * 0.3;
       }
@@ -1932,6 +1934,8 @@ await (async () => {
       const actionB = mixerB.clipAction(srcGltf.animations[0]);
       actionB.loop = THREE.LoopRepeat;
       actionB.clampWhenFinished = false;
+      actionB.zeroSlopeAtStart = true;
+      actionB.zeroSlopeAtEnd = true;
       actionB.timeScale = 0.7;
       actionB.play();
     }
@@ -1958,14 +1962,14 @@ await (async () => {
       const headB = bones['mixamorigHead'];
       const neckB = bones['mixamorigNeck'];
       if (headB) {
-        smHeadY += (headB.rotation.y - smHeadY) * 0.15;
-        smHeadX += (headB.rotation.x - smHeadX) * 0.15;
+        smHeadY += (headB.rotation.y - smHeadY) * 0.05;
+        smHeadX += (headB.rotation.x - smHeadX) * 0.05;
         headB.rotation.y = smHeadY + hy;
         headB.rotation.x = smHeadX + hx;
       }
       if (neckB) {
-        smNeckY += (neckB.rotation.y - smNeckY) * 0.15;
-        smNeckX += (neckB.rotation.x - smNeckX) * 0.15;
+        smNeckY += (neckB.rotation.y - smNeckY) * 0.05;
+        smNeckX += (neckB.rotation.x - smNeckX) * 0.05;
         neckB.rotation.y = smNeckY + hy * 0.3;
         neckB.rotation.x = smNeckX + hx * 0.3;
       }
