@@ -899,8 +899,6 @@ footer a:hover { color: var(--ink); }
     <div class="world-section" data-world="0"></div>
     <div class="world-section" data-world="1"></div>
     <div class="world-section" data-world="2"></div>
-    <div class="world-section" data-world="3"></div>
-    <div class="world-section" data-world="4"></div>
   </div>
 </div>
 
@@ -1055,29 +1053,15 @@ const WORLDS = [
     frameCount: 165, stride: 5
   },
   {
-    slug: 'world-01', name: 'Ashfall',
-    chapter: 'Chapter II', title: 'Built From\nRuin',
-    sub: 'Unreal Engine 5 · Blender · Lumen',
-    accent: '#c46428', rgb: [196,100,40],
-    frameCount: 111, stride: 5
-  },
-  {
     slug: 'world-03', name: 'Verdant',
-    chapter: 'Chapter III', title: 'The Silence\nof Scale',
+    chapter: 'Chapter II', title: 'The Silence\nof Scale',
     sub: 'Unreal Engine 5 · Character Creator 4',
     accent: '#3a8c52', rgb: [58,140,82],
     frameCount: 124, stride: 5
   },
   {
-    slug: 'world-04', name: 'Helios',
-    chapter: 'Chapter IV', title: 'Architectures\nof Tomorrow',
-    sub: 'Unreal Engine 5 · Blender · Substance 3D',
-    accent: '#2872c4', rgb: [40,114,196],
-    frameCount: 179, stride: 5
-  },
-  {
     slug: 'world-05', name: 'Aurum',
-    chapter: 'Chapter V', title: 'Void\nArchitecture',
+    chapter: 'Chapter III', title: 'Void\nArchitecture',
     sub: 'Unreal Engine 5 · Blender · Substance 3D',
     accent: '#c4a028', rgb: [196,160,40],
     frameCount: 375, stride: 8
@@ -1649,10 +1633,10 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined' && typeo
   // Small elements (dots, eyebrow text) shift accent color as user scrolls through content
   const root = document.documentElement;
   [
-    ['showreel', WORLDS[4].accent],
-    ['ads',      WORLDS[3].accent],
-    ['gallery',  WORLDS[2].accent],
-    ['skills',   WORLDS[1].accent],
+    ['showreel', WORLDS[2].accent],
+    ['ads',      WORLDS[2].accent],
+    ['gallery',  WORLDS[1].accent],
+    ['skills',   WORLDS[0].accent],
     ['about',    WORLDS[0].accent],
     ['contact',  '#e8d5b0'],
   ].forEach(([id, color]) => {
