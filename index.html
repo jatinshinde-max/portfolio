@@ -284,40 +284,6 @@ body {
   color: var(--ink-dim);
 }
 
-/* ─── HERO INTRO ────────────────────────────────────────────── */
-#hero-intro {
-  position: fixed; inset: 0; z-index: 10;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  text-align: center;
-  pointer-events: none;
-  transition: opacity 0.7s ease;
-}
-#hero-intro .hi-eyebrow {
-  font-family: var(--f-semi);
-  font-size: 0.6rem; letter-spacing: 0.45em;
-  text-transform: uppercase; color: var(--ink-mute);
-  margin-bottom: 28px;
-}
-#hero-intro .hi-headline {
-  font-family: var(--f-display);
-  font-size: clamp(2.8rem, 9vw, 7.5rem);
-  font-weight: 300; line-height: 1.05;
-  color: var(--ink);
-  text-shadow: 0 4px 60px rgba(0,0,0,0.6);
-  margin-bottom: 28px;
-}
-#hero-intro .hi-sub {
-  font-family: var(--f-semi);
-  font-size: 0.65rem; letter-spacing: 0.18em;
-  color: var(--ink-dim);
-}
-#hero-intro.hidden { opacity: 0; }
-@media (max-width: 768px) {
-  #hero-intro .hi-headline { font-size: clamp(2rem, 12vw, 4rem); }
-  #hero-intro .hi-sub { font-size: 0.6rem; letter-spacing: 0.12em; }
-}
-
 /* ─── SCROLL SECTIONS ───────────────────────────────────────── */
 #scroll-wrap { position: relative; z-index:0; }
 .world-section { height: 400vh; position: relative; }
@@ -891,13 +857,6 @@ footer a:hover { color: var(--ink); }
   <a href="#contact">Contact</a>
 </div>
 
-<!-- HERO INTRO -->
-<div id="hero-intro">
-  <div class="hi-eyebrow">Imaginator Studio</div>
-  <div class="hi-headline">Crafting Worlds.<br>Shaping Characters.<br>Selling Products.</div>
-  <div class="hi-sub">CGI &amp; VFX Artist &mdash; Unreal Engine 5 &middot; Blender &middot; Substance 3D</div>
-</div>
-
 <!-- HUD -->
 <div id="hud">
   <div class="hud-name">
@@ -1261,7 +1220,6 @@ const hMain     = document.getElementById('h-main');
 const hSub      = document.getElementById('h-sub');
 const hScroll   = document.getElementById('h-scroll');
 const hDots     = document.getElementById('h-dots');
-const heroIntro = document.getElementById('hero-intro');
 
 // Build dots
 WORLDS.forEach((_,i) => {
@@ -1321,8 +1279,7 @@ window.addEventListener('scroll', () => {
   currentProgress = progress;
   updateHUD(world, progress);
 
-  // Hero intro fades out after 10vh
-  heroIntro.classList.toggle('hidden', window.scrollY > window.innerHeight * 0.1);
+
 }, { passive: true });
 
 // ═══════════════════════════════════════════════════════
