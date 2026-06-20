@@ -458,8 +458,9 @@ body {
   display: grid;
   grid-template-columns: 0.9fr 1.1fr;
   gap: clamp(40px,8vw,120px);
-  align-items: center;
+  align-items: start;
 }
+.about-text { padding-top: clamp(24px,4vh,56px); }
 @media (max-width:800px) { .about-section { grid-template-columns:1fr; } }
 
 .about-visual {
