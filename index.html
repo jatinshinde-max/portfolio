@@ -284,6 +284,40 @@ body {
   color: var(--ink-dim);
 }
 
+/* ─── HERO INTRO ────────────────────────────────────────────── */
+#hero-intro {
+  position: fixed; inset: 0; z-index: 10;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  pointer-events: none;
+  transition: opacity 0.7s ease;
+}
+#hero-intro .hi-eyebrow {
+  font-family: var(--f-semi);
+  font-size: 0.6rem; letter-spacing: 0.45em;
+  text-transform: uppercase; color: var(--ink-mute);
+  margin-bottom: 28px;
+}
+#hero-intro .hi-headline {
+  font-family: var(--f-display);
+  font-size: clamp(2.8rem, 9vw, 7.5rem);
+  font-weight: 300; line-height: 1.05;
+  color: var(--ink);
+  text-shadow: 0 4px 60px rgba(0,0,0,0.6);
+  margin-bottom: 28px;
+}
+#hero-intro .hi-sub {
+  font-family: var(--f-semi);
+  font-size: 0.65rem; letter-spacing: 0.18em;
+  color: var(--ink-dim);
+}
+#hero-intro.hidden { opacity: 0; }
+@media (max-width: 768px) {
+  #hero-intro .hi-headline { font-size: clamp(2rem, 12vw, 4rem); }
+  #hero-intro .hi-sub { font-size: 0.6rem; letter-spacing: 0.12em; }
+}
+
 /* ─── SCROLL SECTIONS ───────────────────────────────────────── */
 #scroll-wrap { position: relative; z-index:0; }
 .world-section { height: 400vh; position: relative; }
@@ -857,6 +891,13 @@ footer a:hover { color: var(--ink); }
   <a href="#contact">Contact</a>
 </div>
 
+<!-- HERO INTRO -->
+<div id="hero-intro">
+  <div class="hi-eyebrow">Imaginator Studio</div>
+  <div class="hi-headline">Crafting Worlds.<br>Shaping Characters.<br>Selling Products.</div>
+  <div class="hi-sub">CGI &amp; VFX Artist &mdash; Unreal Engine 5 &middot; Blender &middot; Substance 3D</div>
+</div>
+
 <!-- HUD -->
 <div id="hud">
   <div class="hud-name">
@@ -1047,22 +1088,22 @@ const CDN = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev';
 const WORLDS = [
   {
     slug: 'world-02', name: 'Luminara',
-    chapter: 'Chapter I', title: 'Where Logic\nYields to Light',
-    sub: 'Unreal Engine 5 · Substance 3D',
+    chapter: 'Environment Design', title: 'Worlds That\nFeel Real',
+    sub: 'Unreal Engine 5 · Lumen · Nanite · Substance 3D',
     accent: '#7c5cc4', rgb: [124,92,196],
     frameCount: 165, stride: 5
   },
   {
     slug: 'world-03', name: 'Verdant',
-    chapter: 'Chapter II', title: 'The Silence\nof Scale',
-    sub: 'Unreal Engine 5 · Character Creator 4',
+    chapter: 'Cinematic Rendering', title: 'Every Frame\nComposed',
+    sub: 'After Effects · DaVinci Resolve · Blender',
     accent: '#3a8c52', rgb: [58,140,82],
     frameCount: 124, stride: 5
   },
   {
     slug: 'world-05', name: 'Aurum',
-    chapter: 'Chapter III', title: 'Void\nArchitecture',
-    sub: 'Unreal Engine 5 · Blender · Substance 3D',
+    chapter: 'Lighting & Atmosphere', title: 'Light That\nTells Stories',
+    sub: 'Unreal Engine 5 · Substance 3D · Photoshop',
     accent: '#c4a028', rgb: [196,160,40],
     frameCount: 375, stride: 8
   }
@@ -1214,12 +1255,13 @@ requestAnimationFrame(draw);
 // ═══════════════════════════════════════════════════════
 //  HUD
 // ═══════════════════════════════════════════════════════
-const hTitle = document.getElementById('h-title');
-const hChap  = document.getElementById('h-chapter');
-const hMain  = document.getElementById('h-main');
-const hSub   = document.getElementById('h-sub');
-const hScroll= document.getElementById('h-scroll');
-const hDots  = document.getElementById('h-dots');
+const hTitle    = document.getElementById('h-title');
+const hChap     = document.getElementById('h-chapter');
+const hMain     = document.getElementById('h-main');
+const hSub      = document.getElementById('h-sub');
+const hScroll   = document.getElementById('h-scroll');
+const hDots     = document.getElementById('h-dots');
+const heroIntro = document.getElementById('hero-intro');
 
 // Build dots
 WORLDS.forEach((_,i) => {
@@ -1278,6 +1320,9 @@ window.addEventListener('scroll', () => {
   }
   currentProgress = progress;
   updateHUD(world, progress);
+
+  // Hero intro fades out after 10vh
+  heroIntro.classList.toggle('hidden', window.scrollY > window.innerHeight * 0.1);
 }, { passive: true });
 
 // ═══════════════════════════════════════════════════════
