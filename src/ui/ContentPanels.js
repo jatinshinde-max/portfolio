@@ -1,35 +1,27 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-// ─── Static content ───────────────────────────────────────────────────────────
-
-const TOOLS = [
-  'Unreal Engine 5',
-  'Blender',
-  'Substance 3D Painter',
-  'Character Creator 4',
-  'Marvelous Designer',
-  'After Effects',
-  'DaVinci Resolve',
-  'Premiere Pro',
-  'Photoshop',
-  'Illustrator',
-  'Lightroom',
-  'Audition',
-  'Corel Draw',
+// Recruiter-facing capability groups. Keep this list focused on tools that are
+// supported by work we can show in the portfolio rather than every app used.
+const TOOL_GROUPS = [
+  {
+    label: 'Generative AI / Workflows',
+    tools: ['ComfyUI', 'Wan Video', 'LTX Video', 'Flux', 'Qwen Image', 'SeedVR2'],
+  },
+  {
+    label: '3D / Realtime',
+    tools: ['Unreal Engine 5', 'Blender', 'Substance 3D Painter', 'Character Creator 4', 'Marvelous Designer'],
+  },
+  {
+    label: 'VFX / Post',
+    tools: ['After Effects', 'DaVinci Resolve', 'Premiere Pro', 'Photoshop'],
+  },
 ];
 
 const BIO_PARAS = [
-  `CGI & VFX artist specialising in cinematic environments, character work, and visual
-   storytelling. I lead creative teams — directing graphic designers and video editors
-   toward work that holds its own against the best in the field.`,
-  `Five worlds. Each one built from scratch inside Unreal Engine 5, textured in
-   Substance 3D Painter, characters assembled in Character Creator 4 and Marvelous
-   Designer — then composited, graded, and sequenced into the experience you just
-   scrolled through.`,
+  `Visual development, GenAI workflow, CGI and VFX artist building cinematic imagery and controlled production workflows across ComfyUI, Unreal Engine and Blender.`,
+  `I combine traditional 3D and post-production with generative image and video pipelines, focusing on consistency, controllability, iteration and production-ready output.`,
 ];
-
-// ─── Public entry point ───────────────────────────────────────────────────────
 
 export function buildContentPanels(worlds) {
   gsap.registerPlugin(ScrollTrigger);
@@ -43,28 +35,32 @@ export function buildContentPanels(worlds) {
   root.appendChild(_contactSection());
 
   container.appendChild(root);
-
-  // Defer until layout is painted so ScrollTrigger measurements are accurate
   requestAnimationFrame(() => _initReveals());
 }
-
-// ─── Section builders ─────────────────────────────────────────────────────────
 
 function _worldChapter(world, index) {
   const section = document.createElement('section');
   section.className = 'cp-world';
   section.dataset.world = index;
 
-  const projectsHTML = world.projects.map((p, i) => `
-    <div class="cp-project" data-cursor="hover">
-      <span class="cp-project-num">0${i + 1}</span>
-      <div class="cp-project-body">
-        <div class="cp-project-title">${p.title}</div>
-        <div class="cp-project-type">${p.type}</div>
-      </div>
-    </div>
-    <div class="cp-sep"></div>
-  `).join('');
+  // Legacy config may contain placeholder projects. Public case studies must
+  // explicitly opt in after their assets and claims have been verified.
+  const verifiedProjects = (world.projects || []).filter(project => project.verified === true);
+  const projectsHTML = verifiedProjects.length
+    ? `<div class="cp-projects">
+        <div class="cp-sep"></div>
+        ${verifiedProjects.map((p, i) => `
+          <div class="cp-project" data-cursor="hover">
+            <span class="cp-project-num">${String(i + 1).padStart(2, '0')}</span>
+            <div class="cp-project-body">
+              <div class="cp-project-title">${p.title}</div>
+              <div class="cp-project-type">${p.type}</div>
+            </div>
+          </div>
+          <div class="cp-sep"></div>
+        `).join('')}
+      </div>`
+    : '';
 
   section.innerHTML = `
     <div class="cp-inner">
@@ -75,22 +71,14 @@ function _worldChapter(world, index) {
         <h2 class="cp-headline">${world.title.replace(/\n/g, '<br>')}</h2>
         <p class="cp-body">${world.subtitle}</p>
       </div>
-      <div class="cp-projects">
-        <div class="cp-sep"></div>
-        ${projectsHTML}
-      </div>
+      ${projectsHTML}
     </div>
   `;
 
-  // Hover: title shifts right + accent color, JS-set per world
   section.querySelectorAll('.cp-project').forEach(el => {
     const titleEl = el.querySelector('.cp-project-title');
-    el.addEventListener('mouseenter', () => {
-      titleEl.style.color = world.accentColor;
-    });
-    el.addEventListener('mouseleave', () => {
-      titleEl.style.color = '';
-    });
+    el.addEventListener('mouseenter', () => { titleEl.style.color = world.accentColor; });
+    el.addEventListener('mouseleave', () => { titleEl.style.color = ''; });
   });
 
   return section;
@@ -100,27 +88,31 @@ function _aboutSection() {
   const section = document.createElement('section');
   section.className = 'cp-about';
 
-  const parasHTML = BIO_PARAS.map(p =>
-    `<p class="cp-body">${p.replace(/\s+/g, ' ').trim()}</p>`
-  ).join('');
-
-  const toolsHTML = TOOLS.map(t => `
-    <div class="cp-tool">
-      <span class="cp-tool-dot"></span>
-      <span class="cp-tool-name">${t}</span>
+  const parasHTML = BIO_PARAS.map(p => `<p class="cp-body">${p}</p>`).join('');
+  const toolsHTML = TOOL_GROUPS.map(group => `
+    <div class="cp-tool-group">
+      <span class="cp-eyebrow">${group.label}</span>
+      <div class="cp-tools-list">
+        ${group.tools.map(t => `
+          <div class="cp-tool">
+            <span class="cp-tool-dot"></span>
+            <span class="cp-tool-name">${t}</span>
+          </div>
+        `).join('')}
+      </div>
     </div>
   `).join('');
 
   section.innerHTML = `
     <div class="cp-inner cp-about-inner">
       <div class="cp-about-bio">
-        <span class="cp-eyebrow">The Work</span>
-        <h2 class="cp-headline cp-headline--md">The Eye,<br>The Hand,<br>The Build.</h2>
+        <span class="cp-eyebrow">Profile</span>
+        <h2 class="cp-headline cp-headline--md">Visual Development.<br>GenAI Workflows.<br>CGI & VFX.</h2>
         ${parasHTML}
       </div>
       <div class="cp-about-tools">
-        <span class="cp-eyebrow">Tools</span>
-        <div class="cp-tools-list">${toolsHTML}</div>
+        <span class="cp-eyebrow">Production Stack</span>
+        ${toolsHTML}
       </div>
     </div>
   `;
@@ -134,24 +126,18 @@ function _contactSection() {
 
   section.innerHTML = `
     <div class="cp-inner cp-contact-inner">
-      <h2 class="cp-contact-headline">Let's Build<br>a World.</h2>
-      <a
-        href="mailto:jatinshinde118@gmail.com"
-        class="cp-contact-cta"
-        data-cursor="hover"
-      >jatinshinde118@gmail.com</a>
+      <span class="cp-eyebrow">Available for international studio opportunities · Open to relocation</span>
+      <h2 class="cp-contact-headline">Build The<br>Next Frame.</h2>
+      <a href="mailto:jatinshinde118@gmail.com" class="cp-contact-cta" data-cursor="hover">jatinshinde118@gmail.com</a>
     </div>
   `;
 
   return section;
 }
 
-// ─── ScrollTrigger reveals ────────────────────────────────────────────────────
-
 function _initReveals() {
   const ease = 'power2.out';
 
-  // World chapter headers — fade + rise as a unit
   document.querySelectorAll('.cp-world-meta, .cp-world-header').forEach(el => {
     gsap.from(el, {
       opacity: 0, y: 44, duration: 1.0, ease,
@@ -159,24 +145,23 @@ function _initReveals() {
     });
   });
 
-  // Project rows — stagger slide from left
   document.querySelectorAll('.cp-world').forEach(section => {
-    const seps     = section.querySelectorAll('.cp-sep');
+    const projectRoot = section.querySelector('.cp-projects');
+    if (!projectRoot) return;
+    const seps = section.querySelectorAll('.cp-sep');
     const projects = section.querySelectorAll('.cp-project');
 
     gsap.from([...seps], {
-      scaleX: 0, transformOrigin: 'left center',
-      duration: 0.9, ease, stagger: 0.07,
-      scrollTrigger: { trigger: section.querySelector('.cp-projects'), start: 'top 82%', toggleActions: 'play none none none' },
+      scaleX: 0, transformOrigin: 'left center', duration: 0.9, ease, stagger: 0.07,
+      scrollTrigger: { trigger: projectRoot, start: 'top 82%', toggleActions: 'play none none none' },
     });
 
     gsap.from([...projects], {
       opacity: 0, x: -20, duration: 0.7, ease, stagger: 0.1,
-      scrollTrigger: { trigger: section.querySelector('.cp-projects'), start: 'top 78%', toggleActions: 'play none none none' },
+      scrollTrigger: { trigger: projectRoot, start: 'top 78%', toggleActions: 'play none none none' },
     });
   });
 
-  // About columns — each fades independently
   ['cp-about-bio', 'cp-about-tools'].forEach(cls => {
     const el = document.querySelector(`.${cls}`);
     if (!el) return;
@@ -186,13 +171,11 @@ function _initReveals() {
     });
   });
 
-  // Tool items — tight stagger
   gsap.from('.cp-tool', {
     opacity: 0, x: -14, duration: 0.45, ease, stagger: 0.04,
     scrollTrigger: { trigger: '.cp-tools-list', start: 'top 80%', toggleActions: 'play none none none' },
   });
 
-  // Contact headline — slower, more weight
   gsap.from('.cp-contact-headline', {
     opacity: 0, y: 64, duration: 1.3, ease,
     scrollTrigger: { trigger: '.cp-contact', start: 'top 72%', toggleActions: 'play none none none' },
