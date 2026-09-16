@@ -20,7 +20,7 @@ const TOOL_GROUPS = [
 
 const BIO_PARAS = [
   `Visual development, GenAI workflow, CGI and VFX artist building cinematic imagery and controlled production workflows across ComfyUI, Unreal Engine and Blender.`,
-  `My work combines traditional 3D and post-production with generative image and video pipelines — with an emphasis on consistency, controllability, iteration and production-ready results.`,
+  `I combine traditional 3D and post-production with generative image and video pipelines, focusing on consistency, controllability, iteration and production-ready output.`,
 ];
 
 export function buildContentPanels(worlds) {
@@ -43,8 +43,8 @@ function _worldChapter(world, index) {
   section.className = 'cp-world';
   section.dataset.world = index;
 
-  // Old config contains placeholder Project 01/02/03 entries. Do not expose
-  // them publicly. New case studies will opt in with verified: true.
+  // Legacy config may contain placeholder projects. Public case studies must
+  // explicitly opt in after their assets and claims have been verified.
   const verifiedProjects = (world.projects || []).filter(project => project.verified === true);
   const projectsHTML = verifiedProjects.length
     ? `<div class="cp-projects">
@@ -126,7 +126,7 @@ function _contactSection() {
 
   section.innerHTML = `
     <div class="cp-inner cp-contact-inner">
-      <span class="cp-eyebrow">Open to international studio opportunities & relocation</span>
+      <span class="cp-eyebrow">Available for international studio opportunities · Open to relocation</span>
       <h2 class="cp-contact-headline">Build The<br>Next Frame.</h2>
       <a href="mailto:jatinshinde118@gmail.com" class="cp-contact-cta" data-cursor="hover">jatinshinde118@gmail.com</a>
     </div>
