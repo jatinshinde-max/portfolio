@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jatin Shinde — CGI & VFX | Imaginator Studio</title>
-<meta name="description" content="Unreal Engine 5 environments, Blender characters, product visualization, and cinematic rendering.">
+<title>Jatin Shinde — 3D Generalist & Environment Artist | CGI/VFX</title>
+<meta name="description" content="3D Generalist, Environment Artist & CGI/VFX Artist. Cinematic environments, characters and photoreal CGI using Unreal Engine 5, Blender and Substance 3D. Open to full-time opportunities.">
 <meta name="theme-color" content="#06050c">
 <link rel="canonical" href="https://imaginatorstudio.com">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -12,14 +12,14 @@
 <!-- Open Graph -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://imaginatorstudio.com">
-<meta property="og:title" content="Jatin Shinde — CGI & VFX Artist">
-<meta property="og:description" content="Unreal Engine 5 environments, Blender characters, product visualization, and cinematic rendering.">
+<meta property="og:title" content="Jatin Shinde — 3D Generalist & Environment Artist">
+<meta property="og:description" content="Cinematic environments, characters and photoreal CGI using Unreal Engine 5, Blender and Substance 3D. Open to full-time opportunities & relocation.">
 <meta property="og:image" content="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/01.webp">
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Jatin Shinde — CGI & VFX Artist">
-<meta name="twitter:description" content="Unreal Engine 5 environments, Blender characters, product visualization, and cinematic rendering.">
+<meta name="twitter:title" content="Jatin Shinde — 3D Generalist & Environment Artist">
+<meta name="twitter:description" content="Cinematic environments, characters and photoreal CGI using Unreal Engine 5, Blender and Substance 3D.">
 <meta name="twitter:image" content="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/01.webp">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -804,6 +804,176 @@ footer a:hover { color: var(--ink); }
   .hud-title .t-main { font-size: clamp(1.5rem, 9vw, 2.2rem); }
 }
 
+/* ─── HERO INTRO ────────────────────────────────────────────── */
+.hero-intro-section {
+  padding: clamp(80px,14vh,160px) clamp(28px,7vw,100px) clamp(60px,10vh,120px);
+  background: var(--bg);
+  border-top: 1px solid var(--ink-ghost);
+}
+.hi-inner { max-width: 860px; }
+.hi-status {
+  font-family: var(--f-semi);
+  font-size: 0.6rem; letter-spacing: 0.4em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 32px;
+  display: flex; align-items: center; gap: 12px;
+}
+.hi-status::before {
+  content: '';
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+  animation: status-pulse 2.4s ease infinite;
+}
+@keyframes status-pulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.7); }
+}
+.hi-title {
+  margin-bottom: 28px;
+}
+.hi-role-wrap {
+  overflow: hidden;
+  line-height: 1.08;
+}
+.hi-role {
+  font-family: var(--f-display);
+  font-size: clamp(2.8rem, 6.5vw, 6.5rem);
+  font-weight: 200; line-height: 1.0;
+  letter-spacing: -0.02em; color: var(--ink);
+  display: block; will-change: transform;
+}
+.hi-role-wrap:not(:last-child) .hi-role { color: var(--ink-dim); }
+.hi-role-wrap:last-child .hi-role { color: var(--ink); }
+.hi-divider {
+  width: 40px; height: 1px;
+  background: var(--ink-ghost);
+  margin: 24px 0;
+}
+.hi-sub {
+  font-size: 1rem; line-height: 1.8;
+  color: var(--ink-dim); max-width: 52ch;
+  margin-bottom: 48px;
+}
+.hi-ctas {
+  display: flex; gap: 16px; flex-wrap: wrap;
+}
+.hi-btn {
+  display: inline-flex; align-items: center; gap: 12px;
+  padding: 14px 32px;
+  font-family: var(--f-semi);
+  font-size: 0.62rem; letter-spacing: 0.3em;
+  text-transform: uppercase; text-decoration: none;
+  cursor: none;
+  transition: background 0.3s, border-color 0.3s, color 0.3s;
+}
+.hi-btn-primary {
+  background: rgba(255,255,255,0.9);
+  color: var(--bg);
+  border: 1px solid rgba(255,255,255,0.9);
+}
+.hi-btn-primary:hover {
+  background: #fff;
+  border-color: #fff;
+}
+.hi-btn-secondary {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+.hi-btn-secondary:hover {
+  border-color: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.04);
+}
+.hi-btn span { transition: transform 0.3s var(--ease-out); }
+.hi-btn:hover span { transform: translateX(5px); }
+@media (max-width:768px) {
+  .hi-role { font-size: clamp(2rem, 9vw, 3.5rem); }
+  .hi-ctas { flex-direction: column; }
+  .hi-btn { justify-content: center; }
+}
+
+/* ─── TOOLS CATEGORIES ──────────────────────────────────────── */
+.tools-categories {
+  margin-top: 40px;
+  display: flex; flex-direction: column; gap: 0;
+  border: 1px solid var(--ink-ghost);
+}
+.tools-category {
+  border-bottom: 1px solid var(--ink-ghost);
+}
+.tools-category:last-child { border-bottom: none; }
+.tc-header {
+  padding: 12px 18px;
+  font-family: var(--f-semi);
+  font-size: 0.52rem; letter-spacing: 0.4em;
+  text-transform: uppercase; color: var(--ink-mute);
+  background: var(--bg-1);
+  border-bottom: 1px solid var(--ink-ghost);
+}
+.tc-items {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1px; background: var(--ink-ghost);
+}
+
+/* ─── GENERATIVE AI SECTION ─────────────────────────────────── */
+.genai-section {
+  padding: clamp(80px,12vh,140px) clamp(28px,7vw,100px);
+  background: var(--bg);
+  border-top: 1px solid var(--ink-ghost);
+}
+.genai-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(40px,8vw,120px);
+  align-items: start;
+}
+@media (max-width:800px) { .genai-inner { grid-template-columns: 1fr; } }
+.genai-text { padding-top: clamp(16px,3vh,40px); }
+.genai-text .a-body { margin-bottom: 32px; }
+.genai-tags {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-top: 32px;
+}
+.genai-tag {
+  font-family: var(--f-semi);
+  font-size: 0.55rem; letter-spacing: 0.25em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border: 1px solid var(--ink-ghost);
+  color: var(--ink-dim);
+}
+.genai-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+.genai-cell {
+  aspect-ratio: 4/3;
+  background: var(--bg-2);
+  position: relative; overflow: hidden;
+  border-radius: 2px;
+  opacity: 0; transform: translateY(20px);
+  transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
+}
+.genai-cell.vis { opacity: 1; transform: none; }
+.genai-cell img, .genai-cell video {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  filter: saturate(0.85) brightness(0.8);
+  transition: filter 0.5s;
+}
+.genai-cell:hover img, .genai-cell:hover video {
+  filter: saturate(1.0) brightness(0.9);
+}
+.genai-placeholder {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--f-semi);
+  font-size: 0.5rem; letter-spacing: 0.4em;
+  text-transform: uppercase; color: var(--ink-mute);
+}
+
 /* ─── CHARACTER SPINNER ─────────────────────────────────────── */
 .char-spinner {
   position: absolute;
@@ -851,22 +1021,22 @@ footer a:hover { color: var(--ink); }
 <!-- MOBILE NAV OVERLAY -->
 <div id="mob-nav">
   <button id="mob-close" aria-label="Close menu">×</button>
-  <a href="#worlds">Worlds</a>
   <a href="#gallery">Work</a>
   <a href="#about">About</a>
+  <a href="#generative-ai">Generative AI</a>
   <a href="#contact">Contact</a>
 </div>
 
 <!-- HUD -->
 <div id="hud">
   <div class="hud-name">
-    <div class="role">CGI &amp; VFX</div>
+    <div class="role">3D Generalist · Environment Artist</div>
     <div class="name">Jatin Shinde</div>
   </div>
   <nav class="hud-nav">
-    <a href="#worlds">Worlds</a>
     <a href="#gallery">Work</a>
     <a href="#about">About</a>
+    <a href="#generative-ai">Generative AI</a>
     <a href="#contact">Contact</a>
   </nav>
   <button id="mob-menu" aria-label="Open menu">
@@ -905,6 +1075,23 @@ footer a:hover { color: var(--ink); }
 <!-- CONTENT -->
 <div id="content">
 
+  <!-- HERO INTRO -->
+  <div class="hero-intro-section" id="hero-intro">
+    <div class="hi-inner">
+      <div class="hi-status reveal">Based in India · Open to Full-Time Opportunities &amp; Relocation</div>
+      <div class="hi-title">
+        <div class="hi-role-wrap"><div class="hi-role">3D Generalist</div></div>
+        <div class="hi-role-wrap"><div class="hi-role">Environment Artist</div></div>
+        <div class="hi-role-wrap"><div class="hi-role">CGI / VFX Artist</div></div>
+      </div>
+      <p class="hi-sub reveal reveal-delay-1">Creating cinematic environments, characters and photoreal CGI using Unreal Engine 5, Blender and Substance 3D.</p>
+      <div class="hi-ctas reveal reveal-delay-2">
+        <a href="#gallery" class="hi-btn hi-btn-primary">View Selected Work <span>↓</span></a>
+        <a href="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/cv/jatin-shinde-cv.pdf" class="hi-btn hi-btn-secondary" target="_blank" rel="noopener">Download CV <span>→</span></a>
+      </div>
+    </div>
+  </div>
+
   <!-- SHOWREEL -->
   <div class="showreel-section" id="showreel">
     <div class="showreel-inner">
@@ -915,13 +1102,14 @@ footer a:hover { color: var(--ink); }
         <div class="video-overlay"></div>
       </div>
       <div class="showreel-text">
-        <div class="sr-eyebrow reveal">Character Work</div>
-        <h2 class="sr-title reveal reveal-delay-1">From Clay<br>to Skin</h2>
-        <p class="sr-body reveal reveal-delay-2">Full character pipeline: sculpting, retopology, UV mapping, texturing, rigging, and final render. Watch the transition from raw clay to fully textured skin across multiple angles and expressions.</p>
+        <div class="sr-eyebrow reveal">Character Pipeline</div>
+        <h2 class="sr-title reveal reveal-delay-1">Full Pipeline.<br>Clay to<br>Final Render.</h2>
+        <p class="sr-body reveal reveal-delay-2">End-to-end character work: sculpting, retopology, UV mapping, texturing in Substance 3D, rigging, and cinematic render in Unreal Engine 5. Every stage owned and executed independently.</p>
         <div class="sr-meta reveal reveal-delay-3">
-          <div class="sr-meta-item"><span>CC4</span>Character Creator</div>
-          <div class="sr-meta-item"><span>SP</span>Substance Painter</div>
-          <div class="sr-meta-item"><span>UE5</span>Final Render</div>
+          <div class="sr-meta-item"><span>CC4</span>Character Creator 4</div>
+          <div class="sr-meta-item"><span>SP</span>Substance 3D Painter</div>
+          <div class="sr-meta-item"><span>MD</span>Marvelous Designer</div>
+          <div class="sr-meta-item"><span>UE5</span>Cinematic Render</div>
         </div>
       </div>
     </div>
@@ -951,12 +1139,12 @@ footer a:hover { color: var(--ink); }
   <div class="gallery-section" id="gallery">
     <div class="s-head">
       <div class="s-eyebrow reveal">Selected Works</div>
-      <h2 class="s-title reveal reveal-delay-1">Renders.<br>Concept Art.<br>Motion.</h2>
+      <h2 class="s-title reveal reveal-delay-1">Environments.<br>Characters.<br>VFX &amp; Motion.</h2>
     </div>
     <div class="gallery-filters reveal">
       <button class="g-filter active" data-filter="all">All</button>
-      <button class="g-filter" data-filter="renders">Renders</button>
-      <button class="g-filter" data-filter="concept-art">Concept Art</button>
+      <button class="g-filter" data-filter="renders">Environments</button>
+      <button class="g-filter" data-filter="concept-art">VFX &amp; Motion</button>
     </div>
     <div class="gallery-grid" id="g-grid">
       <!-- Gallery cells generated by JS -->
@@ -966,8 +1154,8 @@ footer a:hover { color: var(--ink); }
   <!-- TOOLS & SKILLS -->
   <div class="tools-section" id="skills">
     <div>
-      <div class="s-eyebrow reveal">Production Stack</div>
-      <h2 class="s-title reveal reveal-delay-1">Every<br>Tool,<br>Mastered.</h2>
+      <div class="s-eyebrow reveal">Skills &amp; Software</div>
+      <h2 class="s-title reveal reveal-delay-1">Production<br>Toolkit.</h2>
       <div class="stats-row reveal reveal-delay-2">
         <div class="stat-cell">
           <div class="stat-n">5+</div>
@@ -984,19 +1172,64 @@ footer a:hover { color: var(--ink); }
       </div>
     </div>
     <div>
-      <div class="tools-list reveal">
-        <div class="tool-item"><span class="tool-dot"></span>Unreal Engine 5</div>
-        <div class="tool-item"><span class="tool-dot"></span>Blender</div>
-        <div class="tool-item"><span class="tool-dot"></span>After Effects</div>
-        <div class="tool-item"><span class="tool-dot"></span>Substance 3D</div>
-        <div class="tool-item"><span class="tool-dot"></span>Photoshop</div>
-        <div class="tool-item"><span class="tool-dot"></span>Premier Pro</div>
-        <div class="tool-item"><span class="tool-dot"></span>Illustrator</div>
-        <div class="tool-item"><span class="tool-dot"></span>Character Creator 4</div>
-        <div class="tool-item"><span class="tool-dot"></span>DaVinci Resolve</div>
-        <div class="tool-item"><span class="tool-dot"></span>Marvelous Designer</div>
-        <div class="tool-item"><span class="tool-dot"></span>Audition</div>
-        <div class="tool-item"><span class="tool-dot"></span>Corel Draw</div>
+      <div class="tools-categories reveal">
+        <div class="tools-category">
+          <div class="tc-header">3D / Real-Time</div>
+          <div class="tc-items">
+            <div class="tool-item"><span class="tool-dot"></span>Unreal Engine 5</div>
+            <div class="tool-item"><span class="tool-dot"></span>Blender</div>
+            <div class="tool-item"><span class="tool-dot"></span>Substance 3D Painter</div>
+            <div class="tool-item"><span class="tool-dot"></span>Character Creator 4</div>
+            <div class="tool-item"><span class="tool-dot"></span>Marvelous Designer</div>
+          </div>
+        </div>
+        <div class="tools-category">
+          <div class="tc-header">Compositing / Motion</div>
+          <div class="tc-items">
+            <div class="tool-item"><span class="tool-dot"></span>After Effects</div>
+            <div class="tool-item"><span class="tool-dot"></span>DaVinci Resolve</div>
+            <div class="tool-item"><span class="tool-dot"></span>Premiere Pro</div>
+          </div>
+        </div>
+        <div class="tools-category">
+          <div class="tc-header">Design</div>
+          <div class="tc-items">
+            <div class="tool-item"><span class="tool-dot"></span>Photoshop</div>
+            <div class="tool-item"><span class="tool-dot"></span>Illustrator</div>
+          </div>
+        </div>
+        <div class="tools-category">
+          <div class="tc-header">Generative / AI</div>
+          <div class="tc-items">
+            <div class="tool-item"><span class="tool-dot"></span>ComfyUI</div>
+            <div class="tool-item"><span class="tool-dot"></span>Generative Image Workflows</div>
+            <div class="tool-item"><span class="tool-dot"></span>Generative Video Workflows</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GENERATIVE AI -->
+  <div class="genai-section" id="generative-ai">
+    <div class="genai-inner">
+      <div class="genai-text">
+        <div class="s-eyebrow reveal">Generative AI</div>
+        <h2 class="s-title reveal reveal-delay-1">AI as a<br>Creative Tool.</h2>
+        <p class="a-body reveal reveal-delay-2">Exploring how generative AI amplifies the 3D/VFX pipeline — from concept ideation and rapid prototyping to texture generation and motion. ComfyUI workflows built for cinematic image and video output.</p>
+        <div class="genai-tags reveal reveal-delay-3">
+          <div class="genai-tag">ComfyUI</div>
+          <div class="genai-tag">Image Generation</div>
+          <div class="genai-tag">Video Generation</div>
+          <div class="genai-tag">Texture Synthesis</div>
+          <div class="genai-tag">Concept Development</div>
+        </div>
+      </div>
+      <div class="genai-grid">
+        <div class="genai-cell"><div class="genai-placeholder">Coming Soon</div></div>
+        <div class="genai-cell"><div class="genai-placeholder">Coming Soon</div></div>
+        <div class="genai-cell"><div class="genai-placeholder">Coming Soon</div></div>
+        <div class="genai-cell"><div class="genai-placeholder">Coming Soon</div></div>
       </div>
     </div>
   </div>
@@ -1009,26 +1242,33 @@ footer a:hover { color: var(--ink); }
         <span class="cs-label">Loading</span>
       </div>
       <canvas class="g-canvas" id="about-canvas"></canvas>
-      <div class="av-label">CGI & VFX · India</div>
+      <div class="av-label">3D Generalist · India</div>
     </div>
     <div class="about-text">
       <div class="a-eyebrow reveal">About</div>
-      <h2 class="a-headline reveal reveal-delay-1">CGI &amp; VFX<br>Artist with a<br>Proven Track<br>Record.</h2>
-      <p class="a-body reveal reveal-delay-2">I craft photorealistic environments, characters, and product visualizations. With expertise in Unreal Engine 5, Blender, and Substance 3D, I bring cinematic quality to every frame — from world-building to commercial advertising.</p>
+      <h2 class="a-headline reveal reveal-delay-1">5+ Years Building<br>Photoreal<br>Worlds.</h2>
+      <p class="a-body reveal reveal-delay-2">I'm a 3D Generalist and Environment Artist specializing in cinematic environments, character pipelines, and product CGI. I work across the full production pipeline — from asset creation in Blender and Character Creator 4, to rendering in Unreal Engine 5 with Lumen and Nanite, to compositing in After Effects and DaVinci Resolve.</p>
+      <p class="a-body reveal reveal-delay-3" style="margin-top:20px;">Based in India. Open to full-time roles and relocation. Strong interest in game studios, VFX houses, and creative technology teams.</p>
     </div>
   </div>
 
   <!-- CONTACT -->
   <div class="contact-section" id="contact">
-    <div class="c-eyebrow reveal">Open to Collaboration</div>
-    <h2 class="c-headline reveal reveal-delay-1">Let's Build<br>a World.</h2>
-    <a href="mailto:jatinshinde118@gmail.com" class="c-btn reveal reveal-delay-2">
-      Get in Touch <span>→</span>
-    </a>
+    <div class="c-eyebrow reveal">Open to Opportunities</div>
+    <h2 class="c-headline reveal reveal-delay-1">Available for<br>Full-Time Roles.</h2>
+    <p class="a-body reveal reveal-delay-1" style="max-width:44ch;margin:0 auto 40px;text-align:center;position:relative;z-index:1;">3D Generalist · Environment Artist · CGI/VFX Artist<br>Based in India · Open to relocation</p>
+    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1;">
+      <a href="mailto:jatinshinde118@gmail.com" class="c-btn reveal reveal-delay-2">
+        Send Email <span>→</span>
+      </a>
+      <a href="https://www.linkedin.com/in/jatin-shinde-202b671a9" class="c-btn reveal reveal-delay-3" target="_blank" rel="noopener" style="border-color:rgba(255,255,255,0.12);color:var(--ink-dim);">
+        LinkedIn Profile <span>→</span>
+      </a>
+    </div>
   </div>
 
   <footer>
-    <div class="f-left">© 2026 Jatin Shinde — CGI & VFX</div>
+    <div class="f-left">© 2026 Jatin Shinde — 3D Generalist &amp; Environment Artist</div>
     <div class="f-right">
       <a href="https://www.instagram.com/imaginators.studio" target="_blank" rel="noopener">Instagram</a>
       <a href="https://youtube.com/@imaginatorsstudio" target="_blank" rel="noopener">YouTube</a>
@@ -1083,7 +1323,7 @@ document.addEventListener('mousemove', e => {
   ring.style.left = rx+'px'; ring.style.top = ry+'px';
   requestAnimationFrame(rl);
 })();
-document.querySelectorAll('a,button,.g-cell,.showreel-video').forEach(el => {
+document.querySelectorAll('a,button,.g-cell,.showreel-video,.hi-btn').forEach(el => {
   el.addEventListener('mouseenter', () => ring.classList.add('expand'));
   el.addEventListener('mouseleave', () => ring.classList.remove('expand'));
 });
@@ -1468,6 +1708,11 @@ const revealObs = new IntersectionObserver((entries) => {
 document.querySelectorAll('.reveal').forEach(el => {
   if (!el.matches('.s-title,.sr-title,.a-headline,.c-headline')) revealObs.observe(el);
 });
+// Genai cells
+document.querySelectorAll('.genai-cell').forEach((el, i) => {
+  el.style.transitionDelay = (i * 0.1) + 's';
+  revealObs.observe(el);
+});
 // g-cells revealed via GSAP stagger (not IntersectionObserver)
 
 // ═══════════════════════════════════════════════════════
@@ -1583,6 +1828,19 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined' && typeo
     scrollTrigger: { trigger: '#content', start: 'top 95%', end: 'top 25%', scrub: 0.5 }
   });
 
+  // 2b. HERO ROLE LINES staggered reveal
+  {
+    const roles = document.querySelectorAll('.hi-role');
+    const hiSection = document.querySelector('.hero-intro-section');
+    if (roles.length && hiSection) {
+      gsap.set(roles, { y: '108%' });
+      gsap.to(roles, {
+        y: '0%', duration: 1.0, stagger: 0.12, ease: EASE,
+        scrollTrigger: { trigger: hiSection, start: 'top 80%' }
+      });
+    }
+  }
+
   // 3. TITLE LINE-BY-LINE REVEALS
   // Split each headline into <br>-separated lines and clip-reveal each
   document.querySelectorAll('.s-title,.sr-title,.a-headline,.c-headline').forEach(el => {
@@ -1649,12 +1907,14 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined' && typeo
   // Small elements (dots, eyebrow text) shift accent color as user scrolls through content
   const root = document.documentElement;
   [
-    ['showreel', WORLDS[2].accent],
-    ['ads',      WORLDS[2].accent],
-    ['gallery',  WORLDS[1].accent],
-    ['skills',   WORLDS[0].accent],
-    ['about',    WORLDS[0].accent],
-    ['contact',  '#e8d5b0'],
+    ['hero-intro',      '#e8d5b0'],
+    ['showreel',        WORLDS[2].accent],
+    ['ads',             WORLDS[2].accent],
+    ['gallery',         WORLDS[1].accent],
+    ['skills',          WORLDS[0].accent],
+    ['generative-ai',   '#e8d5b0'],
+    ['about',           WORLDS[0].accent],
+    ['contact',         '#e8d5b0'],
   ].forEach(([id, color]) => {
     const el = document.getElementById(id);
     if (!el) return;
