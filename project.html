@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project — Jatin Shinde</title>
+<meta name="description" content="Project case study — Jatin Shinde, 3D Generalist & Environment Artist">
+<meta name="theme-color" content="#06050c">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400&family=Barlow:ital,wght@0,300;0,400;0,500;1,300&family=Barlow+Semi+Condensed:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ─── TOKENS ────────────────────────────────────────────────── */
+:root {
+  --bg:       #06050c;
+  --bg-1:     #0b0a14;
+  --bg-2:     #100f1c;
+  --ink:      rgba(255,255,255,0.92);
+  --ink-dim:  rgba(255,255,255,0.45);
+  --ink-mute: rgba(255,255,255,0.2);
+  --ink-ghost:rgba(255,255,255,0.06);
+  --accent:   #e8d5b0;
+
+  --f-display: 'Barlow Condensed', sans-serif;
+  --f-body:    'Barlow', sans-serif;
+  --f-semi:    'Barlow Semi Condensed', sans-serif;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-weight: 300;
+  overflow-x: hidden;
+  cursor: none;
+  -webkit-font-smoothing: antialiased;
+}
+@media (hover:none),(pointer:coarse) { body { cursor:auto; } }
+
+/* ─── CURSOR ───────────────────────────────────────────────── */
+#c-dot, #c-ring {
+  position: fixed; top:0; left:0;
+  pointer-events: none; z-index: 9999;
+  transform: translate(-50%,-50%);
+  will-change: transform;
+}
+#c-dot {
+  width: 5px; height: 5px;
+  background: var(--ink);
+  border-radius: 50%;
+  mix-blend-mode: difference;
+  transition: transform 0.1s var(--ease-out);
+}
+#c-ring {
+  width: 34px; height: 34px;
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 50%;
+  transition: width 0.3s var(--ease-out), height 0.3s var(--ease-out),
+              border-color 0.3s, transform 0.12s var(--ease-out);
+}
+#c-ring.expand { width: 60px; height: 60px; border-color: rgba(255,255,255,0.8); }
+@media (hover:none),(pointer:coarse) { #c-dot, #c-ring { display: none; } }
+
+/* ─── TOP BAR ──────────────────────────────────────────────── */
+#topbar {
+  position: fixed; top:0; left:0; right:0;
+  z-index: 50;
+  padding: 24px 36px;
+  display: flex; justify-content: space-between; align-items: center;
+  background: linear-gradient(to bottom, rgba(6,5,12,0.85) 0%, transparent 100%);
+  pointer-events: none;
+}
+#topbar a { pointer-events: auto; }
+.tb-back {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--f-semi);
+  font-size: 0.6rem; letter-spacing: 0.3em;
+  text-transform: uppercase; color: var(--ink-dim);
+  text-decoration: none;
+  transition: color 0.3s;
+  cursor: none;
+}
+.tb-back:hover { color: var(--ink); }
+.tb-back .arrow { transition: transform 0.3s var(--ease-out); }
+.tb-back:hover .arrow { transform: translateX(-4px); }
+.tb-name {
+  font-family: var(--f-display);
+  font-size: 1rem; font-weight: 400;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ink-dim); text-decoration: none;
+}
+
+/* ─── PROJECT HERO ─────────────────────────────────────────── */
+#p-hero {
+  position: relative;
+  width: 100%; height: 100vh;
+  overflow: hidden;
+  display: flex; align-items: flex-end;
+}
+#p-hero-media {
+  position: absolute; inset:0;
+  background: var(--bg-1);
+}
+#p-hero-media img,
+#p-hero-media video {
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+  filter: brightness(0.65);
+}
+.hero-vignette {
+  position: absolute; inset:0;
+  background: linear-gradient(to top, rgba(6,5,12,0.95) 0%, transparent 50%);
+  pointer-events: none;
+}
+.hero-grain {
+  position: absolute; inset:-50%; width:200%; height:200%;
+  pointer-events:none; opacity:0.18;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+  animation: grain-shift 0.12s steps(1) infinite;
+}
+@keyframes grain-shift {
+  0%   {transform:translate(0,0)}  25%  {transform:translate(-3%,-3%)}
+  50%  {transform:translate(3%,2%)} 75% {transform:translate(-2%,3%)}
+  100% {transform:translate(2%,-2%)}
+}
+#p-hero-text {
+  position: relative; z-index: 2;
+  padding: 0 clamp(28px,7vw,100px) clamp(48px,8vh,80px);
+  width: 100%;
+}
+.ph-category {
+  font-family: var(--f-semi);
+  font-size: 0.6rem; letter-spacing: 0.4em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 18px;
+}
+.ph-title {
+  font-family: var(--f-display);
+  font-size: clamp(3rem, 8vw, 8rem);
+  font-weight: 200; line-height: 0.95;
+  letter-spacing: -0.02em;
+  max-width: 14ch;
+  margin-bottom: 28px;
+}
+.ph-meta {
+  display: flex; flex-wrap: wrap; gap: 24px;
+}
+.ph-meta-item {
+  display: flex; flex-direction: column; gap: 4px;
+}
+.ph-meta-label {
+  font-family: var(--f-semi);
+  font-size: 0.5rem; letter-spacing: 0.35em;
+  text-transform: uppercase; color: var(--ink-mute);
+}
+.ph-meta-value {
+  font-family: var(--f-semi);
+  font-size: 0.8rem; color: var(--ink-dim);
+}
+
+/* ─── CONTENT ──────────────────────────────────────────────── */
+#p-content {
+  position: relative; z-index: 5;
+  background: var(--bg);
+}
+
+/* ─── SECTION BASE ─────────────────────────────────────────── */
+.ps {
+  padding: clamp(60px,10vh,120px) clamp(28px,7vw,100px);
+  border-top: 1px solid var(--ink-ghost);
+}
+.ps-label {
+  font-family: var(--f-semi);
+  font-size: 0.55rem; letter-spacing: 0.42em;
+  text-transform: uppercase; color: var(--ink-mute);
+  margin-bottom: 28px;
+}
+.ps-heading {
+  font-family: var(--f-display);
+  font-size: clamp(1.8rem, 3.5vw, 3rem);
+  font-weight: 200; line-height: 1.0;
+  letter-spacing: -0.01em;
+  margin-bottom: 24px;
+}
+.ps-body {
+  font-size: 1rem; line-height: 1.85;
+  color: var(--ink-dim); max-width: 66ch;
+}
+.ps-body + .ps-body { margin-top: 16px; }
+
+/* ─── OVERVIEW + CONTRIBUTION ─────────────────────────────── */
+.ps-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(40px,8vw,100px);
+}
+@media (max-width:800px) { .ps-two-col { grid-template-columns:1fr; } }
+
+/* ─── SPEC TABLE ───────────────────────────────────────────── */
+.spec-table {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1px; background: var(--ink-ghost);
+  border: 1px solid var(--ink-ghost);
+  margin-top: 32px;
+}
+.spec-row {
+  background: var(--bg);
+  padding: 14px 18px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.spec-key {
+  font-family: var(--f-semi);
+  font-size: 0.5rem; letter-spacing: 0.38em;
+  text-transform: uppercase; color: var(--ink-mute);
+}
+.spec-val {
+  font-family: var(--f-semi);
+  font-size: 0.82rem; color: var(--ink-dim);
+}
+@media (max-width:600px) { .spec-table { grid-template-columns:1fr; } }
+
+/* ─── MEDIA GRID ───────────────────────────────────────────── */
+.media-grid {
+  display: grid;
+  gap: 7px;
+  margin-top: 32px;
+}
+.media-grid.cols-1 { grid-template-columns: 1fr; }
+.media-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+.media-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+@media (max-width:768px) {
+  .media-grid.cols-2,
+  .media-grid.cols-3 { grid-template-columns: 1fr; }
+}
+.media-cell {
+  position: relative; overflow: hidden;
+  background: var(--bg-2);
+  border-radius: 2px;
+  aspect-ratio: 16/9;
+}
+.media-cell[data-ratio="4/3"]  { aspect-ratio: 4/3; }
+.media-cell[data-ratio="1/1"]  { aspect-ratio: 1/1; }
+.media-cell[data-ratio="9/16"] { aspect-ratio: 9/16; }
+.media-cell img,
+.media-cell video {
+  position: absolute; inset:0;
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+  filter: brightness(0.88);
+  transition: filter 0.5s;
+}
+.media-cell:hover img,
+.media-cell:hover video { filter: brightness(0.96); }
+.media-caption {
+  margin-top: 8px;
+  font-family: var(--f-semi);
+  font-size: 0.55rem; letter-spacing: 0.3em;
+  text-transform: uppercase; color: var(--ink-mute);
+}
+
+/* ─── DISCLOSURE ───────────────────────────────────────────── */
+.disclosure-box {
+  margin-top: 28px;
+  padding: 20px 24px;
+  border: 1px solid rgba(232,213,176,0.15);
+  background: rgba(232,213,176,0.03);
+}
+.disclosure-box p {
+  font-size: 0.85rem; line-height: 1.75;
+  color: var(--ink-dim);
+}
+.disclosure-box strong {
+  font-weight: 500; color: var(--accent);
+}
+
+/* ─── PREV / NEXT NAV ──────────────────────────────────────── */
+#p-nav {
+  padding: clamp(60px,8vh,100px) clamp(28px,7vw,100px);
+  border-top: 1px solid var(--ink-ghost);
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 2px;
+}
+@media (max-width:600px) { #p-nav { grid-template-columns: 1fr; } }
+.pn-link {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 28px 24px;
+  text-decoration: none;
+  background: var(--bg-1);
+  transition: background 0.3s;
+  cursor: none;
+}
+.pn-link:hover { background: var(--bg-2); }
+.pn-link.next { text-align: right; }
+.pn-dir {
+  font-family: var(--f-semi);
+  font-size: 0.52rem; letter-spacing: 0.4em;
+  text-transform: uppercase; color: var(--ink-mute);
+}
+.pn-title {
+  font-family: var(--f-display);
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 200; color: var(--ink-dim);
+  transition: color 0.3s;
+}
+.pn-link:hover .pn-title { color: var(--ink); }
+
+/* ─── FOOTER ───────────────────────────────────────────────── */
+footer {
+  padding: 28px clamp(28px,7vw,100px);
+  background: var(--bg);
+  border-top: 1px solid var(--ink-ghost);
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 16px;
+}
+footer .f-left {
+  font-family: var(--f-semi);
+  font-size: 0.6rem; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--ink-mute);
+}
+footer a {
+  font-family: var(--f-semi);
+  font-size: 0.6rem; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--ink-mute);
+  text-decoration: none; transition: color 0.3s; cursor: none;
+}
+footer a:hover { color: var(--ink); }
+
+/* ─── NOT FOUND ────────────────────────────────────────────── */
+#p-not-found {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 24px; text-align: center;
+  padding: 40px;
+}
+.nf-code {
+  font-family: var(--f-display);
+  font-size: clamp(6rem,20vw,14rem);
+  font-weight: 200; color: var(--ink-ghost);
+  line-height: 1;
+}
+.nf-msg {
+  font-family: var(--f-semi);
+  font-size: 0.65rem; letter-spacing: 0.35em;
+  text-transform: uppercase; color: var(--ink-mute);
+}
+
+/* ─── SCROLL REVEAL ────────────────────────────────────────── */
+.reveal {
+  opacity: 0; transform: translateY(20px);
+  transition: opacity 0.9s var(--ease-out), transform 0.9s var(--ease-out);
+}
+.reveal.vis { opacity: 1; transform: none; }
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+
+/* ─── LOADING STATE ────────────────────────────────────────── */
+#p-loading {
+  position: fixed; inset:0; z-index: 100;
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity 0.6s var(--ease-out);
+}
+#p-loading.out { opacity: 0; pointer-events: none; }
+.pl-ring {
+  width: 32px; height: 32px;
+  border: 1px solid var(--ink-ghost);
+  border-top-color: var(--ink-dim);
+  border-radius: 50%;
+  animation: pl-spin 1s linear infinite;
+}
+@keyframes pl-spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div id="c-dot"></div>
+<div id="c-ring"></div>
+
+<!-- LOADING SCREEN -->
+<div id="p-loading"><div class="pl-ring"></div></div>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <a href="/" class="tb-back"><span class="arrow">←</span> All Work</a>
+  <a href="/" class="tb-name">Jatin Shinde</a>
+</div>
+
+<!-- PROJECT CONTENT (populated by JS) -->
+<main id="p-root"></main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="f-left">© 2026 Jatin Shinde</div>
+  <a href="/">Back to Portfolio</a>
+</footer>
+
+<script type="module">
+// ═══════════════════════════════════════════════════════════════
+//  PROJECT DATA REGISTRY
+//  Each entry is a project object. Only include fields that have
+//  real content — the renderer skips any field that is absent or
+//  null. Never populate a field with invented or placeholder data.
+// ═══════════════════════════════════════════════════════════════
+
+const CDN = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev';
+
+/**
+ * FIELD REFERENCE — all optional unless noted:
+ *
+ * slug          (required) URL identifier, e.g. "luminara-environment"
+ * title         (required) Project name
+ * category      e.g. "Environment Design", "Character", "Product CGI"
+ * year          e.g. "2024"
+ * role          e.g. "3D Generalist", "Environment Artist"
+ * software      string[]  e.g. ["Unreal Engine 5", "Blender"]
+ * duration      e.g. "3 weeks"
+ *
+ * hero          { type: "image"|"video", src: string }
+ *
+ * overview      string  — project description
+ * contribution  string  — what was personally contributed (be precise)
+ * thirdParty    string  — third-party asset disclosure (if any)
+ *
+ * Media section arrays — each item: { src, type:"image"|"video", caption?, ratio? }
+ * finalRenders  []
+ * processImages []
+ * blockout      []
+ * modeling      []
+ * wireframe     []
+ * uvs           []
+ * texturing     []
+ * materials     []
+ * lighting      []
+ * unrealBreakdown []
+ * technicalDetails string
+ * finalVideo    { src, type:"video" }
+ *
+ * prev          { slug, title }  — previous project
+ * next          { slug, title }  — next project
+ */
+const PROJECTS = [
+  // ── ADD PROJECTS HERE when real data is ready ──────────────────
+  // Example structure (do not uncomment until content is confirmed):
+  //
+  // {
+  //   slug: 'luminara-environment',
+  //   title: 'Luminara',
+  //   category: 'Environment Design',
+  //   year: '2024',
+  //   role: 'Environment Artist',
+  //   software: ['Unreal Engine 5', 'Blender', 'Substance 3D Painter'],
+  //   duration: '4 weeks',
+  //   hero: { type: 'image', src: `${CDN}/projects/luminara/hero.webp` },
+  //   overview: '...',
+  //   contribution: '...',
+  //   finalRenders: [
+  //     { src: `${CDN}/projects/luminara/render-01.webp`, type: 'image', caption: 'Golden hour lighting' },
+  //   ],
+  //   next: { slug: 'verdant-environment', title: 'Verdant' },
+  // },
+];
+
+// ═══════════════════════════════════════════════════════════════
+//  ROUTER — reads ?id= from URL
+// ═══════════════════════════════════════════════════════════════
+const slug = new URLSearchParams(location.search).get('id') || '';
+const project = PROJECTS.find(p => p.slug === slug);
+
+// ═══════════════════════════════════════════════════════════════
+//  RENDERER — builds DOM from project data, section by section
+//  Every section checks for data before rendering.
+// ═══════════════════════════════════════════════════════════════
+
+function el(tag, attrs = {}, ...children) {
+  const node = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === 'class') node.className = v;
+    else if (k === 'html') node.innerHTML = v;
+    else node.setAttribute(k, v);
+  }
+  children.flat().forEach(c => c && node.appendChild(typeof c === 'string' ? document.createTextNode(c) : c));
+  return node;
+}
+
+function mediaCell(item) {
+  const cell = el('div', { class: 'media-cell', ...(item.ratio ? {'data-ratio': item.ratio} : {}) });
+  if (item.type === 'video') {
+    const vid = el('video', { autoplay:'', muted:'', loop:'', playsinline:'', preload:'metadata' });
+    vid.appendChild(el('source', { src: item.src, type: 'video/mp4' }));
+    cell.appendChild(vid);
+  } else {
+    cell.appendChild(el('img', { src: item.src, alt: item.caption || '', loading: 'lazy' }));
+  }
+  return cell;
+}
+
+function mediaSection(label, items, cols = 2) {
+  if (!items || items.length === 0) return null;
+  const sec = el('section', { class: 'ps' });
+  sec.appendChild(el('div', { class: 'ps-label reveal', html: label }));
+  const grid = el('div', { class: `media-grid cols-${cols}` });
+  items.forEach(item => {
+    const wrap = el('div');
+    wrap.appendChild(mediaCell(item));
+    if (item.caption) wrap.appendChild(el('div', { class: 'media-caption', html: item.caption }));
+    grid.appendChild(wrap);
+  });
+  sec.appendChild(grid);
+  return sec;
+}
+
+function renderProject(p, root) {
+  // ── Update page title ──────────────────────────────────────
+  document.title = `${p.title} — Jatin Shinde`;
+
+  // ── HERO ───────────────────────────────────────────────────
+  const hero = el('section', { id: 'p-hero' });
+  const heroMedia = el('div', { id: 'p-hero-media' });
+  if (p.hero) {
+    if (p.hero.type === 'video') {
+      const vid = el('video', { autoplay:'', muted:'', loop:'', playsinline:'', preload:'metadata' });
+      vid.appendChild(el('source', { src: p.hero.src, type: 'video/mp4' }));
+      heroMedia.appendChild(vid);
+    } else {
+      heroMedia.appendChild(el('img', { src: p.hero.src, alt: p.title }));
+    }
+  }
+  hero.appendChild(heroMedia);
+  hero.appendChild(el('div', { class: 'hero-vignette' }));
+  hero.appendChild(el('div', { class: 'hero-grain' }));
+
+  const heroText = el('div', { id: 'p-hero-text' });
+  if (p.category) heroText.appendChild(el('div', { class: 'ph-category', html: p.category }));
+  heroText.appendChild(el('h1', { class: 'ph-title', html: p.title }));
+
+  const metaFields = [
+    p.year     && ['Year',     p.year],
+    p.role     && ['Role',     p.role],
+    p.duration && ['Duration', p.duration],
+    p.software && ['Software', p.software.join(' · ')],
+  ].filter(Boolean);
+
+  if (metaFields.length) {
+    const meta = el('div', { class: 'ph-meta' });
+    metaFields.forEach(([label, value]) => {
+      const item = el('div', { class: 'ph-meta-item' });
+      item.appendChild(el('div', { class: 'ph-meta-label', html: label }));
+      item.appendChild(el('div', { class: 'ph-meta-value', html: value }));
+      meta.appendChild(item);
+    });
+    heroText.appendChild(meta);
+  }
+  hero.appendChild(heroText);
+  root.appendChild(hero);
+
+  // ── CONTENT WRAPPER ────────────────────────────────────────
+  const content = el('div', { id: 'p-content' });
+
+  // ── OVERVIEW + CONTRIBUTION (two-col) ─────────────────────
+  if (p.overview || p.contribution) {
+    const sec = el('section', { class: 'ps' });
+    const cols = el('div', { class: 'ps-two-col' });
+    if (p.overview) {
+      const left = el('div');
+      left.appendChild(el('div', { class: 'ps-label reveal', html: 'Overview' }));
+      left.appendChild(el('p', { class: 'ps-body reveal reveal-delay-1', html: p.overview }));
+      cols.appendChild(left);
+    }
+    if (p.contribution) {
+      const right = el('div');
+      right.appendChild(el('div', { class: 'ps-label reveal', html: 'My Contribution' }));
+      right.appendChild(el('p', { class: 'ps-body reveal reveal-delay-1', html: p.contribution }));
+      cols.appendChild(right);
+    }
+    sec.appendChild(cols);
+
+    // Spec table
+    const specFields = [
+      p.year     && ['Year',     p.year],
+      p.duration && ['Duration', p.duration],
+      p.role     && ['Role',     p.role],
+      p.software && ['Software', p.software.join(', ')],
+    ].filter(Boolean);
+    if (specFields.length) {
+      const table = el('div', { class: 'spec-table reveal' });
+      specFields.forEach(([key, val]) => {
+        const row = el('div', { class: 'spec-row' });
+        row.appendChild(el('div', { class: 'spec-key', html: key }));
+        row.appendChild(el('div', { class: 'spec-val', html: val }));
+        table.appendChild(row);
+      });
+      sec.appendChild(table);
+    }
+    content.appendChild(sec);
+  }
+
+  // ── FINAL RENDERS ──────────────────────────────────────────
+  const finalRendersSec = mediaSection('Final Renders', p.finalRenders, 2);
+  if (finalRendersSec) content.appendChild(finalRendersSec);
+
+  // ── FINAL VIDEO ────────────────────────────────────────────
+  if (p.finalVideo) {
+    const sec = el('section', { class: 'ps' });
+    sec.appendChild(el('div', { class: 'ps-label reveal', html: 'Final Cinematic' }));
+    const grid = el('div', { class: 'media-grid cols-1' });
+    const cell = el('div', { class: 'media-cell' });
+    const vid = el('video', { controls:'', playsinline:'', preload:'metadata' });
+    vid.appendChild(el('source', { src: p.finalVideo.src, type: 'video/mp4' }));
+    cell.appendChild(vid);
+    grid.appendChild(cell);
+    sec.appendChild(grid);
+    content.appendChild(sec);
+  }
+
+  // ── PROCESS SECTIONS ───────────────────────────────────────
+  const processSections = [
+    ['Process', p.processImages, 3],
+    ['Blockout', p.blockout, 3],
+    ['Modeling', p.modeling, 3],
+    ['Wireframe', p.wireframe, 3],
+    ['UV Layout', p.uvs, 3],
+    ['Texturing', p.texturing, 2],
+    ['Materials', p.materials, 2],
+    ['Lighting', p.lighting, 2],
+    ['Unreal Engine Breakdown', p.unrealBreakdown, 2],
+  ];
+  processSections.forEach(([label, items, cols]) => {
+    const sec = mediaSection(label, items, cols);
+    if (sec) content.appendChild(sec);
+  });
+
+  // ── TECHNICAL DETAILS ──────────────────────────────────────
+  if (p.technicalDetails) {
+    const sec = el('section', { class: 'ps' });
+    sec.appendChild(el('div', { class: 'ps-label reveal', html: 'Technical Details' }));
+    sec.appendChild(el('p', { class: 'ps-body reveal reveal-delay-1', html: p.technicalDetails }));
+    content.appendChild(sec);
+  }
+
+  // ── THIRD-PARTY ASSET DISCLOSURE ──────────────────────────
+  if (p.thirdParty) {
+    const sec = el('section', { class: 'ps' });
+    sec.appendChild(el('div', { class: 'ps-label reveal', html: 'Asset Disclosure' }));
+    const box = el('div', { class: 'disclosure-box reveal reveal-delay-1' });
+    box.appendChild(el('p', { html: `<strong>Third-party assets used in this project:</strong> ${p.thirdParty}` }));
+    sec.appendChild(box);
+    content.appendChild(sec);
+  }
+
+  root.appendChild(content);
+
+  // ── PREV / NEXT NAV ────────────────────────────────────────
+  if (p.prev || p.next) {
+    const nav = el('nav', { id: 'p-nav' });
+    if (p.prev) {
+      const lnk = el('a', { href: `project.html?id=${p.prev.slug}`, class: 'pn-link prev' });
+      lnk.appendChild(el('span', { class: 'pn-dir', html: '← Previous' }));
+      lnk.appendChild(el('span', { class: 'pn-title', html: p.prev.title }));
+      nav.appendChild(lnk);
+    } else {
+      nav.appendChild(el('div')); // spacer for grid alignment
+    }
+    if (p.next) {
+      const lnk = el('a', { href: `project.html?id=${p.next.slug}`, class: 'pn-link next' });
+      lnk.appendChild(el('span', { class: 'pn-dir', html: 'Next →' }));
+      lnk.appendChild(el('span', { class: 'pn-title', html: p.next.title }));
+      nav.appendChild(lnk);
+    }
+    root.appendChild(nav);
+  }
+}
+
+function renderNotFound(root) {
+  const wrap = el('div', { id: 'p-not-found' });
+  wrap.appendChild(el('div', { class: 'nf-code', html: '404' }));
+  wrap.appendChild(el('div', { class: 'nf-msg', html: 'Project not found' }));
+  const back = el('a', { href: '/', class: 'tb-back', style: 'margin-top:16px' });
+  back.appendChild(document.createTextNode('← Back to portfolio'));
+  wrap.appendChild(back);
+  root.appendChild(wrap);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════
+const root = document.getElementById('p-root');
+if (project) {
+  renderProject(project, root);
+} else if (slug) {
+  renderNotFound(root);
+} else {
+  // No ?id= — redirect home
+  location.replace('/');
+}
+
+// Hide loading screen
+const loading = document.getElementById('p-loading');
+loading.classList.add('out');
+setTimeout(() => loading.remove(), 700);
+
+// ─── CURSOR ───────────────────────────────────────────────────
+const dot  = document.getElementById('c-dot');
+const ring = document.getElementById('c-ring');
+let mx=0, my=0, rx=0, ry=0;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  dot.style.left = mx+'px'; dot.style.top = my+'px';
+});
+(function rl() {
+  rx += (mx-rx)*0.12; ry += (my-ry)*0.12;
+  ring.style.left = rx+'px'; ring.style.top = ry+'px';
+  requestAnimationFrame(rl);
+})();
+document.querySelectorAll('a,button').forEach(el => {
+  el.addEventListener('mouseenter', () => ring.classList.add('expand'));
+  el.addEventListener('mouseleave', () => ring.classList.remove('expand'));
+});
+
+// ─── SCROLL REVEAL ────────────────────────────────────────────
+const revObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => revObs.observe(el));
+
+// ─── VIDEO AUTOPLAY ────────────────────────────────────────────
+const vidObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) e.target.play().catch(() => {});
+    else e.target.pause();
+  });
+}, { threshold: 0.25 });
+document.querySelectorAll('.media-cell video, #p-hero-media video').forEach(v => vidObs.observe(v));
+</script>
+
+</body>
+</html>
