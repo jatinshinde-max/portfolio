@@ -957,134 +957,6 @@ footer a:hover { color: var(--ink); }
   text-transform: uppercase; color: var(--ink-mute);
 }
 
-/* ─── GOLD HEAD HERO ────────────────────────────────────────── */
-#gh-hero {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  min-height: 600px;
-  background: var(--bg);
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: center;
-  overflow: hidden;
-}
-
-.gh-left {
-  padding: clamp(48px,8vh,120px) clamp(36px,6vw,100px);
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  z-index: 2;
-  position: relative;
-}
-
-.gh-status {
-  font-family: var(--f-semi);
-  font-size: 0.57rem; letter-spacing: 0.38em;
-  text-transform: uppercase; color: var(--accent);
-  display: flex; align-items: center; gap: 10px;
-}
-.gh-status-dot {
-  display: inline-block; width: 5px; height: 5px;
-  border-radius: 50%; background: var(--accent);
-  flex-shrink: 0;
-  animation: status-pulse 2.4s ease infinite;
-}
-
-.gh-name {
-  font-family: var(--f-display);
-  font-size: clamp(3.8rem, 8.5vw, 9rem);
-  font-weight: 200;
-  letter-spacing: -0.03em;
-  line-height: 0.88;
-  color: var(--ink);
-}
-
-.gh-roles {
-  display: flex; flex-direction: column; gap: 2px;
-}
-.gh-role {
-  font-family: var(--f-display);
-  font-size: clamp(1rem, 1.8vw, 1.5rem);
-  font-weight: 300;
-  letter-spacing: 0.04em;
-  color: var(--ink-dim);
-  line-height: 1.55;
-}
-.gh-role:last-child { color: var(--ink); }
-
-.gh-meta {
-  display: flex; flex-direction: column; gap: 5px;
-  border-left: 1px solid var(--ink-ghost);
-  padding-left: 16px;
-}
-.gh-meta span {
-  font-family: var(--f-semi);
-  font-size: 0.5rem; letter-spacing: 0.3em;
-  text-transform: uppercase; color: var(--ink-mute);
-}
-
-.gh-ctas {
-  display: flex; gap: 12px; flex-wrap: wrap;
-  margin-top: 8px;
-}
-
-.gh-right {
-  position: relative;
-  height: 100vh;
-  overflow: hidden;
-}
-
-#gh-fallback {
-  position: absolute; inset: 0;
-  background:
-    radial-gradient(ellipse 65% 75% at 58% 48%,
-      rgba(196,160,40,0.14) 0%,
-      rgba(196,160,40,0.05) 38%,
-      transparent 68%),
-    radial-gradient(ellipse 40% 50% at 65% 55%,
-      rgba(232,213,176,0.06) 0%,
-      transparent 60%);
-  transition: opacity 1.4s ease;
-}
-#gh-fallback.hidden { opacity: 0; pointer-events: none; }
-
-#gh-canvas {
-  position: absolute; inset: 0;
-  width: 100% !important;
-  height: 100% !important;
-  display: block;
-  opacity: 0;
-  transition: opacity 1.6s ease;
-}
-#gh-canvas.visible { opacity: 1; }
-
-/* Mobile: single column, no 3D canvas */
-@media (max-width: 768px) {
-  #gh-hero {
-    grid-template-columns: 1fr;
-    height: auto;
-    min-height: 100svh;
-    padding-bottom: 60px;
-  }
-  .gh-left {
-    padding-top: clamp(100px,16vh,160px);
-    padding-bottom: 0;
-  }
-  .gh-right { display: none; }
-  .gh-name { font-size: clamp(3.2rem, 14vw, 6.5rem); }
-  .gh-role { font-size: clamp(1rem, 4vw, 1.3rem); }
-  .gh-ctas { flex-direction: column; }
-  .gh-ctas .hi-btn { justify-content: center; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  #gh-canvas { transition: none; }
-  #gh-fallback { transition: none; }
-  .gh-status-dot { animation: none; }
-}
-
 /* ─── CHARACTER SPINNER ─────────────────────────────────────── */
 .char-spinner {
   position: absolute;
@@ -1165,34 +1037,21 @@ footer a:hover { color: var(--ink); }
   </div>
 </div>
 
-<!-- GOLD HEAD HERO -->
-<div id="gh-hero">
-  <!-- Left: typography composition -->
-  <div class="gh-left">
-    <div class="gh-status">
-      <span class="gh-status-dot"></span>
-      Based in India · Open to Full-Time
-    </div>
-    <h1 class="gh-name">JATIN<br>SHINDE</h1>
-    <div class="gh-roles">
-      <div class="gh-role">3D Generalist</div>
-      <div class="gh-role">Environment Artist</div>
-      <div class="gh-role">CGI / VFX Artist</div>
-    </div>
-    <div class="gh-meta">
-      <span>7+ Years Production Experience</span>
-      <span>India → Worldwide</span>
-      <span>Open to Full-Time / Relocation</span>
-    </div>
-    <div class="gh-ctas">
-      <a href="#gallery" class="hi-btn hi-btn-primary">View Work <span>↓</span></a>
-      <a href="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/cv/jatin-shinde-cv.pdf" class="hi-btn hi-btn-secondary" target="_blank" rel="noopener">Download CV <span>→</span></a>
-    </div>
+<!-- SCROLL ARCHITECTURE -->
+<div id="scroll-wrap">
+  <!-- STICKY CANVAS -->
+  <div id="stage">
+    <canvas id="main-canvas"></canvas>
+    <div class="vignette"></div>
+    <div class="top-fade"></div>
+    <div class="grain"></div>
   </div>
-  <!-- Right: Gold Head realtime canvas -->
-  <div class="gh-right" id="gh-right">
-    <div id="gh-fallback"></div>
-    <canvas id="gh-canvas"></canvas>
+
+  <!-- 5 WORLD SCROLL SECTIONS -->
+  <div id="worlds">
+    <div class="world-section" data-world="0"></div>
+    <div class="world-section" data-world="1"></div>
+    <div class="world-section" data-world="2"></div>
   </div>
 </div>
 
@@ -1407,10 +1266,6 @@ footer a:hover { color: var(--ink); }
 // ═══════════════════════════════════════════════════════
 //  CONFIGURATION
 // ═══════════════════════════════════════════════════════
-// PROTOTYPE FLAG — enables Gold Head hero, suppresses world frame loading
-// Set to false to restore world scroll experience
-const GOLD_HEAD_MODE = true;
-
 const CDN = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev';
 
 const WORLDS = [
@@ -1458,17 +1313,17 @@ document.querySelectorAll('a,button,.g-cell,.showreel-video,.hi-btn').forEach(el
 });
 
 // ═══════════════════════════════════════════════════════
-//  CANVAS FRAME RENDERER (world scroll — inactive in GOLD_HEAD_MODE)
+//  CANVAS FRAME RENDERER (simulate or load real frames)
 // ═══════════════════════════════════════════════════════
-const canvas = GOLD_HEAD_MODE ? null : document.getElementById('main-canvas');
-const ctx = canvas ? canvas.getContext('2d') : null;
-let W = window.innerWidth, H = window.innerHeight;
+const canvas = document.getElementById('main-canvas');
+const ctx = canvas.getContext('2d');
+let W, H;
 
 function resize() {
-  W = window.innerWidth; H = window.innerHeight;
-  if (canvas) { canvas.width = W; canvas.height = H; }
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
 }
-if (canvas) resize();
+resize();
 window.addEventListener('resize', resize);
 
 // Frame storage per world
@@ -1562,9 +1417,9 @@ let animTime = 0;
 
 function draw(ts) {
   animTime = ts / 1000;
-  if (!canvas || !ctx) return;
   const frame = getFrameForProgress(currentWorldIndex, currentProgress);
   if (frame) {
+    // Draw real UE5 frame — cover mode
     const fAspect = frame.width / frame.height;
     const vAspect = W / H;
     let sw=frame.width, sh=frame.height, sx=0, sy=0;
@@ -1579,7 +1434,7 @@ function draw(ts) {
   }
   requestAnimationFrame(draw);
 }
-if (!GOLD_HEAD_MODE) requestAnimationFrame(draw);
+requestAnimationFrame(draw);
 
 // ═══════════════════════════════════════════════════════
 //  HUD
@@ -1591,19 +1446,13 @@ const hSub      = document.getElementById('h-sub');
 const hScroll   = document.getElementById('h-scroll');
 const hDots     = document.getElementById('h-dots');
 
-// Build dots (hidden in Gold Head mode)
-if (!GOLD_HEAD_MODE) {
-  WORLDS.forEach((_,i) => {
-    const d = document.createElement('div');
-    d.className = 'hud-dot' + (i===0?' on':'');
-    d.id = `hd-${i}`;
-    hDots.appendChild(d);
-  });
-} else {
-  hDots.style.display = 'none';
-  hTitle.style.display = 'none';
-  hScroll.style.display = 'none';
-}
+// Build dots
+WORLDS.forEach((_,i) => {
+  const d = document.createElement('div');
+  d.className = 'hud-dot' + (i===0?' on':'');
+  d.id = `hd-${i}`;
+  hDots.appendChild(d);
+});
 
 function updateHUD(worldIndex, progress) {
   const w = WORLDS[worldIndex];
@@ -1667,16 +1516,8 @@ const lEl  = document.getElementById('loader');
 
 lEl.style.display = 'flex';
 
-if (GOLD_HEAD_MODE) {
-  // Gold Head mode: dismiss loader immediately — world frames are not loaded
-  lNum.textContent = '100';
-  lBar.style.width = '100%';
-  setTimeout(() => {
-    lEl.classList.add('out');
-    setTimeout(() => { lEl.style.display = 'none'; }, 900);
-  }, 200);
-} else {
-  // Load only frame 1 — clear loader immediately, stream rest in background
+// Load only frame 1 — clear loader immediately, stream rest in background
+{
   const w0 = WORLDS[0];
   frameCache.set(0, new Map());
   const cache0 = frameCache.get(0);
@@ -1691,6 +1532,7 @@ if (GOLD_HEAD_MODE) {
         lEl.classList.add('out');
         setTimeout(() => { lEl.style.display = 'none'; updateHUD(0, 0); }, 900);
       }, 300);
+      // Stream remaining frames in background — 4 concurrent requests
       loadWorld(0, () => {});
     });
 }
@@ -1890,25 +1732,24 @@ document.querySelectorAll('.genai-cell').forEach((el, i) => {
 // g-cells revealed via GSAP stagger (not IntersectionObserver)
 
 // ═══════════════════════════════════════════════════════
-//  MOUSE PARALLAX ON CANVAS (world scroll only)
+//  MOUSE PARALLAX ON CANVAS
 // ═══════════════════════════════════════════════════════
-const stage = GOLD_HEAD_MODE ? null : document.getElementById('stage');
-if (!GOLD_HEAD_MODE && stage) {
-  let targetPX = 0, targetPY = 0, curPX = 0, curPY = 0;
-  const MAX_SHIFT = 14;
+// Subtle camera-like parallax — the stage shifts slightly with mouse
+let targetPX = 0, targetPY = 0, curPX = 0, curPY = 0;
+const MAX_SHIFT = 14; // px
 
-  document.addEventListener('mousemove', e => {
-    targetPX = ((e.clientX / window.innerWidth) - 0.5) * MAX_SHIFT;
-    targetPY = ((e.clientY / window.innerHeight) - 0.5) * MAX_SHIFT * 0.6;
-  });
+document.addEventListener('mousemove', e => {
+  targetPX = ((e.clientX / window.innerWidth) - 0.5) * MAX_SHIFT;
+  targetPY = ((e.clientY / window.innerHeight) - 0.5) * MAX_SHIFT * 0.6;
+});
 
-  (function pl() {
-    curPX += (targetPX - curPX) * 0.05;
-    curPY += (targetPY - curPY) * 0.05;
-    stage.style.transform = `translate(${curPX}px, ${curPY}px) scale(1.04)`;
-    requestAnimationFrame(pl);
-  })();
-}
+const stage = document.getElementById('stage');
+(function pl() {
+  curPX += (targetPX - curPX) * 0.05;
+  curPY += (targetPY - curPY) * 0.05;
+  stage.style.transform = `translate(${curPX}px, ${curPY}px) scale(1.04)`;
+  requestAnimationFrame(pl);
+})();
 
 // ═══════════════════════════════════════════════════════
 //  ADS CAROUSEL DRAG-TO-SCROLL
@@ -1978,13 +1819,13 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
   const isMob = matchMedia('(max-width:768px)').matches;
 
   // 1. CANVAS → CONTENT CROSSFADE
+  // Fixed black overlay fades in at world scroll end, fades out as content enters
   const cover = document.createElement('div');
   cover.style.cssText = 'position:fixed;inset:0;background:#06050c;pointer-events:none;z-index:4;opacity:0;';
   document.body.appendChild(cover);
 
-  const crossfadeTrigger = GOLD_HEAD_MODE ? '#gh-hero' : '#worlds';
   gsap.to(cover, { opacity: 1, ease: 'none',
-    scrollTrigger: { trigger: crossfadeTrigger, start: 'bottom 65%', end: 'bottom top', scrub: 0.5 }
+    scrollTrigger: { trigger: '#worlds', start: 'bottom 65%', end: 'bottom top', scrub: 0.5 }
   });
   gsap.to(cover, { opacity: 0, ease: 'none',
     scrollTrigger: { trigger: '#content', start: 'top 95%', end: 'top 25%', scrub: 0.5 }
@@ -2205,231 +2046,6 @@ updateHUD(0, 0);
     }, { rootMargin: '500px' });
 
     charObs.observe(aboutEl);
-  }
-}
-
-// ═══════════════════════════════════════════════════════
-//  GOLD HEAD INTERACTIVE HERO
-// ═══════════════════════════════════════════════════════
-if (GOLD_HEAD_MODE) {
-  // Performance timestamps (browser-side only)
-  const PERF = {
-    heroVisible: performance.now(),
-    glbRequestStart: null,
-    glbRequestEnd: null,
-    modelVisible: null,
-  };
-  console.groupCollapsed('[GoldHead] Performance timeline');
-  console.log('Hero HTML visible at:', PERF.heroVisible.toFixed(0), 'ms from navigation');
-  console.groupEnd();
-
-  // Mobile check — do NOT load 64 MB GLB on mobile
-  const isMobileDevice = window.innerWidth < 768
-    || (navigator.maxTouchPoints > 1 && !matchMedia('(hover:hover)').matches);
-
-  if (isMobileDevice) {
-    console.log('[GoldHead] Mobile detected — GLB suppressed. Lightweight fallback active.');
-  } else {
-    const GH_GLB = `${CDN}/gold-head/Gold%20Head.glb`;
-    const ghCanvas = document.getElementById('gh-canvas');
-    const ghFallback = document.getElementById('gh-fallback');
-
-    let ghNMX = 0, ghNMY = 0;
-    document.addEventListener('mousemove', e => {
-      ghNMX = (e.clientX / window.innerWidth) * 2 - 1;
-      ghNMY = -((e.clientY / window.innerHeight) * 2 - 1);
-    });
-
-    const prefersReducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    const initGoldHead = async () => {
-      try {
-        const THREE = await import('three');
-        const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
-
-        if (!ghCanvas) return;
-
-        // WebGPU renderer with alpha — canvas floats over dark bg, no bg fill needed
-        const renderer = new THREE.WebGPURenderer({
-          canvas: ghCanvas, antialias: true, alpha: true, forceWebGL: false
-        });
-        await renderer.init();
-        renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-        renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.4;
-        renderer.outputColorSpace = THREE.SRGBColorSpace;
-        renderer.setClearColor(0x000000, 0);
-
-        const scene = new THREE.Scene();
-
-        const camera = new THREE.PerspectiveCamera(28, 1, 0.01, 50);
-        camera.position.set(0, 0, 3.2);
-        camera.lookAt(0, 0, 0);
-
-        // Gold-biased lighting rig
-        const keyLight = new THREE.DirectionalLight(0xffd060, 3.8);
-        keyLight.position.set(1.8, 2.8, 2.2);
-        scene.add(keyLight);
-
-        const fillLight = new THREE.DirectionalLight(0x7090b8, 0.55);
-        fillLight.position.set(-2.8, 1.2, 0.8);
-        scene.add(fillLight);
-
-        const rimLight = new THREE.DirectionalLight(0xffe0a0, 1.4);
-        rimLight.position.set(-0.6, 2.2, -2.8);
-        scene.add(rimLight);
-
-        scene.add(new THREE.AmbientLight(0x0e0a06, 0.5));
-
-        function resizeGH() {
-          if (!ghCanvas) return;
-          const w = ghCanvas.clientWidth, h = ghCanvas.clientHeight;
-          if (!w || !h) return;
-          renderer.setSize(w, h, false);
-          camera.aspect = w / h;
-          camera.updateProjectionMatrix();
-        }
-        resizeGH();
-        new ResizeObserver(resizeGH).observe(ghCanvas.parentElement || document.body);
-
-        // Phase 3: Fetch GLB
-        PERF.glbRequestStart = performance.now();
-        console.groupCollapsed('[GoldHead] GLB fetch start');
-        console.log('GLB request start:', PERF.glbRequestStart.toFixed(0), 'ms from navigation');
-        console.log('URL:', GH_GLB);
-        console.log('NOTE: 64 MB prototype source asset — no optimization applied');
-        console.groupEnd();
-
-        let model = null;
-
-        try {
-          const gltf = await new Promise((res, rej) => {
-            new GLTFLoader().load(GH_GLB, res, undefined, rej);
-          });
-          PERF.glbRequestEnd = performance.now();
-
-          model = gltf.scene;
-
-          // Browser-runtime diagnostic — counts only, no size/byte fabrication
-          let meshCount = 0, triCount = 0, vtxCount = 0;
-          const matSet = new Set(), texRefs = [];
-          model.traverse(o => {
-            if (o.isMesh) {
-              meshCount++;
-              const mats = Array.isArray(o.material) ? o.material : [o.material];
-              mats.forEach(m => {
-                if (m) {
-                  matSet.add(m.uuid);
-                  ['map','normalMap','roughnessMap','metalnessMap','emissiveMap','aoMap'].forEach(k => {
-                    if (m[k] && m[k].isTexture) texRefs.push(m[k].name || '(unnamed)');
-                  });
-                }
-              });
-              const geo = o.geometry;
-              if (geo) {
-                if (geo.index) triCount += geo.index.count / 3;
-                if (geo.attributes.position) vtxCount += geo.attributes.position.count;
-              }
-            }
-          });
-
-          console.groupCollapsed('[GoldHead] browser-runtime measurements');
-          console.log('GLB load duration:', (PERF.glbRequestEnd - PERF.glbRequestStart).toFixed(0), 'ms');
-          console.log('Mesh count:', meshCount);
-          console.log('Material count (unique):', matSet.size);
-          console.log('Texture slot references found:', texRefs.length, texRefs.length ? texRefs : '');
-          console.log('Animation clips:', gltf.animations ? gltf.animations.length : 0);
-          console.log('Triangle count (approx):', Math.round(triCount).toLocaleString());
-          console.log('Vertex count (approx):', vtxCount.toLocaleString());
-          console.log('— These are browser-runtime counts only. No optimization has been applied to this asset. —');
-          console.groupEnd();
-
-          // Center model + scale to fit
-          const box = new THREE.Box3().setFromObject(model);
-          const center = box.getCenter(new THREE.Vector3());
-          const size = box.getSize(new THREE.Vector3());
-          const maxDim = Math.max(size.x, size.y, size.z);
-          const scl = 1.8 / maxDim;
-          model.scale.setScalar(scl);
-          model.position.set(-center.x * scl, -center.y * scl, -center.z * scl);
-          scene.add(model);
-
-          // Phase 4: crossfade fallback → realtime model
-          ghCanvas.classList.add('visible');
-          setTimeout(() => { if (ghFallback) ghFallback.classList.add('hidden'); }, 900);
-
-          PERF.modelVisible = performance.now();
-          console.groupCollapsed('[GoldHead] Model visible');
-          console.log('Time to model visible:', PERF.modelVisible.toFixed(0), 'ms from navigation');
-          console.groupEnd();
-
-        } catch (glbErr) {
-          console.group('[GoldHead] GLB load failed — fallback state preserved');
-          console.error(glbErr);
-          console.log('Typography layout intact. Gold gradient fallback remains visible.');
-          console.log('Attempted URL:', GH_GLB);
-          console.groupEnd();
-          return;
-        }
-
-        // Interaction — strict rotation limits (±8°)
-        const MAX_ROT = 0.14;
-        let targetRotX = 0, targetRotY = 0;
-        let currentRotX = 0, currentRotY = 0;
-
-        const clock = new THREE.Clock();
-        let ghHeroVisible = true;
-        const ghHeroEl = document.getElementById('gh-hero');
-        if (ghHeroEl) {
-          new IntersectionObserver(([e]) => { ghHeroVisible = e.isIntersecting; }, { threshold: 0.05 })
-            .observe(ghHeroEl);
-        }
-
-        // Performance audit (check world frames were NOT requested)
-        console.groupCollapsed('[GoldHead] Performance audit');
-        console.log('World frames requested during hero display: false (loader suppressed in GOLD_HEAD_MODE)');
-        console.log('Commercial videos auto-downloaded: false (preload=none + IntersectionObserver)');
-        console.log('Gallery videos auto-downloaded: false (preload=none + IntersectionObserver)');
-        console.groupEnd();
-
-        (function tick() {
-          requestAnimationFrame(tick);
-          if (!ghHeroVisible || !model) return;
-
-          const t = clock.getElapsedTime();
-
-          if (!prefersReducedMotion) {
-            targetRotY = Math.max(-MAX_ROT, Math.min(MAX_ROT, ghNMX * MAX_ROT));
-            targetRotX = Math.max(-MAX_ROT * 0.6, Math.min(MAX_ROT * 0.6, -ghNMY * MAX_ROT * 0.6));
-
-            // Smooth damping — lerp 0.05
-            currentRotY += (targetRotY - currentRotY) * 0.05;
-            currentRotX += (targetRotX - currentRotX) * 0.05;
-
-            // Very slow idle oscillation when pointer inactive
-            const idleY = Math.sin(t * 0.3) * 0.05;
-            const idleX = Math.sin(t * 0.2 + 0.5) * 0.025;
-
-            model.rotation.y = currentRotY + idleY;
-            model.rotation.x = currentRotX + idleX;
-          }
-
-          renderer.render(scene, camera);
-        })();
-
-      } catch (err) {
-        console.group('[GoldHead] Initialization failed');
-        console.error(err);
-        console.groupEnd();
-      }
-    };
-
-    // Defer Three.js init — let first paint complete first
-    if ('requestIdleCallback' in window) {
-      requestIdleCallback(() => initGoldHead(), { timeout: 2000 });
-    } else {
-      setTimeout(initGoldHead, 120);
-    }
   }
 }
 </script>
