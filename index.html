@@ -29,7 +29,6 @@
 <!-- Animation libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js" defer></script>
 
 <script type="importmap">
 {
@@ -167,14 +166,6 @@ body {
   position: absolute; inset:-50%; width:200%; height:200%;
   pointer-events:none; z-index:3; opacity:0.25;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
-  animation: grain-shift 0.12s steps(1) infinite;
-}
-@keyframes grain-shift {
-  0%   {transform:translate(0,0)}
-  25%  {transform:translate(-3%,-3%)}
-  50%  {transform:translate(3%,2%)}
-  75%  {transform:translate(-2%,3%)}
-  100% {transform:translate(2%,-2%)}
 }
 
 /* ─── HUD ───────────────────────────────────────────────────── */
@@ -337,8 +328,8 @@ body {
 .g-cell:nth-child(6n+1) { filter: brightness(1.04); }
 .g-cell img,
 .g-cell video {
-  position: absolute; top: -8%; left: 0;
-  width: 100%; height: 116%;
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
   object-fit: cover; display: block;
   transition: filter 0.5s;
   filter: saturate(0.9) brightness(0.82);
@@ -408,14 +399,6 @@ body {
 }
 @media (max-width:800px) { .tools-section { grid-template-columns:1fr; } }
 
-.tools-list {
-  margin-top: 40px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1px;
-  background: var(--ink-ghost);
-  border: 1px solid var(--ink-ghost);
-}
 .tool-item {
   background: var(--bg);
   padding: 14px 18px;
@@ -1096,7 +1079,7 @@ footer a:hover { color: var(--ink); }
   <div class="showreel-section" id="showreel">
     <div class="showreel-inner">
       <div class="showreel-video reveal">
-        <video id="reel-video" loop muted playsinline preload="metadata">
+        <video id="reel-video" loop muted playsinline preload="none">
           <source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/showreel/character-reel.mp4" type="video/mp4">
         </video>
         <div class="video-overlay"></div>
@@ -1122,15 +1105,15 @@ footer a:hover { color: var(--ink); }
       <h2 class="s-title reveal reveal-delay-1">Product.<br>Advertising.<br>Cinematic.</h2>
     </div>
     <div class="ads-track" id="ads-track">
-      <div class="ad-card"><video muted loop playsinline preload="metadata"><source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/car-commercial.mp4" type="video/mp4"></video><div class="ad-card-info"><div class="ad-card-title">Automotive Concept</div><div class="ad-card-tag">Product · Blender</div></div></div>
-      <div class="ad-card"><video muted loop playsinline preload="metadata"><source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/car-commercial-2.mp4" type="video/mp4"></video><div class="ad-card-info"><div class="ad-card-title">Automotive Interior</div><div class="ad-card-tag">Product · Blender</div></div></div>
-      <div class="ad-card"><video muted loop playsinline preload="metadata"><source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/chocolate-bar.mp4" type="video/mp4"></video><div class="ad-card-info"><div class="ad-card-title">Chocolate Bar</div><div class="ad-card-tag">Product · Blender</div></div></div>
-      <div class="ad-card"><video muted loop playsinline preload="metadata"><source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/earbuds.mp4" type="video/mp4"></video><div class="ad-card-info"><div class="ad-card-title">EarBuds</div><div class="ad-card-tag">Product · After Effects</div></div></div>
-      <div class="ad-card"><video muted loop playsinline preload="metadata"><source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/facewash.mp4" type="video/mp4"></video><div class="ad-card-info"><div class="ad-card-title">Facewash</div><div class="ad-card-tag">Product · Substance 3D</div></div></div>
-      <div class="ad-card"><video muted loop playsinline preload="metadata"><source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/pepsi.mp4" type="video/mp4"></video><div class="ad-card-info"><div class="ad-card-title">Pepsi Commercial</div><div class="ad-card-tag">Advertising · After Effects</div></div></div>
-      <div class="ad-card"><video muted loop playsinline preload="metadata"><source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/shoe.mp4" type="video/mp4"></video><div class="ad-card-info"><div class="ad-card-title">Sneaker Render</div><div class="ad-card-tag">Product · Substance 3D</div></div></div>
-      <div class="ad-card"><video muted loop playsinline preload="metadata"><source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/smart-watch.mp4" type="video/mp4"></video><div class="ad-card-info"><div class="ad-card-title">Smart Watch</div><div class="ad-card-tag">Product · Blender</div></div></div>
-      <div class="ad-card"><video muted loop playsinline preload="metadata"><source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/serum.mp4" type="video/mp4"></video><div class="ad-card-info"><div class="ad-card-title">Serum</div><div class="ad-card-tag">Product · Substance 3D</div></div></div>
+      <div class="ad-card"><video muted loop playsinline preload="none"><source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/car-commercial.mp4" type="video/mp4"></video><div class="ad-card-info"><div class="ad-card-title">Automotive Concept</div><div class="ad-card-tag">Product · Blender</div></div></div>
+      <div class="ad-card"><video muted loop playsinline preload="none"><source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/car-commercial-2.mp4" type="video/mp4"></video><div class="ad-card-info"><div class="ad-card-title">Automotive Interior</div><div class="ad-card-tag">Product · Blender</div></div></div>
+      <div class="ad-card"><video muted loop playsinline preload="none"><source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/chocolate-bar.mp4" type="video/mp4"></video><div class="ad-card-info"><div class="ad-card-title">Chocolate Bar</div><div class="ad-card-tag">Product · Blender</div></div></div>
+      <div class="ad-card"><video muted loop playsinline preload="none"><source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/earbuds.mp4" type="video/mp4"></video><div class="ad-card-info"><div class="ad-card-title">EarBuds</div><div class="ad-card-tag">Product · After Effects</div></div></div>
+      <div class="ad-card"><video muted loop playsinline preload="none"><source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/facewash.mp4" type="video/mp4"></video><div class="ad-card-info"><div class="ad-card-title">Facewash</div><div class="ad-card-tag">Product · Substance 3D</div></div></div>
+      <div class="ad-card"><video muted loop playsinline preload="none"><source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/pepsi.mp4" type="video/mp4"></video><div class="ad-card-info"><div class="ad-card-title">Pepsi Commercial</div><div class="ad-card-tag">Advertising · After Effects</div></div></div>
+      <div class="ad-card"><video muted loop playsinline preload="none"><source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/shoe.mp4" type="video/mp4"></video><div class="ad-card-info"><div class="ad-card-title">Sneaker Render</div><div class="ad-card-tag">Product · Substance 3D</div></div></div>
+      <div class="ad-card"><video muted loop playsinline preload="none"><source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/smart-watch.mp4" type="video/mp4"></video><div class="ad-card-info"><div class="ad-card-title">Smart Watch</div><div class="ad-card-tag">Product · Blender</div></div></div>
+      <div class="ad-card"><video muted loop playsinline preload="none"><source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/serum.mp4" type="video/mp4"></video><div class="ad-card-info"><div class="ad-card-title">Serum</div><div class="ad-card-tag">Product · Substance 3D</div></div></div>
     </div>
     <div class="ads-drag-hint reveal">Drag to explore</div>
   </div>
@@ -1353,8 +1336,8 @@ let lastFrameData = null;
 async function loadWorld(worldIndex, onProgress) {
   if (worldLoading.has(worldIndex)) return worldLoading.get(worldIndex);
   const w = WORLDS[worldIndex];
-  const cache = new Map();
-  frameCache.set(worldIndex, cache);
+  if (!frameCache.has(worldIndex)) frameCache.set(worldIndex, new Map());
+  const cache = frameCache.get(worldIndex);
 
   const promise = (async () => {
     const STRIDE = w.stride;
@@ -1370,6 +1353,7 @@ async function loadWorld(worldIndex, onProgress) {
     for (let c = 0; c < urls.length; c += CHUNK) {
       const chunk = urls.slice(c, c + CHUNK);
       await Promise.all(chunk.map(async ({ url, num }) => {
+        if (cache.has(num)) { loaded++; onProgress && onProgress(loaded/total); return; }
         try {
           const res = await fetch(url);
           if (!res.ok) return;
@@ -1532,22 +1516,26 @@ const lEl  = document.getElementById('loader');
 
 lEl.style.display = 'flex';
 
-// Load world 0, update counter
-loadWorld(0, (p) => {
-  const pct = Math.round(p * 100);
-  lNum.textContent = String(pct).padStart(2,'0');
-  lBar.style.width = (p * 100) + '%';
-}).then(() => {
-  lNum.textContent = '100';
-  lBar.style.width = '100%';
-  setTimeout(() => {
-    lEl.classList.add('out');
-    setTimeout(() => {
-      lEl.style.display = 'none';
-      updateHUD(0, 0);
-    }, 900);
-  }, 300);
-});
+// Load only frame 1 — clear loader immediately, stream rest in background
+{
+  const w0 = WORLDS[0];
+  frameCache.set(0, new Map());
+  const cache0 = frameCache.get(0);
+  fetch(`${CDN}/${w0.slug}/frame_0001.webp`)
+    .then(r => r.ok ? r.blob() : null)
+    .then(blob => blob ? createImageBitmap(blob) : null)
+    .then(bmp => {
+      if (bmp) cache0.set(1, bmp);
+      lNum.textContent = '100';
+      lBar.style.width = '100%';
+      setTimeout(() => {
+        lEl.classList.add('out');
+        setTimeout(() => { lEl.style.display = 'none'; updateHUD(0, 0); }, 900);
+      }, 300);
+      // Stream remaining frames in background — 4 concurrent requests
+      loadWorld(0, () => {});
+    });
+}
 
 // ═══════════════════════════════════════════════════════
 //  GALLERY CELLS
@@ -1629,7 +1617,7 @@ GALLERY_ITEMS.forEach(item => {
     cell.appendChild(img);
   } else if (item.video) {
     const vid = document.createElement('video');
-    vid.setAttribute('autoplay', ''); vid.muted = true; vid.loop = true; vid.playsInline = true; vid.preload = 'metadata';
+    vid.setAttribute('autoplay', ''); vid.muted = true; vid.loop = true; vid.playsInline = true; vid.preload = 'none';
     const s = document.createElement('source');
     s.src = item.video; s.type = 'video/mp4';
     vid.appendChild(s); cell.appendChild(vid);
@@ -1693,6 +1681,33 @@ document.querySelectorAll('.ad-card').forEach(card => {
   card.addEventListener('mouseenter', () => v.play().catch(() => {}));
   card.addEventListener('mouseleave', () => v.pause());
 });
+
+// Preload showreel metadata before it enters viewport
+{
+  const srSection = document.getElementById('showreel');
+  if (srSection) {
+    const srPreObs = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      const v = document.getElementById('reel-video');
+      if (v) { v.preload = 'metadata'; v.load(); }
+      srPreObs.disconnect();
+    }, { rootMargin: '600px' });
+    srPreObs.observe(srSection);
+  }
+}
+
+// Preload ad video metadata when ads section is nearby
+{
+  const adsSection = document.getElementById('ads');
+  if (adsSection) {
+    const adsPreObs = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      adsSection.querySelectorAll('video').forEach(v => { v.preload = 'metadata'; v.load(); });
+      adsPreObs.disconnect();
+    }, { rootMargin: '300px' });
+    adsPreObs.observe(adsSection);
+  }
+}
 
 // ═══════════════════════════════════════════════════════
 //  SCROLL REVEAL (IntersectionObserver)
@@ -1797,26 +1812,13 @@ if (mobMenu && mobNav) {
 //  CINEMATIC SCROLL ANIMATIONS
 //  Lenis · GSAP ScrollTrigger
 // ═══════════════════════════════════════════════════════
-if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined' && typeof Lenis !== 'undefined') {
+if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
 
   gsap.registerPlugin(ScrollTrigger);
   const EASE = 'cubic-bezier(0.23, 1, 0.32, 1)';
   const isMob = matchMedia('(max-width:768px)').matches;
 
-  // 1. LENIS SMOOTH SCROLL
-  const lenis = new Lenis({
-    duration: 0.9,
-    easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-    smoothWheel: true,
-    wheelMultiplier: 1.1,
-  });
-  // Share RAF with GSAP — no double loop
-  gsap.ticker.add(t => lenis.raf(t * 1000));
-  gsap.ticker.lagSmoothing(0);
-  // Keep ScrollTrigger scroll position in sync with Lenis
-  lenis.on('scroll', ScrollTrigger.update);
-
-  // 2. CANVAS → CONTENT CROSSFADE
+  // 1. CANVAS → CONTENT CROSSFADE
   // Fixed black overlay fades in at world scroll end, fades out as content enters
   const cover = document.createElement('div');
   cover.style.cssText = 'position:fixed;inset:0;background:#06050c;pointer-events:none;z-index:4;opacity:0;';
@@ -1870,21 +1872,7 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined' && typeo
   });
 
 
-  // 5. GALLERY CELL PARALLAX (desktop only)
-  // Media is 116% tall, GSAP scrubs translateY so it drifts at ~0.85x scroll speed
-  if (!isMob) {
-    document.querySelectorAll('.g-cell img, .g-cell video').forEach(media => {
-      media.style.willChange = 'transform';
-      gsap.fromTo(media,
-        { y: '-7%' },
-        { y: '7%', ease: 'none',
-          scrollTrigger: { trigger: media.closest('.g-cell'), start: 'top bottom', end: 'bottom top', scrub: true }
-        }
-      );
-    });
-  }
-
-  // 6. AD CARDS STAGGERED REVEAL
+  // 5. AD CARDS STAGGERED REVEAL
   const adCards = [...document.querySelectorAll('.ad-card')];
   gsap.set(adCards, { opacity: 0, y: 22 });
   ScrollTrigger.create({
@@ -1927,171 +1915,139 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined' && typeo
 
 // Initial HUD update
 updateHUD(0, 0);
-</script>
 
-<script type="module">
 // ═══════════════════════════════════════════════════════
-//  CHARACTER SYSTEM — JON_wave.glb
-//  Scene A: About section (chest-up, portrait canvas)
-//  Scene B: Hero section (full-body, full viewport)
+//  THREE.JS CHARACTER — deferred until #about is nearby
 // ═══════════════════════════════════════════════════════
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { clone as skeletonClone } from 'three/addons/utils/SkeletonUtils.js';
+{
+  const aboutEl = document.getElementById('about');
+  if (aboutEl) {
+    let charLoaded = false;
+    let nMX = 0, nMY = 0;
+    document.addEventListener('mousemove', e => {
+      nMX = (e.clientX / window.innerWidth) * 2 - 1;
+      nMY = -((e.clientY / window.innerHeight) * 2 - 1);
+    });
 
-const MODEL_URL = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/models/JON%20wave.glb';
-const DEG = Math.PI / 180;
+    const charObs = new IntersectionObserver(async ([e]) => {
+      if (!e.isIntersecting || charLoaded) return;
+      charLoaded = true;
+      charObs.disconnect();
 
-// ── Shared normalised mouse (-1..1) ───────────────────────────
-let nMX = 0, nMY = 0;
-document.addEventListener('mousemove', e => {
-  nMX = (e.clientX / window.innerWidth)  * 2 - 1;
-  nMY = -((e.clientY / window.innerHeight) * 2 - 1);
-});
+      const DEG = Math.PI / 180;
+      const MODEL_URL = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/models/JON%20wave.glb';
 
-// ── Load source GLB once ──────────────────────────────────────
-let srcGltf;
-try {
-  srcGltf = await new Promise((res, rej) => new GLTFLoader().load(MODEL_URL, res, undefined, rej));
-} catch (err) {
-  console.warn('Character: GLB load failed', err);
-  document.querySelectorAll('.char-spinner').forEach(sp => sp.remove());
-}
-if (!srcGltf) throw new Error('abort');
+      try {
+        const THREE = await import('three');
+        const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
+        const { clone: skeletonClone } = await import('three/addons/utils/SkeletonUtils.js');
 
-// ── Helpers ───────────────────────────────────────────────────
-function getBones(root) {
-  const m = {};
-  root.traverse(o => { if (o.isBone) m[o.name] = o; });
-  return m;
-}
+        const srcGltf = await new Promise((res, rej) => new GLTFLoader().load(MODEL_URL, res, undefined, rej));
 
+        function getBones(root) {
+          const m = {};
+          root.traverse(o => { if (o.isBone) m[o.name] = o; });
+          return m;
+        }
 
-function addLights(scene) {
-  // Key — warm, top-right, main light source
-  const key = new THREE.DirectionalLight(0xffd4a6, 2.5);
-  key.position.set(3, 4, 2);
-  key.castShadow = true;
-  key.shadow.mapSize.set(1024, 1024);
-  key.shadow.bias = -0.0005;
-  scene.add(key);
+        function addLights(scene) {
+          const key = new THREE.DirectionalLight(0xffd4a6, 2.5);
+          key.position.set(3, 4, 2); key.castShadow = true;
+          key.shadow.mapSize.set(1024, 1024); key.shadow.bias = -0.0005;
+          scene.add(key);
+          const fill = new THREE.DirectionalLight(0xa6c8ff, 0.8);
+          fill.position.set(-3, 2, 1); scene.add(fill);
+          const rim = new THREE.DirectionalLight(0xffffff, 1.8);
+          rim.position.set(-1, 3, -3); scene.add(rim);
+          scene.add(new THREE.AmbientLight(0x1a1a2e, 0.3));
+        }
 
-  // Fill — cool, left side, softens key shadows
-  const fill = new THREE.DirectionalLight(0xa6c8ff, 0.8);
-  fill.position.set(-3, 2, 1);
-  scene.add(fill);
+        async function makeRenderer(canvas, alpha) {
+          const r = new THREE.WebGPURenderer({ canvas, antialias: true, alpha, forceWebGL: false });
+          await r.init();
+          r.setPixelRatio(Math.min(devicePixelRatio, 2));
+          r.toneMapping = THREE.ACESFilmicToneMapping;
+          r.toneMappingExposure = 1.1;
+          r.outputColorSpace = THREE.SRGBColorSpace;
+          return r;
+        }
 
-  // Rim — white, behind and above, edge separation from background
-  const rim = new THREE.DirectionalLight(0xffffff, 1.8);
-  rim.position.set(-1, 3, -3);
-  scene.add(rim);
+        // Scene A — About section (chest-up, portrait canvas)
+        const canvas = document.getElementById('about-canvas');
+        if (canvas) {
+          const model = skeletonClone(srcGltf.scene);
+          const box = new THREE.Box3().setFromObject(model);
+          const ctr = box.getCenter(new THREE.Vector3());
 
-  // Ambient — near-black, prevents pure-black shadows
-  scene.add(new THREE.AmbientLight(0x1a1a2e, 0.3));
-}
+          const scene = new THREE.Scene();
+          scene.background = new THREE.Color(0x100f1c);
+          scene.add(model);
+          addLights(scene);
 
-async function makeRenderer(canvas, alpha) {
-  const r = new THREE.WebGPURenderer({ canvas, antialias: true, alpha, forceWebGL: false });
-  await r.init();
-  r.setPixelRatio(Math.min(devicePixelRatio, 2));
-  r.toneMapping = THREE.ACESFilmicToneMapping;
-  r.toneMappingExposure = 1.1;
-  r.outputColorSpace = THREE.SRGBColorSpace;
-  return r;
-}
+          const renderer = await makeRenderer(canvas, false);
+          const camera = new THREE.PerspectiveCamera(32, 0.75, 0.01, 50);
+          const ANG_A = 12 * DEG;
+          camera.position.set(ctr.x + Math.sin(ANG_A) * 2, box.min.y + 1.5, ctr.z + Math.cos(ANG_A) * 2);
+          camera.lookAt(ctr.x, box.min.y + 1.4, ctr.z);
 
+          function resizeA() {
+            const w = canvas.clientWidth, h = canvas.clientHeight;
+            if (!w || !h) return;
+            renderer.setSize(w, h, false);
+            camera.aspect = w / h; camera.updateProjectionMatrix();
+          }
+          resizeA();
+          new ResizeObserver(resizeA).observe(canvas.parentElement);
 
-function hideSpinner(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.classList.add('hidden');
-  setTimeout(() => el.remove(), 600);
-}
+          const bones = getBones(model);
+          const mixerA = new THREE.AnimationMixer(model);
+          if (srcGltf.animations.length > 0) {
+            const actionA = mixerA.clipAction(srcGltf.animations[0]);
+            actionA.loop = THREE.LoopRepeat; actionA.clampWhenFinished = false;
+            actionA.zeroSlopeAtStart = true; actionA.zeroSlopeAtEnd = true;
+            actionA.timeScale = 0.7; actionA.play();
+          }
 
-// ══════════════════════════════════════════════════════════════
-//  SCENE A — About section (chest-up, portrait canvas)
-// ══════════════════════════════════════════════════════════════
-await (async () => {
-  const canvas = document.getElementById('about-canvas');
-  if (canvas) {
-    // skeletonClone properly rebinds the skeleton to the cloned bones
-    // (scene.clone(true) shares the original skeleton — bone edits have no effect)
-    const model = skeletonClone(srcGltf.scene);
-    const box = new THREE.Box3().setFromObject(model);
-    const sz  = box.getSize(new THREE.Vector3());
-    const ctr = box.getCenter(new THREE.Vector3());
+          let hx = 0, hy = 0, smHeadY = 0, smHeadX = 0, smNeckY = 0, smNeckX = 0;
+          let visA = false;
+          new IntersectionObserver(([e]) => { visA = e.isIntersecting; }, { threshold: 0.05 }).observe(aboutEl);
 
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x100f1c);
-    scene.add(model);
-    addLights(scene);
+          const clkA = new THREE.Clock();
+          (function tick() {
+            requestAnimationFrame(tick);
+            const delta = Math.min(clkA.getDelta(), 0.05);
+            if (!visA) return;
+            mixerA.update(delta);
+            hx += (-nMY * 10 * DEG - hx) * 0.05;
+            hy += ( nMX * 20 * DEG - hy) * 0.05;
+            const headA = bones['mixamorigHead'];
+            const neckA = bones['mixamorigNeck'];
+            if (headA) {
+              smHeadY += (headA.rotation.y - smHeadY) * 0.05;
+              smHeadX += (headA.rotation.x - smHeadX) * 0.05;
+              headA.rotation.y = smHeadY + hy; headA.rotation.x = smHeadX + hx;
+            }
+            if (neckA) {
+              smNeckY += (neckA.rotation.y - smNeckY) * 0.05;
+              smNeckX += (neckA.rotation.x - smNeckX) * 0.05;
+              neckA.rotation.y = smNeckY + hy * 0.3; neckA.rotation.x = smNeckX + hx * 0.3;
+            }
+            renderer.render(scene, camera);
+          })();
 
-    const renderer = await makeRenderer(canvas, false);
-    const camera = new THREE.PerspectiveCamera(32, 0.75, 0.01, 50);
-
-    // Chest-up: 12° three-quarter view toward character's left (waving hand side)
-    const ANG_A = 12 * DEG;
-    camera.position.set(ctr.x + Math.sin(ANG_A) * 2, box.min.y + 1.5, ctr.z + Math.cos(ANG_A) * 2);
-    camera.lookAt(ctr.x, box.min.y + 1.4, ctr.z);
-
-    function resizeA() {
-      const w = canvas.clientWidth, h = canvas.clientHeight;
-      if (!w || !h) return;
-      renderer.setSize(w, h, false);
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-    }
-    resizeA();
-    new ResizeObserver(resizeA).observe(canvas.parentElement);
-
-    const bones = getBones(model);
-    const mixerA = new THREE.AnimationMixer(model);
-    if (srcGltf.animations.length > 0) {
-      const actionA = mixerA.clipAction(srcGltf.animations[0]);
-      actionA.loop = THREE.LoopRepeat;
-      actionA.clampWhenFinished = false;
-      actionA.zeroSlopeAtStart = true;
-      actionA.zeroSlopeAtEnd = true;
-      actionA.timeScale = 0.7;
-      actionA.play();
-    }
-    let hx = 0, hy = 0;
-    // Smoothed mixer rotations — lerped each frame to absorb the loop-point snap
-    let smHeadY = 0, smHeadX = 0, smNeckY = 0, smNeckX = 0;
-
-    let visA = false;
-    new IntersectionObserver(([e]) => { visA = e.isIntersecting; }, { threshold: 0.05 })
-      .observe(document.getElementById('about') || canvas.parentElement);
-
-    const clkA = new THREE.Clock();
-    (function tick() {
-      requestAnimationFrame(tick);
-      const delta = Math.min(clkA.getDelta(), 0.05);
-      if (!visA) return;
-      mixerA.update(delta);
-      hx += (-nMY * 10 * DEG - hx) * 0.05;
-      hy += ( nMX * 20 * DEG - hy) * 0.05;
-      const headA = bones['mixamorigHead'];
-      const neckA = bones['mixamorigNeck'];
-      if (headA) {
-        smHeadY += (headA.rotation.y - smHeadY) * 0.05;
-        smHeadX += (headA.rotation.x - smHeadX) * 0.05;
-        headA.rotation.y = smHeadY + hy;
-        headA.rotation.x = smHeadX + hx;
+          // Hide spinner once renderer is up
+          const sp = document.getElementById('about-spinner');
+          if (sp) { sp.classList.add('hidden'); setTimeout(() => sp.remove(), 600); }
+        }
+      } catch (err) {
+        console.warn('Character: load failed', err);
+        document.querySelectorAll('.char-spinner').forEach(sp => sp.remove());
       }
-      if (neckA) {
-        smNeckY += (neckA.rotation.y - smNeckY) * 0.05;
-        smNeckX += (neckA.rotation.x - smNeckX) * 0.05;
-        neckA.rotation.y = smNeckY + hy * 0.3;
-        neckA.rotation.x = smNeckX + hx * 0.3;
-      }
-      renderer.render(scene, camera);
-    })();
+    }, { rootMargin: '500px' });
 
-    hideSpinner('about-spinner');
+    charObs.observe(aboutEl);
   }
-})();
-
+}
 </script>
 
 </body>
