@@ -957,6 +957,134 @@ footer a:hover { color: var(--ink); }
   text-transform: uppercase; color: var(--ink-mute);
 }
 
+/* ─── SEQUENCE 1 — CINEMATIC OPENING ──────────────────────── */
+#seq1-wrap {
+  position: relative;
+  height: 220vh;
+  z-index: 0;
+}
+#seq1-stage {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  z-index: 1;
+  /* overscan slightly so parallax shift doesn't reveal edges */
+  margin: -2px;
+}
+#seq1-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 38%;
+  display: block;
+  will-change: auto;
+}
+/* Identity — bottom-left */
+#seq1-identity {
+  position: absolute;
+  bottom: clamp(64px, 9vh, 110px);
+  left: clamp(28px, 5vw, 72px);
+  z-index: 10;
+  pointer-events: none;
+}
+.seq1-label {
+  font-family: var(--f-semi);
+  font-size: 0.56rem;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 10px;
+  opacity: 0;
+  text-shadow: 0 2px 18px rgba(0,0,0,0.85);
+}
+.seq1-name {
+  font-family: var(--f-display);
+  font-size: clamp(3.5rem, 8vw, 8.5rem);
+  font-weight: 200;
+  line-height: 0.93;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  opacity: 0;
+  text-shadow: 0 4px 40px rgba(0,0,0,0.7);
+}
+/* Metadata — bottom-right */
+#seq1-meta {
+  position: absolute;
+  bottom: clamp(72px, 10vh, 120px);
+  right: clamp(28px, 5vw, 72px);
+  z-index: 10;
+  pointer-events: none;
+  text-align: right;
+  opacity: 0;
+}
+.seq1-meta-line {
+  font-family: var(--f-semi);
+  font-size: 0.54rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  line-height: 2.2;
+  text-shadow: 0 2px 16px rgba(0,0,0,0.9);
+}
+/* CTA — bottom-center */
+#seq1-cta {
+  position: absolute;
+  bottom: clamp(28px, 4.5vh, 50px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0;
+}
+.seq1-cta-text {
+  font-family: var(--f-semi);
+  font-size: 0.5rem;
+  letter-spacing: 0.48em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  text-shadow: 0 2px 12px rgba(0,0,0,0.8);
+  white-space: nowrap;
+}
+.seq1-cta-arrow {
+  color: rgba(255,255,255,0.35);
+  font-size: 1rem;
+  animation: line-pulse 1.9s ease infinite;
+}
+/* seq1 progress bar — thin bottom edge */
+#seq1-progress-bar {
+  position: absolute;
+  bottom: 0; left: 0;
+  height: 1px;
+  background: rgba(255,255,255,0.18);
+  z-index: 10;
+  transform-origin: left;
+  transform: scaleX(0);
+}
+/* Mobile */
+@media (max-width: 768px) {
+  #seq1-wrap { height: 200vh; }
+  .seq1-name { font-size: clamp(2.8rem, 13vw, 5.5rem); }
+  #seq1-video { object-position: 38% 38%; }
+  #seq1-meta { display: none; }
+  .seq1-label { font-size: 0.52rem; letter-spacing: 0.32em; }
+}
+@media (max-width: 400px) {
+  .seq1-name { font-size: clamp(2.2rem, 14vw, 3.8rem); }
+}
+/* Reduced motion — static first frame, no scrub */
+@media (prefers-reduced-motion: reduce) {
+  #seq1-video { transition: none; }
+  #seq1-cta .seq1-cta-arrow { animation: none; }
+}
+
 /* ─── CHARACTER SPINNER ─────────────────────────────────────── */
 .char-spinner {
   position: absolute;
@@ -998,7 +1126,7 @@ footer a:hover { color: var(--ink); }
 <div id="loader">
   <div class="l-num" id="l-num">00</div>
   <div class="l-bar-wrap"><div class="l-bar" id="l-bar"></div></div>
-  <div class="l-label">Rendering Worlds</div>
+  <div class="l-label">Entering the World</div>
 </div>
 
 <!-- MOBILE NAV OVERLAY -->
@@ -1037,17 +1165,46 @@ footer a:hover { color: var(--ink); }
   </div>
 </div>
 
-<!-- SCROLL ARCHITECTURE -->
-<div id="scroll-wrap">
-  <!-- STICKY CANVAS -->
+<!-- SEQUENCE 1 — CINEMATIC OPENING -->
+<div id="seq1-wrap">
+  <div id="seq1-stage">
+    <video id="seq1-video" muted playsinline preload="metadata"
+           aria-hidden="true">
+      <source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/environment-sequence-01/Sequence1.mp4" type="video/mp4">
+    </video>
+    <div class="vignette"></div>
+    <div class="top-fade"></div>
+    <div class="grain"></div>
+    <!-- Identity — bottom left -->
+    <div id="seq1-identity">
+      <div class="seq1-label" id="seq1-label">3D Generalist &nbsp;·&nbsp; Environment Artist</div>
+      <div class="seq1-name" id="seq1-name">Jatin<br>Shinde</div>
+    </div>
+    <!-- Technical metadata — bottom right -->
+    <div id="seq1-meta">
+      <div class="seq1-meta-line">CGI / VFX</div>
+      <div class="seq1-meta-line">Realtime &nbsp;·&nbsp; Environment</div>
+      <div class="seq1-meta-line">7+ Years Production</div>
+    </div>
+    <!-- CTA — bottom centre -->
+    <div id="seq1-cta">
+      <div class="seq1-cta-text">Selected Work</div>
+      <div class="seq1-cta-arrow">↓</div>
+    </div>
+    <!-- Thin progress bar along bottom edge -->
+    <div id="seq1-progress-bar"></div>
+  </div>
+</div>
+
+<!-- OLD SCROLL ARCHITECTURE — kept intact for revert; hidden during Sequence1 experiment -->
+<!-- To restore: remove display:none from #scroll-wrap-legacy and remove #seq1-wrap above -->
+<div id="scroll-wrap" style="display:none" aria-hidden="true">
   <div id="stage">
     <canvas id="main-canvas"></canvas>
     <div class="vignette"></div>
     <div class="top-fade"></div>
     <div class="grain"></div>
   </div>
-
-  <!-- 5 WORLD SCROLL SECTIONS -->
   <div id="worlds">
     <div class="world-section" data-world="0"></div>
     <div class="world-section" data-world="1"></div>
@@ -1058,8 +1215,8 @@ footer a:hover { color: var(--ink); }
 <!-- CONTENT -->
 <div id="content">
 
-  <!-- HERO INTRO -->
-  <div class="hero-intro-section" id="hero-intro">
+  <!-- HERO INTRO — disabled for Sequence1 experiment; restore by removing style attribute -->
+  <div class="hero-intro-section" id="hero-intro" style="display:none" aria-hidden="true">
     <div class="hi-inner">
       <div class="hi-status reveal">Based in India · Open to Full-Time Opportunities &amp; Relocation</div>
       <div class="hi-title">
@@ -1316,12 +1473,12 @@ document.querySelectorAll('a,button,.g-cell,.showreel-video,.hi-btn').forEach(el
 //  CANVAS FRAME RENDERER (simulate or load real frames)
 // ═══════════════════════════════════════════════════════
 const canvas = document.getElementById('main-canvas');
-const ctx = canvas.getContext('2d');
-let W, H;
+const ctx = canvas ? canvas.getContext('2d') : null;
+let W = window.innerWidth, H = window.innerHeight;
 
 function resize() {
-  W = canvas.width = window.innerWidth;
-  H = canvas.height = window.innerHeight;
+  W = window.innerWidth; H = window.innerHeight;
+  if (canvas) { canvas.width = W; canvas.height = H; }
 }
 resize();
 window.addEventListener('resize', resize);
@@ -1416,6 +1573,7 @@ let currentWorldIndex = 0;
 let animTime = 0;
 
 function draw(ts) {
+  if (!ctx) { requestAnimationFrame(draw); return; }
   animTime = ts / 1000;
   const frame = getFrameForProgress(currentWorldIndex, currentProgress);
   if (frame) {
@@ -1516,25 +1674,58 @@ const lEl  = document.getElementById('loader');
 
 lEl.style.display = 'flex';
 
-// Load only frame 1 — clear loader immediately, stream rest in background
+// ─── SEQUENCE 1 LOADER ──────────────────────────────────────
+// Dismiss loader as soon as first video frame is seekable.
+// Old world frames are NOT loaded on init — performance preserved.
 {
-  const w0 = WORLDS[0];
-  frameCache.set(0, new Map());
-  const cache0 = frameCache.get(0);
-  fetch(`${CDN}/${w0.slug}/frame_0001.webp`)
-    .then(r => r.ok ? r.blob() : null)
-    .then(blob => blob ? createImageBitmap(blob) : null)
-    .then(bmp => {
-      if (bmp) cache0.set(1, bmp);
-      lNum.textContent = '100';
-      lBar.style.width = '100%';
+  const SEQ1_PERF = { start: performance.now(), metaAt: null, firstFrameAt: null };
+  const seq1El = document.getElementById('seq1-video');
+
+  function dismissLoader() {
+    clearInterval(fakeTimer);
+    lNum.textContent = '100';
+    lBar.style.width = '100%';
+    setTimeout(() => {
+      lEl.classList.add('out');
       setTimeout(() => {
-        lEl.classList.add('out');
-        setTimeout(() => { lEl.style.display = 'none'; updateHUD(0, 0); }, 900);
-      }, 300);
-      // Stream remaining frames in background — 4 concurrent requests
-      loadWorld(0, () => {});
-    });
+        lEl.style.display = 'none';
+        SEQ1_PERF.firstFrameAt = performance.now();
+        console.log('[SEQ1] First frame visible in', (SEQ1_PERF.firstFrameAt - SEQ1_PERF.start).toFixed(0), 'ms');
+        console.log('[SEQ1] World frames requested:', false, '(none — Phase A preserved)');
+        console.log('[SEQ1] Commercial/gallery video preload: false (Phase A preserved)');
+      }, 900);
+    }, 250);
+  }
+
+  // Animate counter to ~85 while waiting for metadata
+  let fakeN = 0;
+  const fakeTimer = setInterval(() => {
+    fakeN = Math.min(fakeN + 4 + Math.random() * 6, 85);
+    lNum.textContent = String(Math.round(fakeN)).padStart(2, '0');
+    lBar.style.width = fakeN + '%';
+  }, 80);
+
+  if (seq1El) {
+    // On metadata ready, seek to first frame
+    seq1El.addEventListener('loadedmetadata', () => {
+      SEQ1_PERF.metaAt = performance.now();
+      console.log('[SEQ1] Metadata ready in', (SEQ1_PERF.metaAt - SEQ1_PERF.start).toFixed(0), 'ms, duration:', seq1El.duration.toFixed(2)+'s');
+      seq1El.currentTime = 0.001;
+    }, { once: true });
+    // First frame decoded → dismiss
+    seq1El.addEventListener('seeked', dismissLoader, { once: true });
+    // Hard fallback after 4s
+    setTimeout(() => {
+      if (lEl.style.display !== 'none') {
+        console.warn('[SEQ1] Loader fallback triggered — metadata/seek slow');
+        dismissLoader();
+      }
+    }, 4000);
+    console.log('[SEQ1] Video request started:', performance.now().toFixed(0)+'ms');
+  } else {
+    // seq1-video not found — dismiss immediately
+    setTimeout(dismissLoader, 400);
+  }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1743,11 +1934,11 @@ document.addEventListener('mousemove', e => {
   targetPY = ((e.clientY / window.innerHeight) - 0.5) * MAX_SHIFT * 0.6;
 });
 
-const stage = document.getElementById('stage');
+const stage = document.getElementById('seq1-stage') || document.getElementById('stage');
 (function pl() {
   curPX += (targetPX - curPX) * 0.05;
   curPY += (targetPY - curPY) * 0.05;
-  stage.style.transform = `translate(${curPX}px, ${curPY}px) scale(1.04)`;
+  if (stage) stage.style.transform = `translate(${curPX}px, ${curPY}px) scale(1.04)`;
   requestAnimationFrame(pl);
 })();
 
@@ -1825,7 +2016,7 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
   document.body.appendChild(cover);
 
   gsap.to(cover, { opacity: 1, ease: 'none',
-    scrollTrigger: { trigger: '#worlds', start: 'bottom 65%', end: 'bottom top', scrub: 0.5 }
+    scrollTrigger: { trigger: '#seq1-wrap', start: 'bottom 65%', end: 'bottom top', scrub: 0.5 }
   });
   gsap.to(cover, { opacity: 0, ease: 'none',
     scrollTrigger: { trigger: '#content', start: 'top 95%', end: 'top 25%', scrub: 0.5 }
@@ -1913,8 +2104,155 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
 
 } // end animation guard
 
-// Initial HUD update
-updateHUD(0, 0);
+// ═══════════════════════════════════════════════════════
+//  SEQUENCE 1 — SCROLL SCRUB ENGINE + IDENTITY CHOREOGRAPHY
+// ═══════════════════════════════════════════════════════
+{
+  const seq1Wrap  = document.getElementById('seq1-wrap');
+  const seq1Video = document.getElementById('seq1-video');
+  const seq1Bar   = document.getElementById('seq1-progress-bar');
+  const idName    = document.getElementById('seq1-name');
+  const idLabel   = document.getElementById('seq1-label');
+  const idMeta    = document.getElementById('seq1-meta');
+  const idCta     = document.getElementById('seq1-cta');
+
+  let seq1Duration  = 0;
+  let seq1TargetT   = 0;   // raw target video time
+  let seq1DisplayT  = 0;   // smoothed time (damped)
+  let seq1P         = 0;   // scroll progress 0–1
+  let seq1Ticking   = false;
+  let reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let isMobDevice   = matchMedia('(max-width:768px),(pointer:coarse)').matches;
+
+  // Seek performance tracking
+  let lastSeekRequest = 0;
+  let seekCount = 0, slowSeeks = 0;
+
+  if (seq1Video) {
+    seq1Video.addEventListener('loadedmetadata', () => {
+      seq1Duration = seq1Video.duration || 0;
+    }, { once: true });
+
+    seq1Video.addEventListener('seeked', () => {
+      const dt = performance.now() - lastSeekRequest;
+      seekCount++;
+      if (dt > 120) {
+        slowSeeks++;
+        if (slowSeeks <= 5) console.warn('[SEQ1] Slow seek:', dt.toFixed(0)+'ms ('+seekCount+'th seek)');
+        if (slowSeeks === 5) console.warn('[SEQ1] Repeated slow seeks — MP4 keyframe spacing may need optimisation for scrubbing');
+      }
+    });
+  }
+
+  // ─ PROGRESS CALCULATION ─────────────────────────────
+  function getSeq1Progress() {
+    if (!seq1Wrap) return 0;
+    const totalScroll = seq1Wrap.offsetHeight - window.innerHeight;
+    if (totalScroll <= 0) return 0;
+    return Math.max(0, Math.min(1, window.scrollY / totalScroll));
+  }
+
+  // ─ IDENTITY CHOREOGRAPHY ────────────────────────────
+  // Each element fades in/out across distinct scroll ranges.
+  // All opacity transitions handled via CSS (transition: opacity 0.6s) so JS
+  // only needs to set the final opacity value on meaningful changes.
+  let prevP = -1;
+
+  function lerp01(p, lo, hi) {
+    return Math.max(0, Math.min(1, (p - lo) / (hi - lo)));
+  }
+
+  function updateIdentity(p) {
+    if (Math.abs(p - prevP) < 0.004) return;
+    prevP = p;
+
+    // Name + label: 0.04→0.12 in, full 0.12→0.88, 0.88→0.96 out
+    const nameOp = p < 0.04 ? 0 : p < 0.12 ? lerp01(p, 0.04, 0.12) : p > 0.96 ? 0 : p > 0.88 ? 1 - lerp01(p, 0.88, 0.96) : 1;
+    if (idName)  idName.style.opacity  = nameOp.toFixed(3);
+    if (idLabel) idLabel.style.opacity = nameOp.toFixed(3);
+
+    // Meta (bottom-right): 0.38→0.5 in, 0.5→0.72 full, 0.72→0.82 out
+    const metaOp = p < 0.38 ? 0 : p < 0.5 ? lerp01(p, 0.38, 0.5) : p > 0.82 ? 0 : p > 0.72 ? 1 - lerp01(p, 0.72, 0.82) : 1;
+    if (idMeta) idMeta.style.opacity = metaOp.toFixed(3);
+
+    // CTA: 0.84→0.94 in, stays
+    const ctaOp = lerp01(p, 0.84, 0.94);
+    if (idCta) idCta.style.opacity = ctaOp.toFixed(3);
+
+    // Progress bar width
+    if (seq1Bar) seq1Bar.style.transform = `scaleX(${p.toFixed(4)})`;
+    if (seq1Bar) seq1Bar.style.width = '100%';
+  }
+
+  // ─ SCRUB TICK ───────────────────────────────────────
+  function seq1Tick() {
+    seq1Ticking = false;
+
+    seq1P = getSeq1Progress();
+    updateIdentity(seq1P);
+
+    if (seq1Duration > 0 && seq1Video && !reducedMotion) {
+      seq1TargetT = seq1P * seq1Duration;
+      // Damp — reduce jitter without over-smoothing
+      seq1DisplayT += (seq1TargetT - seq1DisplayT) * 0.22;
+      const delta = Math.abs(seq1DisplayT - seq1Video.currentTime);
+      if (delta > 0.05) {
+        lastSeekRequest = performance.now();
+        seq1Video.currentTime = seq1DisplayT;
+      }
+    }
+
+    // Keep ticking while within the seq1 section
+    if (seq1P > 0 && seq1P < 1) {
+      seq1Ticking = true;
+      requestAnimationFrame(seq1Tick);
+    }
+  }
+
+  window.addEventListener('scroll', () => {
+    if (!seq1Ticking) {
+      seq1Ticking = true;
+      requestAnimationFrame(seq1Tick);
+    }
+  }, { passive: true });
+
+  // ─ MOBILE — simpler autoplay presentation ───────────
+  if (isMobDevice && seq1Video) {
+    // On mobile: autoplay a short loop (first 4s) rather than scrubbing
+    seq1Video.addEventListener('loadedmetadata', () => {
+      seq1Video.currentTime = 0;
+      seq1Video.play().catch(() => {});
+      // Pause at 4s and hold
+      seq1Video.addEventListener('timeupdate', function holdAt4() {
+        if (seq1Video.currentTime >= 4) {
+          seq1Video.pause();
+          seq1Video.removeEventListener('timeupdate', holdAt4);
+          // Show identity immediately on mobile (no scroll choreography)
+          if (idLabel) idLabel.style.opacity = '1';
+          if (idName)  idName.style.opacity  = '1';
+          if (idCta)   idCta.style.opacity   = '1';
+        }
+      });
+      console.log('[SEQ1] Mobile mode: autoplay to 4s, then hold');
+    }, { once: true });
+  }
+
+  // ─ REDUCED MOTION ───────────────────────────────────
+  if (reducedMotion && seq1Video) {
+    seq1Video.currentTime = 0;
+    // Show static first frame, identity always visible
+    if (idLabel) idLabel.style.opacity = '1'; if (idLabel) idLabel.style.transition = 'none';
+    if (idName)  idName.style.opacity  = '1'; if (idName)  idName.style.transition  = 'none';
+    if (idCta)   idCta.style.opacity   = '1'; if (idCta)   idCta.style.transition   = 'none';
+    console.log('[SEQ1] Reduced motion: static first frame');
+  }
+
+  // ─ NETWORK OBSERVATION ──────────────────────────────
+  if ('connection' in navigator) {
+    const c = navigator.connection;
+    console.log('[SEQ1] Network:', c.effectiveType, 'downlink:', c.downlink+'Mbps');
+  }
+}
 
 // ═══════════════════════════════════════════════════════
 //  THREE.JS CHARACTER — deferred until #about is nearby
