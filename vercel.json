@@ -1,7 +1,10 @@
 {
   "rewrites": [
     { "source": "/test-mp4",  "destination": "/test-mp4.html" },
-    { "source": "/test-seq",  "destination": "/test-seq.html" }
+    { "source": "/test-seq",  "destination": "/test-seq.html" },
+    { "source": "/type-a",    "destination": "/type-a.html" },
+    { "source": "/type-b",    "destination": "/type-b.html" },
+    { "source": "/type-c",    "destination": "/type-c.html" }
   ],
   "headers": [
     {

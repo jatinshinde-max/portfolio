@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Type C — Contemporary Creative Technology</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+
+<!--
+  TYPE DIRECTION C — CONTEMPORARY CREATIVE TECHNOLOGY
+  ─────────────────────────────────────────────────────
+  Display:  Syne 600–800
+  Body:     DM Sans 300–400
+  Mono/UI:  DM Mono 300 (used MORE prominently — including nav)
+
+  Philosophy: Creative studio meets technical pipeline.
+  Syne has subtle geometric personality — its 'R', 'N', 'a', 'g'
+  are distinctive without being decorative. Designed for a
+  creative studio (Syndicat, Paris). Used widely by game studios,
+  motion graphics companies, and independent creative practices.
+  DM Mono as a navigation element signals technical precision.
+  DM Sans gives clean modern body copy that pairs with Syne's
+  character without competing. The combination reads: VFX pipeline
+  awareness + artistic vision.
+-->
+
+<style>
+/* ─── RESET ──────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+/* ─── TOKEN SYSTEM ───────────────────────────── */
+:root {
+  --bg:        #06050c;
+  --bg-1:      #0b0a14;
+  --bg-2:      #100f1c;
+  --ink:       rgba(255,255,255,0.92);
+  --ink-dim:   rgba(255,255,255,0.45);
+  --ink-mute:  rgba(255,255,255,0.2);
+  --ink-ghost: rgba(255,255,255,0.06);
+  --rule:      rgba(255,255,255,0.08);
+  --accent:    #e8d5b0;
+
+  /* TYPE SYSTEM C */
+  --disp:  'Syne', system-ui, sans-serif;
+  --body:  'DM Sans', system-ui, sans-serif;
+  --mono:  'DM Mono', 'Courier New', monospace;
+
+  --w-regular: 400;
+  --w-medium:  500;
+  --w-semi:    600;
+  --w-bold:    700;
+  --w-black:   800;
+  --w-mono:    300;
+
+  /* SCALE */
+  --sz-hero:       clamp(2.5rem, 6.5vw, 8rem);
+  --sz-hero-sub:   clamp(0.65rem, 1vw, 0.75rem);
+  --sz-section:    clamp(1.4rem, 2.8vw, 2.4rem);
+  --sz-world-num:  clamp(3.8rem, 8.5vw, 10rem);
+  --sz-world-name: clamp(1.1rem, 2.2vw, 1.8rem);
+  --sz-body:       clamp(0.875rem, 1.05vw, 1rem);
+  --sz-label:      clamp(0.55rem, 0.75vw, 0.65rem);
+  --sz-cta:        clamp(0.7rem, 0.9vw, 0.78rem);
+
+  /* TRACKING */
+  --tr-tight:   -0.02em;
+  --tr-normal:   0em;
+  --tr-caps:     0.12em;
+  --tr-label:    0.28em;
+}
+
+/* ─── BASE ───────────────────────────────────── */
+html, body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── DIRECTION BADGE ────────────────────────── */
+.dir-badge {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--mono);
+  font-size: 0.5rem;
+  font-weight: var(--w-mono);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: rgba(232,213,176,0.06);
+  border: 1px solid rgba(232,213,176,0.15);
+  padding: 0.4em 1.2em;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+/* ─── NAV — DM Mono used for all nav labels ─── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(1.5rem, 4vw, 3.5rem);
+  z-index: 900;
+  border-bottom: 1px solid var(--rule);
+  background: rgba(6,5,12,0.85);
+  backdrop-filter: blur(12px);
+}
+.nav-name {
+  /* In Direction C, name in Syne — shows off the typeface character at small size */
+  font-family: var(--disp);
+  font-weight: var(--w-bold);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.nav-links {
+  display: flex;
+  gap: clamp(1.2rem, 2.5vw, 2rem);
+  list-style: none;
+}
+/* Nav uses DM Mono — signals technical/pipeline awareness */
+.nav-links a {
+  font-family: var(--mono);
+  font-weight: var(--w-mono);
+  font-size: var(--sz-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--ink); }
+
+/* ─── SHARED SECTION BASE ────────────────────── */
+section {
+  padding: clamp(4rem, 8vh, 7rem) clamp(1.5rem, 4vw, 3.5rem);
+  border-bottom: 1px solid var(--rule);
+}
+.section-eyebrow {
+  font-family: var(--mono);
+  font-weight: var(--w-mono);
+  font-size: var(--sz-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin-bottom: 2.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.section-eyebrow::after {
+  content: '';
+  flex: 1;
+  max-width: 3rem;
+  height: 1px;
+  background: var(--rule);
+}
+.section-title {
+  font-family: var(--disp);
+  font-weight: var(--w-semi);
+  font-size: var(--sz-section);
+  letter-spacing: var(--tr-tight);
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+/* ─── HERO ───────────────────────────────────── */
+#hero {
+  min-height: 100vh;
+  padding-top: calc(52px + clamp(3rem, 8vh, 6rem));
+  display: grid;
+  grid-template-rows: 1fr auto;
+  border-bottom: 1px solid var(--rule);
+}
+.hero-main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(1rem, 2.5vh, 1.8rem);
+}
+/* DM Mono as a small coordinate/code annotation in the hero — Direction C signature */
+.hero-coord {
+  font-family: var(--mono);
+  font-weight: var(--w-mono);
+  font-size: var(--sz-label);
+  letter-spacing: var(--tr-label);
+  color: var(--ink-ghost);
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
+}
+.hero-name {
+  font-family: var(--disp);
+  font-weight: var(--w-black);
+  font-size: var(--sz-hero);
+  letter-spacing: -0.03em;
+  line-height: 0.93;
+  color: var(--ink);
+  display: block;
+}
+.hero-roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0;
+  padding-top: 0.5rem;
+  flex-direction: column;
+}
+/* Roles as DM Mono — technical identity prefix */
+.hero-role {
+  font-family: var(--mono);
+  font-weight: var(--w-mono);
+  font-size: var(--sz-hero-sub);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+.hero-rule {
+  width: 100%;
+  height: 1px;
+  background: var(--rule);
+  margin: clamp(1rem, 2vh, 1.5rem) 0;
+}
+.hero-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.hero-years {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.hero-years .num {
+  font-family: var(--disp);
+  font-weight: var(--w-black);
+  font-size: clamp(2rem, 4.5vw, 5rem);
+  letter-spacing: var(--tr-tight);
+  line-height: 1;
+  color: var(--ink);
+}
+.hero-years .label {
+  font-family: var(--mono);
+  font-weight: var(--w-mono);
+  font-size: var(--sz-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.hero-location p {
+  font-family: var(--mono);
+  font-weight: var(--w-mono);
+  font-size: var(--sz-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  line-height: 1.8;
+  text-align: right;
+}
+
+/* ─── WORLDS ─────────────────────────────────── */
+#worlds { background: var(--bg); }
+.worlds-list {
+  margin-top: clamp(2rem, 4vh, 3.5rem);
+  display: flex;
+  flex-direction: column;
+}
+.world-entry {
+  display: grid;
+  grid-template-columns: clamp(3.5rem, 7vw, 7rem) 1fr auto;
+  align-items: center;
+  gap: 0 clamp(1rem, 2.5vw, 2.5rem);
+  padding: clamp(0.8rem, 1.8vh, 1.4rem) 0;
+  border-bottom: 1px solid var(--rule);
+  cursor: default;
+}
+.world-entry:first-child { border-top: 1px solid var(--rule); }
+/* Numbers in Syne — the geometric quirks show at display size */
+.world-num {
+  font-family: var(--disp);
+  font-weight: var(--w-black);
+  font-size: var(--sz-world-num);
+  letter-spacing: var(--tr-tight);
+  line-height: 1;
+  color: var(--ink-ghost);
+  transition: color 0.3s;
+}
+.world-entry:hover .world-num { color: rgba(255,255,255,0.12); }
+.world-info {}
+/* World names in Syne — distinctive at mid-size */
+.world-name {
+  font-family: var(--disp);
+  font-weight: var(--w-semi);
+  font-size: var(--sz-world-name);
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  display: block;
+  margin-bottom: 0.25rem;
+}
+.world-tag {
+  font-family: var(--mono);
+  font-weight: var(--w-mono);
+  font-size: var(--sz-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.world-arrow {
+  font-family: var(--mono);
+  font-size: var(--sz-label);
+  color: var(--ink-ghost);
+  letter-spacing: 0.1em;
+}
+
+/* ─── COMMERCIAL ─────────────────────────────── */
+#commercial { background: var(--bg-1); }
+.commercial-layout {
+  margin-top: clamp(2rem, 4vh, 3.5rem);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: start;
+}
+.commercial-media {
+  aspect-ratio: 16/9;
+  background: linear-gradient(135deg, var(--bg) 0%, var(--bg-2) 100%);
+  border: 1px solid var(--rule);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.media-label {
+  font-family: var(--mono);
+  font-size: var(--sz-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--ink-ghost);
+}
+.commercial-categories {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: clamp(1.5rem, 3vh, 2.5rem);
+}
+.cat-tag {
+  font-family: var(--mono);
+  font-weight: var(--w-mono);
+  font-size: var(--sz-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  border: 1px solid var(--rule);
+  padding: 0.3em 0.8em;
+}
+.project-meta {
+  margin: clamp(1.2rem, 2.5vh, 2rem) 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem 1.5rem;
+}
+.meta-key {
+  font-family: var(--mono);
+  font-weight: var(--w-mono);
+  font-size: var(--sz-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  display: block;
+  margin-bottom: 0.2rem;
+}
+.meta-val {
+  font-family: var(--body);
+  font-weight: var(--w-regular);
+  font-size: var(--sz-body);
+  color: var(--ink-dim);
+}
+.body-copy {
+  font-family: var(--body);
+  font-weight: 300;
+  font-size: var(--sz-body);
+  line-height: 1.8;
+  color: var(--ink-dim);
+  margin: clamp(1.2rem, 2.5vh, 2rem) 0;
+  max-width: 52ch;
+}
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--disp);
+  font-weight: var(--w-semi);
+  font-size: clamp(0.8rem, 1.1vw, 0.92rem);
+  letter-spacing: var(--tr-caps);
+  text-transform: uppercase;
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  padding-bottom: 0.2em;
+  transition: border-color 0.2s, color 0.2s;
+}
+.cta:hover { color: var(--accent); border-color: var(--accent); }
+
+/* ─── ABOUT ──────────────────────────────────── */
+#about { background: var(--bg); }
+.about-layout {
+  margin-top: clamp(2rem, 4vh, 3.5rem);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: start;
+}
+.about-body {
+  font-family: var(--body);
+  font-weight: 300;
+  font-size: var(--sz-body);
+  line-height: 1.8;
+  color: var(--ink-dim);
+  max-width: 54ch;
+}
+.about-body + .about-body { margin-top: 1.2rem; }
+.tools-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: clamp(1.5rem, 3vh, 2.5rem);
+}
+.tool-tag {
+  font-family: var(--mono);
+  font-weight: var(--w-mono);
+  font-size: var(--sz-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  border: 1px solid var(--rule);
+  padding: 0.3em 0.8em;
+}
+
+/* ─── CONTACT ────────────────────────────────── */
+#contact {
+  background: var(--bg-1);
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+/* Syne at display size in contact — shows personality in a low-key context */
+.contact-avail {
+  font-family: var(--disp);
+  font-weight: var(--w-bold);
+  font-size: clamp(1.8rem, 4.5vw, 5.5rem);
+  letter-spacing: var(--tr-tight);
+  line-height: 1.05;
+  color: var(--ink);
+  margin-bottom: clamp(1rem, 2.5vh, 2rem);
+}
+.contact-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(1.5rem, 3vw, 3rem);
+  margin-top: clamp(1.5rem, 3vh, 2.5rem);
+}
+.contact-detail .key {
+  font-family: var(--mono);
+  font-weight: var(--w-mono);
+  font-size: var(--sz-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  display: block;
+  margin-bottom: 0.3rem;
+}
+.contact-detail .val {
+  font-family: var(--body);
+  font-weight: var(--w-regular);
+  font-size: var(--sz-body);
+  color: var(--ink-dim);
+}
+
+/* ─── RESPONSIVE ─────────────────────────────── */
+@media (max-width: 768px) {
+  .commercial-layout,
+  .about-layout { grid-template-columns: 1fr; }
+  .nav-links { display: none; }
+  .hero-meta { flex-direction: column; align-items: flex-start; }
+  .hero-location p { text-align: left; }
+  .contact-avail { font-size: clamp(1.8rem, 8vw, 3rem); }
+}
+</style>
+</head>
+<body>
+
+<div class="dir-badge">Direction C — Contemporary Creative Technology</div>
+
+<!-- [7] NAVIGATION — DM Mono throughout (technical identity) -->
+<nav>
+  <span class="nav-name">Jatin Shinde</span>
+  <ul class="nav-links">
+    <li><a href="#worlds">Worlds</a></li>
+    <li><a href="#commercial">Commercial</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- [1] HERO / IDENTITY -->
+<section id="hero">
+  <div class="hero-main">
+    <!-- Coordinate label — Direction C signature detail -->
+    <span class="hero-coord">CGI · VFX · ENV · 2018—</span>
+    <span class="hero-name">JATIN<br>SHINDE</span>
+    <div class="hero-rule"></div>
+    <!-- Roles in DM Mono — technical register -->
+    <div class="hero-roles">
+      <span class="hero-role">3D Generalist</span>
+      <span class="hero-role">Environment Artist</span>
+      <span class="hero-role">CGI / VFX Artist</span>
+    </div>
+  </div>
+  <div class="hero-meta">
+    <div class="hero-years">
+      <!-- [8] LARGE NUMBER — Syne character visible -->
+      <span class="num">7+</span>
+      <span class="label">Years · Creative Production</span>
+    </div>
+    <div class="hero-location">
+      <!-- [9] TECHNICAL LABEL -->
+      <p>Based in India</p>
+      <p>Open to Relocation</p>
+    </div>
+  </div>
+</section>
+
+<!-- [2] SECTION TITLE + [3] WORLD TITLE + [8] INDEX -->
+<section id="worlds">
+  <div class="section-eyebrow">01 &nbsp; Selected Worlds</div>
+  <h2 class="section-title">Five cinematic<br>environments</h2>
+
+  <div class="worlds-list">
+    <div class="world-entry">
+      <!-- [8] Syne numbers — geometric personality at display size -->
+      <span class="world-num">01</span>
+      <div class="world-info">
+        <!-- [3] WORLD TITLE — Syne semi-bold -->
+        <span class="world-name">Ashfall</span>
+        <!-- [9] TECHNICAL LABEL — DM Mono -->
+        <span class="world-tag">Post-Apocalyptic · Ash &amp; Ember</span>
+      </div>
+      <span class="world-arrow">→</span>
+    </div>
+    <div class="world-entry">
+      <span class="world-num">02</span>
+      <div class="world-info">
+        <span class="world-name">Luminara</span>
+        <span class="world-tag">Bioluminescent · Deep Environment</span>
+      </div>
+      <span class="world-arrow">→</span>
+    </div>
+    <div class="world-entry">
+      <span class="world-num">03</span>
+      <div class="world-info">
+        <span class="world-name">Verdant</span>
+        <span class="world-tag">Dense Overgrowth · Natural Light</span>
+      </div>
+      <span class="world-arrow">→</span>
+    </div>
+    <div class="world-entry">
+      <span class="world-num">04</span>
+      <div class="world-info">
+        <span class="world-name">Helios</span>
+        <span class="world-tag">Solar Architecture · Atmospheric</span>
+      </div>
+      <span class="world-arrow">→</span>
+    </div>
+    <div class="world-entry">
+      <span class="world-num">05</span>
+      <div class="world-info">
+        <span class="world-name">Aurum</span>
+        <span class="world-tag">Golden Hour · Ancient Geometry</span>
+      </div>
+      <span class="world-arrow">→</span>
+    </div>
+  </div>
+</section>
+
+<!-- [4] PROJECT METADATA + [5] BODY COPY + [6] CTA -->
+<section id="commercial">
+  <div class="section-eyebrow">02 &nbsp; Commercial CGI</div>
+  <h2 class="section-title">Product · Advertising · Motion</h2>
+
+  <div class="commercial-layout">
+    <div class="commercial-media">
+      <span class="media-label">[ Commercial — Product CGI ]</span>
+    </div>
+    <div class="commercial-text">
+      <!-- [9] LABELS — all DM Mono -->
+      <div class="commercial-categories">
+        <span class="cat-tag">Product</span>
+        <span class="cat-tag">Advertising</span>
+        <span class="cat-tag">Motion</span>
+      </div>
+
+      <!-- [4] PROJECT METADATA -->
+      <div class="project-meta">
+        <div class="meta-row">
+          <span class="meta-key">Year</span>
+          <span class="meta-val">2024</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-key">Software</span>
+          <span class="meta-val">Blender · After Effects</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-key">Category</span>
+          <span class="meta-val">Commercial CGI</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-key">Format</span>
+          <span class="meta-val">16:9 · 4K</span>
+        </div>
+      </div>
+
+      <!-- [5] BODY COPY — DM Sans for body -->
+      <p class="body-copy">
+        High-end product visualisation and commercial CGI for advertising
+        campaigns. Photoreal rendering, cinematic lighting, motion graphics
+        integration. Delivered across broadcast, digital and out-of-home formats.
+      </p>
+
+      <!-- [6] CTA — Syne semi-bold -->
+      <a href="#" class="cta">View Project →</a>
+    </div>
+  </div>
+</section>
+
+<!-- [5] BODY COPY — ABOUT -->
+<section id="about">
+  <div class="section-eyebrow">03 &nbsp; About</div>
+  <h2 class="section-title">CGI &amp; VFX artist.<br>7+ years in creative production.</h2>
+
+  <div class="about-layout">
+    <div>
+      <!-- [5] BODY COPY — DM Sans -->
+      <p class="about-body">
+        I lead creative teams combining CGI, VFX and real-time environments.
+        My practice spans photoreal product visualisation, cinematic environment
+        art, character work and motion graphics — built across After Effects,
+        Blender, Unreal Engine 5 and Substance 3D.
+      </p>
+      <p class="about-body">
+        Every project starts with a question: what does this space feel like,
+        not just look like? The answer lives in lighting, atmosphere, the quality
+        of the air between surfaces.
+      </p>
+    </div>
+    <div>
+      <div class="section-eyebrow" style="margin-bottom:1rem;">Tools</div>
+      <div class="tools-grid">
+        <span class="tool-tag">Unreal Engine 5</span>
+        <span class="tool-tag">Blender</span>
+        <span class="tool-tag">After Effects</span>
+        <span class="tool-tag">Substance 3D</span>
+        <span class="tool-tag">DaVinci Resolve</span>
+        <span class="tool-tag">Photoshop</span>
+        <span class="tool-tag">Character Creator 4</span>
+        <span class="tool-tag">Marvelous Designer</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- [10] CONTACT TYPOGRAPHY -->
+<section id="contact">
+  <div class="section-eyebrow">04 &nbsp; Contact</div>
+
+  <!-- Syne bold at display — personality without decoration -->
+  <p class="contact-avail">
+    Available for<br>full-time opportunities
+  </p>
+
+  <!-- [6] CTA — Syne -->
+  <a href="mailto:jatinshinde118@gmail.com" class="cta">Get in touch →</a>
+
+  <!-- [9] TECHNICAL LABELS — all DM Mono -->
+  <div class="contact-meta">
+    <div class="contact-detail">
+      <span class="key">Location</span>
+      <span class="val">Based in India</span>
+    </div>
+    <div class="contact-detail">
+      <span class="key">Relocation</span>
+      <span class="val">Open</span>
+    </div>
+    <div class="contact-detail">
+      <span class="key">Availability</span>
+      <span class="val">Full-time · Freelance</span>
+    </div>
+    <div class="contact-detail">
+      <span class="key">Response</span>
+      <span class="val">Within 48 hours</span>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
