@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Selected Worlds — Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,200;0,300;0,400;0,500;1,200;1,300&family=Inter:wght@300;400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+
+/* ── TOKENS ─────────────────────────────────────────────── */
+:root {
+  --bg:        #06050c;
+  --bg-1:      #0b0a14;
+  --ink:       rgba(255,255,255,0.90);
+  --ink-dim:   rgba(255,255,255,0.42);
+  --ink-mute:  rgba(255,255,255,0.18);
+  --ink-ghost: rgba(255,255,255,0.06);
+  --accent:    #e8d5b0;
+
+  --f-display: 'Inter Tight', sans-serif;
+  --f-body:    'Inter', sans-serif;
+  --f-mono:    'DM Mono', monospace;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in:  cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+/* ── RESET ──────────────────────────────────────────────── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 16px; scroll-behavior: auto; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-weight: 300;
+  overflow-x: hidden;
+  cursor: none;
+  -webkit-font-smoothing: antialiased;
+}
+@media (hover:none),(pointer:coarse) { body { cursor: auto; } }
+
+/* ── CURSOR ─────────────────────────────────────────────── */
+#c-dot, #c-ring {
+  position: fixed; top: 0; left: 0;
+  pointer-events: none; z-index: 9999;
+  transform: translate(-50%,-50%);
+  will-change: transform;
+}
+#c-dot {
+  width: 5px; height: 5px;
+  background: var(--ink);
+  border-radius: 50%;
+  mix-blend-mode: difference;
+}
+#c-ring {
+  width: 30px; height: 30px;
+  border: 1px solid rgba(255,255,255,0.5);
+  border-radius: 50%;
+  transition: transform 0.2s var(--ease-out), border-color 0.2s;
+  will-change: transform;
+}
+#c-ring.expand {
+  transform: translate(-50%,-50%) scale(1.7);
+  border-color: var(--accent);
+}
+@media (hover:none),(pointer:coarse) { #c-dot, #c-ring { display:none; } }
+
+/* ── SEQ1 PROXY ─────────────────────────────────────────── */
+/* Represents the end-state of Sequence1 — the cinematic opening that precedes the Worlds section */
+#seq1-proxy {
+  position: relative;
+  height: 100vh;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  overflow: hidden;
+}
+
+/* Simulated Sequence1 final-frame: dark vignette feel */
+#seq1-proxy::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 70% at 50% 40%, rgba(12,10,22,0.0) 0%, rgba(6,5,12,0.7) 100%),
+    linear-gradient(180deg, rgba(6,5,12,0) 50%, rgba(6,5,12,1) 100%);
+  z-index: 1;
+}
+
+.seq1-proxy-hint {
+  position: relative;
+  z-index: 2;
+  margin-bottom: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  opacity: 0.32;
+}
+.seq1-proxy-label {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  font-weight: 300;
+  letter-spacing: 0.28em;
+  color: var(--ink);
+  text-transform: uppercase;
+}
+.seq1-proxy-scroll {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(180deg, transparent, var(--ink));
+  animation: scrollbar-pulse 2.2s ease-in-out infinite;
+}
+@keyframes scrollbar-pulse {
+  0%, 100% { opacity: 0.3; transform: scaleY(0.6) translateY(-8px); }
+  50%       { opacity: 0.8; transform: scaleY(1) translateY(0); }
+}
+
+/* Handoff gradient — blends seq1-proxy bottom into worlds canvas */
+.seq1-handoff-gradient {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: linear-gradient(180deg, transparent, var(--bg));
+  z-index: 3;
+}
+
+/* Seq1 proxy background fill — a placeholder dark environment feel */
+.seq1-env-fill {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 30% 70%, rgba(22,18,10,0.9) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 80% at 70% 30%, rgba(10,8,20,0.8) 0%, transparent 60%),
+    linear-gradient(145deg, #0d0b18 0%, #08070f 40%, #0b0a10 70%, #07060d 100%);
+  z-index: 0;
+}
+
+.seq1-proxy-note {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  text-align: center;
+}
+.seq1-proxy-note span {
+  display: block;
+  font-family: var(--f-mono);
+  font-size: 9px;
+  font-weight: 300;
+  letter-spacing: 0.3em;
+  color: var(--ink-mute);
+  text-transform: uppercase;
+}
+
+/* ── WORLDS SECTION ─────────────────────────────────────── */
+#worlds-section {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg);
+  /* Reveal animation triggered by .is-revealed class */
+}
+
+/* ── CANVASES ────────────────────────────────────────────── */
+#worlds-canvas-a,
+#worlds-canvas-b {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+#worlds-canvas-a { z-index: 1; }
+#worlds-canvas-b {
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.7s var(--ease-out);
+}
+#worlds-canvas-b.transitioning { opacity: 1; }
+
+/* ── WORLD OVERLAYS ──────────────────────────────────────── */
+/* Vignette: cinematic edge darkening */
+#worlds-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 70% at 50% 50%, transparent 40%, rgba(6,5,12,0.55) 100%),
+    linear-gradient(180deg, rgba(6,5,12,0.4) 0%, transparent 18%, transparent 65%, rgba(6,5,12,0.85) 100%),
+    linear-gradient(90deg, rgba(6,5,12,0.3) 0%, transparent 15%, transparent 85%, rgba(6,5,12,0.3) 100%);
+}
+
+/* Grain texture overlay */
+#worlds-grain {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  animation: grain-drift 0.5s steps(1) infinite;
+}
+@keyframes grain-drift {
+  0%  { background-position: 0 0; }
+  20% { background-position: -40px 20px; }
+  40% { background-position: 60px -30px; }
+  60% { background-position: -20px 50px; }
+  80% { background-position: 30px -10px; }
+  100%{ background-position: 0 0; }
+}
+
+/* Loading state overlay */
+#worlds-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.6s var(--ease-out);
+}
+#worlds-loading.hidden { opacity: 0; pointer-events: none; }
+.wl-bar {
+  width: 120px;
+  height: 1px;
+  background: var(--ink-ghost);
+  position: relative;
+  overflow: hidden;
+}
+.wl-bar::after {
+  content: '';
+  position: absolute;
+  left: -100%;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--accent);
+  animation: wl-scan 1.2s var(--ease-out) infinite;
+}
+@keyframes wl-scan {
+  0%   { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* ── WORLD INFO ──────────────────────────────────────────── */
+/* Bottom-left: world identity during active state */
+#world-info {
+  position: absolute;
+  bottom: 96px;
+  left: 44px;
+  z-index: 10;
+  pointer-events: none;
+  transform: translateY(0);
+  transition: transform 0.6s var(--ease-out), opacity 0.6s var(--ease-out);
+}
+#world-info.switching {
+  transform: translateY(14px);
+  opacity: 0;
+}
+.wi-fraction {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  font-weight: 300;
+  letter-spacing: 0.25em;
+  color: var(--ink-dim);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.wi-fraction-sep {
+  width: 20px;
+  height: 1px;
+  background: var(--ink-mute);
+}
+.wi-name {
+  font-family: var(--f-display);
+  font-size: clamp(2.4rem, 4vw, 4rem);
+  font-weight: 300;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  color: var(--ink);
+  margin-bottom: 10px;
+}
+.wi-label {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  font-weight: 300;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.wi-label::after {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.5;
+}
+
+/* Accent bar: 2px color indicator, left edge of name */
+#world-accent-bar {
+  position: absolute;
+  left: -16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 60%;
+  border-radius: 1px;
+  background: var(--accent);
+  transition: background 0.7s var(--ease-out), height 0.4s var(--ease-out);
+}
+
+/* ── WORLD INDEX ─────────────────────────────────────────── */
+/* Bottom: horizontal 5-world navigation strip */
+#world-index {
+  position: absolute;
+  bottom: 32px;
+  right: 44px;
+  z-index: 10;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.wi-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 12px 14px 10px;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  transition: opacity 0.35s var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.wi-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 14px;
+  right: 14px;
+  height: 1px;
+  background: var(--ink-ghost);
+  transition: background 0.35s var(--ease-out);
+}
+.wi-item:hover { opacity: 1 !important; }
+.wi-item:hover::before { background: var(--ink-mute); }
+
+.wi-item.active::before {
+  background: var(--accent);
+  transition: background 0.7s var(--ease-out);
+}
+
+.wi-num {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  color: var(--ink-dim);
+  transition: color 0.35s;
+}
+.wi-item.active .wi-num {
+  color: var(--accent);
+}
+
+.wi-wname {
+  font-family: var(--f-display);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: var(--ink-mute);
+  text-transform: uppercase;
+  transition: color 0.35s;
+  white-space: nowrap;
+}
+.wi-item.active .wi-wname { color: var(--ink); }
+
+/* Mobile: index visible but simplified */
+@media (max-width: 768px) {
+  #world-index {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    justify-content: stretch;
+    gap: 0;
+    background: linear-gradient(180deg, transparent, rgba(6,5,12,0.8) 50%);
+    padding: 16px 0 env(safe-area-inset-bottom, 16px);
+  }
+  .wi-item {
+    flex: 1;
+    align-items: center;
+    padding: 10px 6px 8px;
+  }
+  .wi-item::before {
+    left: 4px;
+    right: 4px;
+  }
+  .wi-wname {
+    font-size: 9px;
+    letter-spacing: 0.04em;
+  }
+  #world-info {
+    left: 24px;
+    bottom: 110px;
+  }
+}
+
+/* ── PROGRESS BAR ────────────────────────────────────────── */
+#worlds-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 1px;
+  z-index: 11;
+  background: var(--accent);
+  width: 0%;
+  transition: width 0.1s linear, background 0.7s var(--ease-out);
+  opacity: 0.7;
+}
+
+/* ── WORLDS REVEAL ANIMATION ─────────────────────────────── */
+/* The worlds section starts invisible; the IntersectionObserver reveals it */
+#worlds-section {
+  opacity: 0;
+  transform: translateY(0);
+}
+#worlds-section.is-revealed {
+  opacity: 1;
+  transition: opacity 0.9s var(--ease-out);
+}
+
+/* ── AFTER-WORLDS PLACEHOLDER ───────────────────────────── */
+#after-worlds {
+  position: relative;
+  height: 60vh;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top: 1px solid var(--ink-ghost);
+}
+.aw-note {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  font-weight: 300;
+  letter-spacing: 0.3em;
+  color: var(--ink-mute);
+  text-transform: uppercase;
+  text-align: center;
+}
+
+/* ── PROTOTYPE BADGE ─────────────────────────────────────── */
+#proto-badge {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9990;
+  font-family: var(--f-mono);
+  font-size: 8px;
+  font-weight: 300;
+  letter-spacing: 0.25em;
+  color: var(--ink-mute);
+  text-transform: uppercase;
+  background: rgba(6,5,12,0.7);
+  padding: 5px 10px;
+  border: 1px solid var(--ink-ghost);
+  pointer-events: none;
+}
+
+</style>
+</head>
+<body>
+
+<div id="c-dot"></div>
+<div id="c-ring"></div>
+<div id="proto-badge">Worlds Prototype — /worlds-test</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SEQ1 PROXY — represents Sequence1 in its resting end-state -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="seq1-proxy">
+  <div class="seq1-env-fill"></div>
+
+  <div class="seq1-proxy-note">
+    <span>Sequence 01 — Cinematic Opening</span>
+    <span style="margin-top:6px;font-size:8px;opacity:0.6">[Placeholder — scroll-scrubbed MP4 lives here]</span>
+  </div>
+
+  <div class="seq1-proxy-hint">
+    <div class="seq1-proxy-label">Continue</div>
+    <div class="seq1-proxy-scroll"></div>
+  </div>
+  <div class="seq1-handoff-gradient"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- WORLDS SECTION — the cinematic environment selector        -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section id="worlds-section" aria-label="Selected Worlds">
+
+  <!-- Canvases: A = current world, B = incoming world (crossfade) -->
+  <canvas id="worlds-canvas-a"></canvas>
+  <canvas id="worlds-canvas-b"></canvas>
+
+  <!-- Grain + vignette overlays -->
+  <div id="worlds-vignette"></div>
+  <div id="worlds-grain"></div>
+
+  <!-- Loading state -->
+  <div id="worlds-loading">
+    <div class="wl-bar"></div>
+  </div>
+
+  <!-- World info overlay: bottom-left -->
+  <div id="world-info">
+    <div id="world-accent-bar"></div>
+    <div class="wi-fraction">
+      <span id="wi-num-current">01</span>
+      <span class="wi-fraction-sep"></span>
+      <span>05</span>
+    </div>
+    <div class="wi-name" id="wi-name">Ashfall</div>
+    <div class="wi-label">Environment</div>
+  </div>
+
+  <!-- World index: five worlds navigation strip -->
+  <nav id="world-index" aria-label="World selection">
+    <button class="wi-item active" data-world="0" aria-label="World 01: Ashfall">
+      <span class="wi-num">01</span>
+      <span class="wi-wname">Ashfall</span>
+    </button>
+    <button class="wi-item" data-world="1" aria-label="World 02: Luminara">
+      <span class="wi-num">02</span>
+      <span class="wi-wname">Luminara</span>
+    </button>
+    <button class="wi-item" data-world="2" aria-label="World 03: Verdant">
+      <span class="wi-num">03</span>
+      <span class="wi-wname">Verdant</span>
+    </button>
+    <button class="wi-item" data-world="3" aria-label="World 04: Helios">
+      <span class="wi-num">04</span>
+      <span class="wi-wname">Helios</span>
+    </button>
+    <button class="wi-item" data-world="4" aria-label="World 05: Aurum">
+      <span class="wi-num">05</span>
+      <span class="wi-wname">Aurum</span>
+    </button>
+  </nav>
+
+  <!-- Frame progress bar: top edge -->
+  <div id="worlds-progress"></div>
+
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- AFTER WORLDS — placeholder for Commercial CGI section      -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="after-worlds">
+  <div class="aw-note">
+    Commercial CGI &nbsp;·&nbsp; Character &nbsp;·&nbsp; Transformations<br>
+    <span style="display:block;margin-top:8px;font-size:8px;opacity:0.5">[Next sections follow]</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- ENGINE ─────────────────────────────────────────────────── -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<script type="module">
+
+// ──────────────────────────────────────────────────────────────
+// CONFIG
+// ──────────────────────────────────────────────────────────────
+const CDN = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev';
+const FRAME_INTERVAL = 85;   // ms between ambient animation frames (~11.7fps)
+const TRANSITION_MS  = 700;  // world crossfade duration
+const INIT_FRAMES    = 24;   // frames to load before showing (first burst)
+const BG_BATCH       = 8;    // frames per background batch
+const BG_DELAY       = 60;   // ms between background batches
+
+const WORLDS = [
+  {
+    slug:       'world-01',
+    name:       'Ashfall',
+    label:      'Environment',
+    frameCount: 111,
+    // Note: world-01 is in worlds.config.js but not in production WORLDS array.
+    // Frames may exist on R2 — prototype will load gracefully.
+    accent:     '#c46428',
+    accentRGB:  [196, 100, 40],
+    posterFrame: 1,   // frame_0001.webp
+  },
+  {
+    slug:       'world-02',
+    name:       'Luminara',
+    label:      'Environment',
+    frameCount: 165,
+    accent:     '#7c5cc4',
+    accentRGB:  [124, 92, 196],
+    posterFrame: 1,
+  },
+  {
+    slug:       'world-03',
+    name:       'Verdant',
+    label:      'Environment',
+    frameCount: 124,
+    accent:     '#3a8c52',
+    accentRGB:  [58, 140, 82],
+    posterFrame: 61,  // frame_0061 is confirmed working (used in production)
+  },
+  {
+    slug:       'world-04',
+    name:       'Helios',
+    label:      'Environment',
+    frameCount: 179,
+    // Note: world-04 is in worlds.config.js but not in production WORLDS array.
+    accent:     '#2872c4',
+    accentRGB:  [40, 114, 196],
+    posterFrame: 1,
+  },
+  {
+    slug:       'world-05',
+    name:       'Aurum',
+    label:      'Environment',
+    frameCount: 375,
+    accent:     '#c4a028',
+    accentRGB:  [196, 160, 40],
+    posterFrame: 1,
+  },
+];
+
+// ──────────────────────────────────────────────────────────────
+// STATE
+// ──────────────────────────────────────────────────────────────
+let activeWorld   = 0;      // currently displayed world
+let isTransition  = false;  // crossfade in progress
+let transitionTarget = -1;  // world being transitioned to
+
+// Per-world: frames (ImageBitmap[]), animIdx, loadState
+const worldState = WORLDS.map(w => ({
+  poster:     null,      // HTMLImageElement — poster fallback
+  posterBmp:  null,      // ImageBitmap version drawn on canvas
+  frames:     [],        // ImageBitmap[] loaded frames (ordered by frame number)
+  frameNums:  [],        // which frame numbers are loaded (parallel array)
+  animIdx:    0,         // current animation position
+  loadState:  'idle',    // idle | loading | done | error
+  abortCtrl:  null,      // AbortController for cancelling background load
+}));
+
+// Animation clock
+let lastTs      = 0;
+let frameTimer  = 0;
+let animDirty   = true;
+let rafId       = null;
+
+// Parallax (desktop only)
+const PARALLAX_AMP_X = 8, PARALLAX_AMP_Y = 5;
+const PARALLAX_K     = 0.022;
+const PARALLAX_THR   = 0.04;
+let tPX = 0, tPY = 0, cPX = 0, cPY = 0, lPX = 0, lPY = 0;
+
+// DOM
+const canvasA     = document.getElementById('worlds-canvas-a');
+const canvasB     = document.getElementById('worlds-canvas-b');
+const ctxA        = canvasA.getContext('2d');
+const ctxB        = canvasB.getContext('2d');
+const worldInfo   = document.getElementById('world-info');
+const wiName      = document.getElementById('wi-name');
+const wiNumCur    = document.getElementById('wi-num-current');
+const accentBar   = document.getElementById('world-accent-bar');
+const progressBar = document.getElementById('worlds-progress');
+const loadOverlay = document.getElementById('worlds-loading');
+const indexItems  = [...document.querySelectorAll('.wi-item')];
+
+let W = 0, H = 0, DPR = Math.min(devicePixelRatio, 2);
+const isMob = matchMedia('(max-width:768px),(pointer:coarse)').matches;
+
+// ──────────────────────────────────────────────────────────────
+// CANVAS RESIZE
+// ──────────────────────────────────────────────────────────────
+function resize() {
+  W = window.innerWidth;
+  H = window.innerHeight;
+  const pw = W * DPR, ph = H * DPR;
+  for (const cv of [canvasA, canvasB]) {
+    cv.width  = pw;
+    cv.height = ph;
+    cv.style.width  = W + 'px';
+    cv.style.height = H + 'px';
+  }
+  animDirty = true;
+}
+window.addEventListener('resize', () => { resize(); });
+resize();
+
+// ──────────────────────────────────────────────────────────────
+// DRAW — cover-fit an image onto a canvas context
+// ──────────────────────────────────────────────────────────────
+function drawImageCover(ctx, img) {
+  if (!img) return;
+  const sw = img.width  || img.naturalWidth;
+  const sh = img.height || img.naturalHeight;
+  if (!sw || !sh) return;
+
+  // Apply parallax offset (desktop only)
+  const ox = isMob ? 0 : cPX;
+  const oy = isMob ? 0 : cPY;
+
+  const scale = Math.max((W * DPR) / sw, (H * DPR) / sh);
+  // Slightly overscan for parallax headroom
+  const os = isMob ? 1 : 1.06;
+  const finalScale = scale * os;
+  const dw = sw * finalScale;
+  const dh = sh * finalScale;
+  const dx = ((W * DPR) - dw) / 2 + ox * DPR;
+  const dy = ((H * DPR) - dh) / 2 + oy * DPR;
+  ctx.drawImage(img, dx, dy, dw, dh);
+}
+
+// ──────────────────────────────────────────────────────────────
+// POSTER LOAD — one poster per world, loaded eagerly for active, lazy for others
+// ──────────────────────────────────────────────────────────────
+function loadPoster(worldIdx) {
+  const w  = WORLDS[worldIdx];
+  const st = worldState[worldIdx];
+  if (st.poster) return Promise.resolve(st.poster);
+
+  return new Promise(resolve => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    const n = String(w.posterFrame).padStart(4, '0');
+    img.src = `${CDN}/${w.slug}/frame_${n}.webp`;
+    img.onload = () => {
+      st.poster = img;
+      createImageBitmap(img).then(bmp => { st.posterBmp = bmp; }).catch(() => {});
+      resolve(img);
+    };
+    img.onerror = () => resolve(null);
+  });
+}
+
+// Immediately start loading active world poster, lazy for others
+loadPoster(0).then(img => {
+  if (img) {
+    loadOverlay.classList.add('hidden');
+    animDirty = true;
+  }
+});
+// Preload inactive world posters after a short delay
+setTimeout(() => {
+  for (let i = 1; i < WORLDS.length; i++) loadPoster(i);
+}, 1200);
+
+// ──────────────────────────────────────────────────────────────
+// FRAME SEQUENCE LOAD — progressive loading for active world
+// ──────────────────────────────────────────────────────────────
+async function loadWorldFrames(worldIdx) {
+  const st = worldState[worldIdx];
+  if (st.loadState === 'loading' || st.loadState === 'done') return;
+  st.loadState = 'loading';
+  const ctrl = new AbortController();
+  st.abortCtrl = ctrl;
+  const w = WORLDS[worldIdx];
+
+  // Build frame list (every frame, starting from 1)
+  const frameNums = [];
+  for (let i = 1; i <= w.frameCount; i++) frameNums.push(i);
+
+  let firstBurstDone = false;
+
+  for (let start = 0; start < frameNums.length; start += BG_BATCH) {
+    if (ctrl.signal.aborted) break;
+
+    const batch = frameNums.slice(start, start + BG_BATCH);
+
+    await Promise.all(batch.map(async (num) => {
+      if (ctrl.signal.aborted) return;
+      try {
+        const n   = String(num).padStart(4, '0');
+        const url = `${CDN}/${w.slug}/frame_${n}.webp`;
+        const res = await fetch(url, { signal: ctrl.signal, cache: 'force-cache' });
+        if (!res.ok) return;
+        const blob = await res.blob();
+        const bmp  = await createImageBitmap(blob);
+        // Insert in sorted order
+        const insertAt = st.frameNums.findIndex(n => n > num);
+        if (insertAt === -1) {
+          st.frameNums.push(num);
+          st.frames.push(bmp);
+        } else {
+          st.frameNums.splice(insertAt, 0, num);
+          st.frames.splice(insertAt, 0, bmp);
+        }
+        animDirty = true;
+      } catch (e) {
+        if (e.name !== 'AbortError') {/* silently skip missing frames */}
+      }
+    }));
+
+    // After first burst completes: hide loading overlay
+    if (!firstBurstDone && st.frames.length >= Math.min(INIT_FRAMES, w.frameCount)) {
+      firstBurstDone = true;
+      loadOverlay.classList.add('hidden');
+    }
+
+    // Throttle background batches
+    if (start + BG_BATCH < frameNums.length && !ctrl.signal.aborted) {
+      await new Promise(r => setTimeout(r, BG_DELAY));
+    }
+  }
+
+  if (!ctrl.signal.aborted) {
+    st.loadState = 'done';
+  }
+}
+
+// ──────────────────────────────────────────────────────────────
+// CANCEL BACKGROUND LOADING — release resources for inactive worlds
+// ──────────────────────────────────────────────────────────────
+function cancelWorldLoad(worldIdx) {
+  const st = worldState[worldIdx];
+  if (st.abortCtrl) {
+    st.abortCtrl.abort();
+    st.abortCtrl = null;
+  }
+  // Keep loaded frames (they're memory-resident; benefit future re-visits)
+  // But reset loadState so it can resume if re-activated
+  if (st.loadState === 'loading') st.loadState = 'idle';
+}
+
+// ──────────────────────────────────────────────────────────────
+// GET CURRENT VISUAL — best available frame or poster
+// ──────────────────────────────────────────────────────────────
+function getCurrentVisual(worldIdx) {
+  const st = worldState[worldIdx];
+  if (st.frames.length > 0) {
+    return st.frames[st.animIdx % st.frames.length];
+  }
+  return st.posterBmp || st.poster;
+}
+
+// ──────────────────────────────────────────────────────────────
+// DRAW FRAME — render active world to canvas A
+// ──────────────────────────────────────────────────────────────
+function drawActiveWorld() {
+  const visual = getCurrentVisual(activeWorld);
+  if (!visual) return;
+  ctxA.clearRect(0, 0, canvasA.width, canvasA.height);
+  drawImageCover(ctxA, visual);
+}
+
+// ──────────────────────────────────────────────────────────────
+// WORLD TRANSITION — crossfade A → B
+// ──────────────────────────────────────────────────────────────
+function switchWorld(targetIdx) {
+  if (targetIdx === activeWorld || isTransition) return;
+
+  isTransition     = true;
+  transitionTarget = targetIdx;
+
+  // Draw incoming world onto canvas B
+  const incoming = getCurrentVisual(targetIdx);
+  ctxB.clearRect(0, 0, canvasB.width, canvasB.height);
+  if (incoming) drawImageCover(ctxB, incoming);
+
+  // Fade out world info
+  worldInfo.classList.add('switching');
+
+  // Trigger CSS crossfade: B fades in over A
+  // Use a rAF to ensure the draw happened before the transition starts
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      canvasB.classList.add('transitioning');
+    });
+  });
+
+  // Update index item states immediately (accent changes follow CSS transition)
+  indexItems.forEach((el, i) => {
+    el.classList.toggle('active', i === targetIdx);
+    el.style.opacity = i === targetIdx ? '1' : '0.45';
+  });
+
+  // Update accent colors
+  const w = WORLDS[targetIdx];
+  accentBar.style.background = w.accent;
+  progressBar.style.background = w.accent;
+  document.querySelectorAll('.wi-item.active .wi-num, .wi-item.active .wi-wname').forEach(el => {
+    el.style.color = ''; // revert to CSS class color
+  });
+
+  // After transition: swap canvases, update info
+  setTimeout(() => {
+    // Copy B content to A (B is now fully visible)
+    ctxA.clearRect(0, 0, canvasA.width, canvasA.height);
+    ctxA.drawImage(canvasB, 0, 0);
+    // Reset B
+    canvasB.classList.remove('transitioning');
+    ctxB.clearRect(0, 0, canvasB.width, canvasB.height);
+
+    // Update active world
+    activeWorld = targetIdx;
+    isTransition = false;
+
+    // Update world info text
+    wiName.textContent = w.name;
+    wiNumCur.textContent = String(targetIdx + 1).padStart(2, '0');
+
+    // Show info
+    worldInfo.classList.remove('switching');
+    setTimeout(() => { worldInfo.classList.remove('switching'); }, 50);
+
+    // Cancel load of previous world if running (optional: keep it for fast returns)
+    // Start loading new active world's frames
+    loadWorldFrames(targetIdx);
+
+  }, TRANSITION_MS + 50);
+}
+
+// ──────────────────────────────────────────────────────────────
+// CURSOR
+// ──────────────────────────────────────────────────────────────
+const cDot  = document.getElementById('c-dot');
+const cRing = document.getElementById('c-ring');
+let mX = -100, mY = -100, rX = -100, rY = -100;
+if (!isMob) {
+  document.addEventListener('mousemove', e => {
+    mX = e.clientX; mY = e.clientY;
+    cDot.style.left = mX + 'px';
+    cDot.style.top  = mY + 'px';
+    tPX = ((mX / W) - 0.5) * PARALLAX_AMP_X;
+    tPY = ((mY / H) - 0.5) * PARALLAX_AMP_Y;
+  });
+  document.addEventListener('mouseleave', () => { tPX = 0; tPY = 0; });
+  document.querySelectorAll('.wi-item').forEach(el => {
+    el.addEventListener('mouseenter', () => cRing.classList.add('expand'));
+    el.addEventListener('mouseleave', () => cRing.classList.remove('expand'));
+  });
+}
+
+// ──────────────────────────────────────────────────────────────
+// ANIMATION LOOP — unified RAF tick
+// ──────────────────────────────────────────────────────────────
+function tick(ts) {
+  rafId = requestAnimationFrame(tick);
+  const dt = Math.min(ts - lastTs, 80);
+  lastTs = ts;
+
+  // 1. Cursor ring lerp
+  if (!isMob) {
+    rX += (mX - rX) * 0.14;
+    rY += (mY - rY) * 0.14;
+    cRing.style.left = rX + 'px';
+    cRing.style.top  = rY + 'px';
+  }
+
+  // 2. Parallax lerp
+  if (!isMob) {
+    cPX += (tPX - cPX) * PARALLAX_K;
+    cPY += (tPY - cPY) * PARALLAX_K;
+    const dx = Math.abs(cPX - lPX), dy = Math.abs(cPY - lPY);
+    if (dx > PARALLAX_THR || dy > PARALLAX_THR) {
+      lPX = cPX; lPY = cPY;
+      animDirty = true;
+    }
+  }
+
+  // 3. Ambient frame advance
+  const st = worldState[activeWorld];
+  if (st.frames.length > 1 && !isTransition) {
+    frameTimer += dt;
+    if (frameTimer >= FRAME_INTERVAL) {
+      frameTimer %= FRAME_INTERVAL;
+      st.animIdx = (st.animIdx + 1) % st.frames.length;
+      animDirty = true;
+    }
+  }
+
+  // 4. Draw when needed
+  if (animDirty && !isTransition) {
+    drawActiveWorld();
+    animDirty = false;
+  }
+
+  // 5. Progress bar: ratio of loaded frames to total
+  if (!isTransition) {
+    const pct = st.frames.length > 0
+      ? Math.round((st.animIdx / Math.max(st.frames.length - 1, 1)) * 100)
+      : 0;
+    progressBar.style.width = pct + '%';
+  }
+}
+
+// ──────────────────────────────────────────────────────────────
+// WORLD INDEX INTERACTIONS
+// ──────────────────────────────────────────────────────────────
+indexItems.forEach((el, i) => {
+  // Dim inactive items (CSS handles active, JS handles opacity)
+  el.style.opacity = i === 0 ? '1' : '0.45';
+
+  el.addEventListener('click', () => {
+    if (i === activeWorld || isTransition) return;
+    switchWorld(i);
+  });
+});
+
+// Mobile: allow swipe on world index to advance worlds
+let touchStartX = 0;
+document.getElementById('world-index').addEventListener('touchstart', e => {
+  touchStartX = e.touches[0].clientX;
+}, { passive: true });
+document.getElementById('world-index').addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  // Swipe left → next world, swipe right → prev world
+  if (Math.abs(dx) > 40) {
+    const dir   = dx < 0 ? 1 : -1;
+    const next  = Math.max(0, Math.min(WORLDS.length - 1, activeWorld + dir));
+    if (next !== activeWorld) switchWorld(next);
+  }
+}, { passive: true });
+
+// ──────────────────────────────────────────────────────────────
+// INITIAL ACCENT COLOR
+// ──────────────────────────────────────────────────────────────
+accentBar.style.background = WORLDS[0].accent;
+progressBar.style.background = WORLDS[0].accent;
+
+// ──────────────────────────────────────────────────────────────
+// WORLDS SECTION REVEAL — IntersectionObserver
+// ──────────────────────────────────────────────────────────────
+const worldsSection = document.getElementById('worlds-section');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting && !worldsSection.classList.contains('is-revealed')) {
+      worldsSection.classList.add('is-revealed');
+      // Begin loading active world frames as section becomes visible
+      loadWorldFrames(activeWorld);
+    }
+  });
+}, { threshold: 0.15 });
+observer.observe(worldsSection);
+
+// ──────────────────────────────────────────────────────────────
+// START
+// ──────────────────────────────────────────────────────────────
+requestAnimationFrame(tick);
+
+</script>
+</body>
+</html>
