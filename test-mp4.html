@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TEST — MP4 Scrub</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #06050c;
+  --ink: rgba(255,255,255,0.92);
+  --ink-dim: rgba(255,255,255,0.45);
+  --accent: #c46428;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'DM Mono', 'Courier New', monospace;
+  overflow-x: hidden;
+}
+
+/* ── STAGE ── */
+#wrap {
+  position: relative;
+  height: 300vh;
+}
+#stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  margin: -2px;
+}
+#video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 38%;
+  display: block;
+  will-change: transform;
+  transform: scale(1.08);
+  transform-origin: center center;
+}
+
+/* ── GRAIN + VIGNETTE ── */
+.grain {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  opacity: 0.35;
+}
+.vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 80% at 50% 50%, transparent 40%, rgba(6,5,12,0.7) 100%);
+  pointer-events: none;
+}
+
+/* ── PROGRESS BAR ── */
+#progress-bar {
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: none;
+}
+
+/* ── LABELS ── */
+.label-top {
+  position: absolute;
+  top: 2rem; left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+.label-backend {
+  position: absolute;
+  top: 2rem; right: 2rem;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  opacity: 0.8;
+}
+.scroll-hint {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.55rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+/* ── AFTER SCROLL SPACER ── */
+#after-scroll {
+  height: 40vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+/* ── DEBUG PANEL ── */
+#debug {
+  display: none;
+  position: fixed;
+  bottom: 1rem; right: 1rem;
+  background: rgba(0,0,0,0.85);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 0.75rem 1rem;
+  font-size: 0.55rem;
+  line-height: 1.7;
+  letter-spacing: 0.05em;
+  z-index: 9999;
+  min-width: 220px;
+  color: #a0ffa0;
+}
+#debug.active { display: block; }
+#debug .warn { color: #ffcc44; }
+#debug .err  { color: #ff5555; }
+#debug h4 {
+  color: rgba(255,255,255,0.5);
+  font-size: 0.5rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 0.3rem;
+}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div id="wrap">
+  <div id="stage">
+    <video id="video" muted playsinline preload="metadata" aria-hidden="true">
+      <source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/environment-sequence-01/Sequence1.mp4" type="video/mp4">
+    </video>
+    <div class="vignette"></div>
+    <div class="grain"></div>
+    <div id="progress-bar"></div>
+    <div class="label-top">Scroll Experience — Phase 1.5 Test</div>
+    <div class="label-backend">BACKEND: MP4</div>
+    <div class="scroll-hint">Scroll to scrub ↓</div>
+  </div>
+</div>
+
+<div id="after-scroll">End of scroll sequence — compare with /test-seq.html</div>
+
+<!-- Debug panel (shown via ?debug=1) -->
+<div id="debug">
+  <h4>MP4 Debug</h4>
+  <div id="dbg-progress">progress: —</div>
+  <div id="dbg-target">target t: —</div>
+  <div id="dbg-current">current t: —</div>
+  <div id="dbg-media">mediaTime: —</div>
+  <div id="dbg-diff">diff: —</div>
+  <div id="dbg-rate">rate: —</div>
+  <div id="dbg-fps">frame Δ: —</div>
+  <div id="dbg-drops">drops: 0</div>
+  <div id="dbg-seeks">back seeks: 0</div>
+</div>
+
+<script>
+'use strict';
+
+const R2 = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev';
+
+// ── CONSTANTS ─────────────────────────────────────────────
+const CHASE_THRESHOLD    = 1.0;
+const FINE_THRESHOLD     = 0.05;
+const MAX_RATE           = 3.5;
+const BACK_SEEK_INTERVAL = 42;     // ms
+
+// Parallax
+const PARALLAX_AMP_X          = 10;
+const PARALLAX_AMP_Y          = 6;
+const PARALLAX_DAMPING        = 0.028;
+const PARALLAX_WRITE_THRESHOLD = 0.05;
+
+// ── STATE ──────────────────────────────────────────────────
+const video   = document.getElementById('video');
+const bar     = document.getElementById('progress-bar');
+const wrap    = document.getElementById('wrap');
+const stage   = document.getElementById('stage');
+
+let duration         = 0;
+let mediaTime        = 0;
+let lastBackSeekTs   = 0;
+let backSeekCount    = 0;
+
+let targetPX = 0, targetPY = 0;
+let curPX    = 0, curPY    = 0;
+let lastPX   = 0, lastPY   = 0;
+
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const isMob         = matchMedia('(max-width:768px),(pointer:coarse)').matches;
+
+// Debug
+const debugMode = new URLSearchParams(location.search).get('debug') === '1';
+const dbg = {
+  panel:    document.getElementById('debug'),
+  progress: document.getElementById('dbg-progress'),
+  target:   document.getElementById('dbg-target'),
+  current:  document.getElementById('dbg-current'),
+  media:    document.getElementById('dbg-media'),
+  diff:     document.getElementById('dbg-diff'),
+  rate:     document.getElementById('dbg-rate'),
+  fps:      document.getElementById('dbg-fps'),
+  drops:    document.getElementById('dbg-drops'),
+  seeks:    document.getElementById('dbg-seeks'),
+};
+let dropCount  = 0;
+let lastFrameTs = 0;
+if (debugMode) dbg.panel.classList.add('active');
+
+// ── VIDEO SETUP ────────────────────────────────────────────
+if (video) {
+  video.addEventListener('loadedmetadata', () => {
+    duration = video.duration || 0;
+  }, { once: true });
+
+  // requestVideoFrameCallback for accurate mediaTime
+  (function scheduleRVFC() {
+    if (typeof video.requestVideoFrameCallback === 'function') {
+      video.requestVideoFrameCallback((_, meta) => {
+        mediaTime = meta.mediaTime;
+        scheduleRVFC();
+      });
+    }
+  })();
+}
+
+// Promote to full preload on first scroll
+window.addEventListener('scroll', () => {
+  if (video && video.preload !== 'auto') video.preload = 'auto';
+}, { once: true, passive: true });
+
+// ── PARALLAX ──────────────────────────────────────────────
+document.addEventListener('mousemove', e => {
+  targetPX = ((e.clientX / innerWidth)  - 0.5) * PARALLAX_AMP_X;
+  targetPY = ((e.clientY / innerHeight) - 0.5) * PARALLAX_AMP_Y;
+});
+document.addEventListener('mouseleave', () => { targetPX = 0; targetPY = 0; });
+
+// ── PROGRESS ──────────────────────────────────────────────
+function getProgress() {
+  if (!wrap) return 0;
+  const total = wrap.offsetHeight - innerHeight;
+  if (total <= 0) return 0;
+  return Math.max(0, Math.min(1, scrollY / total));
+}
+
+// ── RAF TICK ──────────────────────────────────────────────
+function tick(ts) {
+  const p = getProgress();
+
+  // Parallax
+  if (!isMob && !reducedMotion) {
+    curPX += (targetPX - curPX) * PARALLAX_DAMPING;
+    curPY += (targetPY - curPY) * PARALLAX_DAMPING;
+  } else {
+    curPX += (0 - curPX) * 0.08;
+    curPY += (0 - curPY) * 0.08;
+  }
+
+  const endP = p < 0.85 ? 0 : Math.min(1, (p - 0.85) / 0.15);
+  const vidScale = (1.08 + endP * 0.03).toFixed(4);
+
+  if (video) {
+    const dX = Math.abs(curPX - lastPX);
+    const dY = Math.abs(curPY - lastPY);
+    const scaleChanged = vidScale !== video.dataset.lastScale;
+    if (dX > PARALLAX_WRITE_THRESHOLD || dY > PARALLAX_WRITE_THRESHOLD || scaleChanged) {
+      lastPX = curPX; lastPY = curPY;
+      video.dataset.lastScale = vidScale;
+      video.style.transform = !isMob
+        ? `translate(${curPX.toFixed(2)}px,${curPY.toFixed(2)}px) scale(${vidScale})`
+        : `scale(${vidScale})`;
+    }
+  }
+
+  // Progress bar
+  if (bar) { bar.style.transform = `scaleX(${p.toFixed(4)})`; bar.style.width = '100%'; }
+
+  // Scrub
+  let diff = 0, refTime = 0, rate = 0;
+  if (duration > 0 && video && !reducedMotion && !isMob) {
+    const targetT = p * duration;
+    refTime = (mediaTime > 0 && Math.abs(mediaTime - video.currentTime) < 0.1)
+      ? mediaTime
+      : video.currentTime;
+    diff = targetT - refTime;
+
+    if (Math.abs(diff) > CHASE_THRESHOLD) {
+      video.pause();
+      video.currentTime = targetT;
+    } else if (diff > FINE_THRESHOLD) {
+      rate = Math.min(MAX_RATE, 0.4 + diff * 5);
+      if (video.paused) video.play().catch(() => {});
+      if (Math.abs(video.playbackRate - rate) > 0.04) video.playbackRate = rate;
+    } else if (diff < -FINE_THRESHOLD) {
+      if (!video.paused) video.pause();
+      const now = performance.now();
+      if (now - lastBackSeekTs >= BACK_SEEK_INTERVAL) {
+        lastBackSeekTs = now;
+        backSeekCount++;
+        const t = Math.max(0, targetT);
+        if (typeof video.fastSeek === 'function') video.fastSeek(t);
+        else video.currentTime = t;
+      }
+    } else {
+      if (!video.paused) { video.pause(); video.playbackRate = 1; }
+    }
+  }
+
+  // Debug instrumentation
+  if (debugMode) {
+    const frameMs = lastFrameTs ? ts - lastFrameTs : 0;
+    if (frameMs > 25 && lastFrameTs > 0) dropCount++;
+    lastFrameTs = ts;
+
+    const cls = frameMs > 25 ? 'warn' : frameMs > 40 ? 'err' : '';
+    dbg.progress.textContent = `progress: ${(p * 100).toFixed(1)}%`;
+    dbg.target.textContent   = `target t: ${duration > 0 ? (p * duration).toFixed(3) : '—'}s`;
+    dbg.current.textContent  = `current t: ${video ? video.currentTime.toFixed(3) : '—'}s`;
+    dbg.media.textContent    = `mediaTime: ${mediaTime.toFixed(3)}s`;
+    dbg.diff.textContent     = `diff: ${diff.toFixed(4)}s`;
+    dbg.rate.textContent     = `rate: ${video ? video.playbackRate.toFixed(2) : '—'}`;
+    dbg.fps.className = cls;
+    dbg.fps.textContent  = `frame Δ: ${frameMs.toFixed(1)}ms`;
+    dbg.drops.textContent = `drops (>25ms): ${dropCount}`;
+    dbg.seeks.textContent = `back seeks: ${backSeekCount}`;
+  }
+
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>

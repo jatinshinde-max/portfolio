@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TEST — Image Sequence Scrub</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #06050c;
+  --ink: rgba(255,255,255,0.92);
+  --ink-dim: rgba(255,255,255,0.45);
+  --accent: #c46428;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'DM Mono', 'Courier New', monospace;
+  overflow-x: hidden;
+}
+
+/* ── STAGE ── */
+#wrap {
+  position: relative;
+  height: 300vh;
+}
+#stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  margin: -2px;
+}
+#seq-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  will-change: transform;
+  transform: scale(1.08);
+  transform-origin: center center;
+}
+
+/* ── GRAIN + VIGNETTE ── */
+.grain {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  opacity: 0.35;
+}
+.vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 80% at 50% 50%, transparent 40%, rgba(6,5,12,0.7) 100%);
+  pointer-events: none;
+}
+
+/* ── PROGRESS BAR ── */
+#progress-bar {
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+/* ── LOADING OVERLAY ── */
+#loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  transition: opacity 0.6s ease;
+  z-index: 10;
+}
+#loading.hidden { opacity: 0; pointer-events: none; }
+#loading-count {
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+#loading-bar-wrap {
+  width: 160px;
+  height: 1px;
+  background: rgba(255,255,255,0.1);
+  margin-top: 1rem;
+}
+#loading-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  width: 0%;
+  transition: width 0.2s linear;
+}
+
+/* ── LABELS ── */
+.label-top {
+  position: absolute;
+  top: 2rem; left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+.label-backend {
+  position: absolute;
+  top: 2rem; right: 2rem;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  opacity: 0.8;
+}
+.scroll-hint {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.55rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  transition: opacity 0.4s;
+}
+.scroll-hint.hidden { opacity: 0; }
+
+/* ── AFTER SCROLL SPACER ── */
+#after-scroll {
+  height: 40vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+/* ── DEBUG PANEL ── */
+#debug {
+  display: none;
+  position: fixed;
+  bottom: 1rem; right: 1rem;
+  background: rgba(0,0,0,0.85);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 0.75rem 1rem;
+  font-size: 0.55rem;
+  line-height: 1.7;
+  letter-spacing: 0.05em;
+  z-index: 9999;
+  min-width: 240px;
+  color: #a0ffa0;
+}
+#debug.active { display: block; }
+#debug .warn { color: #ffcc44; }
+#debug .err  { color: #ff5555; }
+#debug h4 {
+  color: rgba(255,255,255,0.5);
+  font-size: 0.5rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 0.3rem;
+}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div id="wrap">
+  <div id="stage">
+    <canvas id="seq-canvas" aria-hidden="true"></canvas>
+    <div class="vignette"></div>
+    <div class="grain"></div>
+    <div id="progress-bar"></div>
+    <div id="loading">
+      <div id="loading-count">Loading frames…</div>
+      <div id="loading-bar-wrap"><div id="loading-bar-fill"></div></div>
+    </div>
+    <div class="label-top">Scroll Experience — Phase 1.5 Test</div>
+    <div class="label-backend">BACKEND: IMAGE SEQ</div>
+    <div class="scroll-hint" id="scroll-hint">Scroll to scrub ↓</div>
+  </div>
+</div>
+
+<div id="after-scroll">End of scroll sequence — compare with /test-mp4.html</div>
+
+<!-- Debug panel (shown via ?debug=1) -->
+<div id="debug">
+  <h4>Image Seq Debug</h4>
+  <div id="dbg-progress">progress: —</div>
+  <div id="dbg-frame">frame: — / —</div>
+  <div id="dbg-loaded">loaded: — / —</div>
+  <div id="dbg-cache">cache hits: 0</div>
+  <div id="dbg-misses">cache misses: 0</div>
+  <div id="dbg-fps">frame Δ: —</div>
+  <div id="dbg-drops">drops (>25ms): 0</div>
+</div>
+
+<script>
+'use strict';
+
+/*
+ * IMAGE SEQUENCE ARCHITECTURE
+ * ─────────────────────────────────────────────────────────────────
+ * R2 path: seq1-frames/frame_NNNN.webp  (4-digit zero-padded)
+ *
+ * TO EXTRACT FRAMES from Sequence1.mp4 locally, run:
+ *   ffmpeg -i Sequence1.mp4 -vf "fps=24,scale=1920:1080" -q:v 2 frame_%04d.jpg
+ *   Then convert to WebP:
+ *   for f in frame_*.jpg; do cwebp -q 82 "$f" -o "${f%.jpg}.webp"; done
+ *   Then upload the folder to R2 as: seq1-frames/frame_0001.webp … frame_NNNN.webp
+ *
+ * This prototype auto-detects frame count by probing R2 (binary search),
+ * OR you can hard-code TOTAL_FRAMES below once you know it.
+ * ─────────────────────────────────────────────────────────────────
+ */
+
+const R2_BASE    = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev';
+const FRAMES_DIR = `${R2_BASE}/seq1-frames`;
+
+// Hard-code once known — set to 0 for auto-detect (slower first load)
+const TOTAL_FRAMES_HINT = 0;
+
+// Preload strategy constants
+const INIT_WINDOW   = 20;   // frames to load before revealing canvas (first visible range)
+const NEAR_WINDOW   = 15;   // frames ahead+behind current position to keep warm
+const BATCH_SIZE    = 6;    // concurrent fetch batch during background preload
+const BATCH_DELAY   = 60;   // ms between background batches (yield to RAF/scroll)
+
+// Parallax
+const PARALLAX_AMP_X           = 10;
+const PARALLAX_AMP_Y           = 6;
+const PARALLAX_DAMPING         = 0.028;
+const PARALLAX_WRITE_THRESHOLD = 0.05;
+
+// ── ELEMENTS ────────────────────────────────────────────────────
+const canvas      = document.getElementById('seq-canvas');
+const ctx         = canvas.getContext('2d');
+const bar         = document.getElementById('progress-bar');
+const wrap        = document.getElementById('wrap');
+const loading     = document.getElementById('loading');
+const loadCount   = document.getElementById('loading-count');
+const loadFill    = document.getElementById('loading-bar-fill');
+const scrollHint  = document.getElementById('scroll-hint');
+
+// ── STATE ─────────────────────────────────────────────────────
+let totalFrames   = TOTAL_FRAMES_HINT || 0;
+let frames        = [];          // sparse array of ImageBitmap (index = frame number 0-based)
+let loadedCount   = 0;
+let initReady     = false;       // true once INIT_WINDOW frames are ready to show
+let lastDrawnIdx  = -1;
+
+let targetPX = 0, targetPY = 0;
+let curPX    = 0, curPY    = 0;
+let lastPX   = 0, lastPY   = 0;
+
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const isMob         = matchMedia('(max-width:768px),(pointer:coarse)').matches;
+
+// Debug
+const debugMode = new URLSearchParams(location.search).get('debug') === '1';
+const dbg = {
+  panel:    document.getElementById('debug'),
+  progress: document.getElementById('dbg-progress'),
+  frame:    document.getElementById('dbg-frame'),
+  loaded:   document.getElementById('dbg-loaded'),
+  cache:    document.getElementById('dbg-cache'),
+  misses:   document.getElementById('dbg-misses'),
+  fps:      document.getElementById('dbg-fps'),
+  drops:    document.getElementById('dbg-drops'),
+};
+let cacheHits = 0, cacheMisses = 0, dropCount = 0, lastFrameTs = 0;
+if (debugMode) dbg.panel.classList.add('active');
+
+// ── CANVAS SIZE ───────────────────────────────────────────────
+function resizeCanvas() {
+  const dpr = Math.min(devicePixelRatio, 2);
+  canvas.width  = innerWidth  * dpr;
+  canvas.height = innerHeight * dpr;
+  ctx.scale(dpr, dpr);
+  if (lastDrawnIdx >= 0 && frames[lastDrawnIdx]) drawFrame(lastDrawnIdx);
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+// ── FRAME URL ────────────────────────────────────────────────
+function frameUrl(n) {
+  // n is 1-based (frame_0001.webp to frame_NNNN.webp)
+  return `${FRAMES_DIR}/frame_${String(n).padStart(4, '0')}.webp`;
+}
+
+// ── FETCH ONE FRAME ───────────────────────────────────────────
+async function fetchFrame(n) {
+  if (n < 1 || (totalFrames > 0 && n > totalFrames)) return;
+  if (frames[n]) { cacheHits++; return; }   // already loaded
+  cacheMisses++;
+  try {
+    const resp = await fetch(frameUrl(n));
+    if (!resp.ok) return;
+    const blob   = await resp.blob();
+    const bitmap = await createImageBitmap(blob);
+    frames[n]    = bitmap;
+    loadedCount++;
+  } catch (_) {}
+}
+
+// ── DRAW FRAME ────────────────────────────────────────────────
+function drawFrame(idx) {
+  const bmp = frames[idx];
+  if (!bmp) return;
+  const W = innerWidth, H = innerHeight;
+  // Cover-fit (same as object-fit:cover at center 38%)
+  const scale = Math.max(W / bmp.width, H / bmp.height);
+  const sw = bmp.width  * scale;
+  const sh = bmp.height * scale;
+  const sx = (W - sw) / 2;
+  const sy = (H - sh) * 0.38;   // object-position center 38%
+  ctx.clearRect(0, 0, W, H);
+  ctx.drawImage(bmp, sx, sy, sw, sh);
+  lastDrawnIdx = idx;
+}
+
+// ── PROGRESS ────────────────────────────────────────────────
+function getProgress() {
+  if (!wrap) return 0;
+  const total = wrap.offsetHeight - innerHeight;
+  if (total <= 0) return 0;
+  return Math.max(0, Math.min(1, scrollY / total));
+}
+
+function progressToFrame(p) {
+  if (totalFrames === 0) return 1;
+  return Math.max(1, Math.min(totalFrames, Math.round(p * (totalFrames - 1)) + 1));
+}
+
+// ── FRAME COUNT DETECTION ─────────────────────────────────
+// Binary search: probe R2 to find total frame count.
+// Only runs if TOTAL_FRAMES_HINT is 0.
+async function detectFrameCount() {
+  // Quick check: does frame 1 exist?
+  try {
+    const r = await fetch(frameUrl(1), { method: 'HEAD' });
+    if (!r.ok) {
+      // Frames not uploaded yet — show placeholder
+      loadCount.textContent = 'Frames not yet uploaded to R2';
+      loadFill.style.width  = '0%';
+      return 0;
+    }
+  } catch (_) {
+    loadCount.textContent = 'Cannot reach R2 (network error)';
+    return 0;
+  }
+
+  // Binary search: find last valid frame
+  let lo = 1, hi = 2000;
+  while (lo < hi) {
+    const mid = Math.floor((lo + hi + 1) / 2);
+    try {
+      const r = await fetch(frameUrl(mid), { method: 'HEAD' });
+      if (r.ok) lo = mid; else hi = mid - 1;
+    } catch (_) { hi = mid - 1; }
+  }
+  return lo;
+}
+
+// ── BACKGROUND PRELOAD (non-blocking, batched) ─────────────
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function backgroundPreload() {
+  // Load all remaining frames in order, yielding between batches
+  const remaining = [];
+  for (let i = 1; i <= totalFrames; i++) {
+    if (!frames[i]) remaining.push(i);
+  }
+  for (let i = 0; i < remaining.length; i += BATCH_SIZE) {
+    const batch = remaining.slice(i, i + BATCH_SIZE).map(fetchFrame);
+    await Promise.all(batch);
+    await sleep(BATCH_DELAY);
+  }
+}
+
+// ── PRIORITY WINDOW — load frames near current position ────
+let windowLoading = false;
+async function loadNearWindow(currentIdx) {
+  if (windowLoading) return;
+  windowLoading = true;
+  const lo = Math.max(1, currentIdx - NEAR_WINDOW);
+  const hi = Math.min(totalFrames, currentIdx + NEAR_WINDOW);
+  const needed = [];
+  for (let i = lo; i <= hi; i++) {
+    if (!frames[i]) needed.push(i);
+  }
+  // Sort by distance from currentIdx so closest frames load first
+  needed.sort((a, b) => Math.abs(a - currentIdx) - Math.abs(b - currentIdx));
+  await Promise.all(needed.map(fetchFrame));
+  windowLoading = false;
+}
+
+// ── INIT ───────────────────────────────────────────────────
+async function init() {
+  loadCount.textContent = 'Detecting frames…';
+
+  if (TOTAL_FRAMES_HINT > 0) {
+    totalFrames = TOTAL_FRAMES_HINT;
+  } else {
+    totalFrames = await detectFrameCount();
+    if (totalFrames === 0) return;  // not uploaded yet
+  }
+
+  loadCount.textContent = `Loading ${INIT_WINDOW} frames…`;
+
+  // Load first INIT_WINDOW frames immediately
+  const initBatch = [];
+  for (let i = 1; i <= Math.min(INIT_WINDOW, totalFrames); i++) {
+    initBatch.push(fetchFrame(i));
+  }
+  await Promise.all(initBatch);
+
+  // Show canvas
+  loading.classList.add('hidden');
+  if (frames[1]) drawFrame(1);
+  initReady = true;
+
+  // Background: load rest after first paint
+  requestAnimationFrame(() => {
+    setTimeout(backgroundPreload, 200);
+  });
+}
+
+init();
+
+// ── PARALLAX ─────────────────────────────────────────────
+document.addEventListener('mousemove', e => {
+  targetPX = ((e.clientX / innerWidth)  - 0.5) * PARALLAX_AMP_X;
+  targetPY = ((e.clientY / innerHeight) - 0.5) * PARALLAX_AMP_Y;
+});
+document.addEventListener('mouseleave', () => { targetPX = 0; targetPY = 0; });
+
+// ── RAF TICK ──────────────────────────────────────────────
+let lastWindowIdx = -1;
+
+function tick(ts) {
+  const p   = getProgress();
+  const idx = progressToFrame(p);
+
+  // Parallax
+  if (!isMob && !reducedMotion) {
+    curPX += (targetPX - curPX) * PARALLAX_DAMPING;
+    curPY += (targetPY - curPY) * PARALLAX_DAMPING;
+  } else {
+    curPX += (0 - curPX) * 0.08;
+    curPY += (0 - curPY) * 0.08;
+  }
+
+  const endP = p < 0.85 ? 0 : Math.min(1, (p - 0.85) / 0.15);
+  const scale = (1.08 + endP * 0.03).toFixed(4);
+
+  // Write transform when changed enough
+  {
+    const dX = Math.abs(curPX - lastPX);
+    const dY = Math.abs(curPY - lastPY);
+    const scaleChanged = scale !== canvas.dataset.lastScale;
+    if (dX > PARALLAX_WRITE_THRESHOLD || dY > PARALLAX_WRITE_THRESHOLD || scaleChanged) {
+      lastPX = curPX; lastPY = curPY;
+      canvas.dataset.lastScale = scale;
+      canvas.style.transform = !isMob
+        ? `translate(${curPX.toFixed(2)}px,${curPY.toFixed(2)}px) scale(${scale})`
+        : `scale(${scale})`;
+    }
+  }
+
+  // Progress bar
+  if (bar) { bar.style.transform = `scaleX(${p.toFixed(4)})`; bar.style.width = '100%'; }
+
+  if (initReady) {
+    // Hide scroll hint once scrolled
+    if (p > 0.02 && scrollHint) scrollHint.classList.add('hidden');
+
+    // Draw frame — deterministic, no interpolation
+    if (idx !== lastDrawnIdx) {
+      if (frames[idx]) {
+        drawFrame(idx);
+      } else {
+        // Frame not ready — find nearest loaded frame to avoid blank
+        let fallback = -1;
+        for (let d = 1; d <= 10; d++) {
+          if (frames[idx - d]) { fallback = idx - d; break; }
+          if (frames[idx + d]) { fallback = idx + d; break; }
+        }
+        if (fallback >= 0) drawFrame(fallback);
+      }
+    }
+
+    // Trigger near-window load when position moves significantly
+    if (Math.abs(idx - lastWindowIdx) > 5) {
+      lastWindowIdx = idx;
+      loadNearWindow(idx);
+    }
+  }
+
+  // Update loading overlay pct
+  if (!initReady && totalFrames > 0) {
+    const pct = Math.round((loadedCount / Math.min(INIT_WINDOW, totalFrames)) * 100);
+    loadFill.style.width = `${Math.min(100, pct)}%`;
+    loadCount.textContent = `Loading — ${loadedCount} / ${Math.min(INIT_WINDOW, totalFrames)} frames`;
+  }
+
+  // Debug
+  if (debugMode) {
+    const frameMs = lastFrameTs ? ts - lastFrameTs : 0;
+    if (frameMs > 25 && lastFrameTs > 0) dropCount++;
+    lastFrameTs = ts;
+    const cls = frameMs > 25 ? 'warn' : frameMs > 40 ? 'err' : '';
+    dbg.progress.textContent = `progress: ${(p * 100).toFixed(1)}%`;
+    dbg.frame.textContent    = `frame: ${idx} / ${totalFrames}`;
+    dbg.loaded.textContent   = `loaded: ${loadedCount} / ${totalFrames}`;
+    dbg.cache.textContent    = `cache hits: ${cacheHits}`;
+    dbg.misses.textContent   = `cache misses: ${cacheMisses}`;
+    dbg.fps.className = cls;
+    dbg.fps.textContent   = `frame Δ: ${frameMs.toFixed(1)}ms`;
+    dbg.drops.textContent = `drops (>25ms): ${dropCount}`;
+  }
+
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>

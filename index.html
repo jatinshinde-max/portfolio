@@ -2332,13 +2332,27 @@ document.querySelectorAll('.genai-cell').forEach((el, i) => {
 // Mouse parallax — lerp state updated by unified RAF tick
 // Applied to #seq1-video (absolute child), NOT to #seq1-stage (sticky).
 // Sticky + transform forces full composite layer re-eval every frame.
-let targetPX = 0, targetPY = 0, curPX = 0, curPY = 0;
-const MAX_SHIFT = 14; // px
+// ─── PARALLAX STATE ────────────────────────────────────────────
+// targetPX/PY: where the camera "wants" to be (set by mouse)
+// curPX/PY:    where it actually is (lerps toward target each frame)
+// lastPX/PY:   last value written to DOM (threshold prevents micro-jitter)
+let targetPX = 0, targetPY = 0;
+let curPX = 0, curPY = 0;
+let lastPX = 0, lastPY = 0;
+
+// Cinematic constants — adjust feel here, not in the tick
+const PARALLAX_AMP_X   = 10;    // px max horizontal shift (was 14 — reduced)
+const PARALLAX_AMP_Y   = 6;     // px max vertical shift
+const PARALLAX_DAMPING = 0.028; // lerp factor per 60fps frame — lower = more inertia
+const PARALLAX_WRITE_THRESHOLD = 0.05; // px — skip DOM write if change is smaller
 
 document.addEventListener('mousemove', e => {
-  targetPX = ((e.clientX / window.innerWidth) - 0.5) * MAX_SHIFT;
-  targetPY = ((e.clientY / window.innerHeight) - 0.5) * MAX_SHIFT * 0.6;
+  targetPX = ((e.clientX / window.innerWidth)  - 0.5) * PARALLAX_AMP_X;
+  targetPY = ((e.clientY / window.innerHeight) - 0.5) * PARALLAX_AMP_Y;
 });
+
+// Smooth reset when pointer leaves the page
+document.addEventListener('mouseleave', () => { targetPX = 0; targetPY = 0; });
 
 // scrollWrap ref for canvas visibility gating
 const scrollWrap = document.getElementById('scroll-wrap');
@@ -2525,19 +2539,34 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
   const seq1Video = document.getElementById('seq1-video');
   const seq1Bar   = document.getElementById('seq1-progress-bar');
 
-  let seq1Duration  = 0;
+  let seq1Duration      = 0;
+  let seq1MediaTime     = 0;   // actual rendered time from requestVideoFrameCallback
+  let lastBackwardSeekTs = 0;  // performance.now() of last backward seek
   let reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let isMobDevice   = matchMedia('(max-width:768px),(pointer:coarse)').matches;
 
   // Velocity-based playback constants
-  const CHASE_THRESHOLD = 1.2;   // seconds — hard-seek if gap is larger
-  const FINE_THRESHOLD  = 0.055; // seconds — pause when this close
-  const MAX_RATE        = 4.0;   // max playback speed to chase target
+  const CHASE_THRESHOLD    = 1.0;   // seconds — hard-seek if gap is larger
+  const FINE_THRESHOLD     = 0.05;  // seconds — pause when this close
+  const MAX_RATE           = 3.5;   // max playback speed to chase target
+  const BACK_SEEK_INTERVAL = 42;    // ms — min interval between backward seeks
 
   if (seq1Video) {
     seq1Video.addEventListener('loadedmetadata', () => {
       seq1Duration = seq1Video.duration || 0;
     }, { once: true });
+
+    // requestVideoFrameCallback: tracks actual rendered frame time.
+    // More accurate than currentTime for diff calc during playback.
+    // Falls back gracefully when not available (Firefox, Safari).
+    (function scheduleRVFC() {
+      if (typeof seq1Video.requestVideoFrameCallback === 'function') {
+        seq1Video.requestVideoFrameCallback((_, meta) => {
+          seq1MediaTime = meta.mediaTime;
+          scheduleRVFC();
+        });
+      }
+    })();
   }
 
   // ─ PROGRESS CALCULATION ─────────────────────────────
@@ -2590,18 +2619,33 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
     // Ending scale (last 15% of scroll) folded into same transform
     // to avoid a second conflicting CSS rule on the same element.
     {
-      if (!isMobDevice) {
-        curPX += (targetPX - curPX) * 0.05;
-        curPY += (targetPY - curPY) * 0.05;
+      // Cinematic inertia: low damping = heavy camera feel, not cursor tracking.
+      // reducedMotion check: honour OS accessibility preference.
+      if (!isMobDevice && !reducedMotion) {
+        curPX += (targetPX - curPX) * PARALLAX_DAMPING;
+        curPY += (targetPY - curPY) * PARALLAX_DAMPING;
+      } else if (isMobDevice || reducedMotion) {
+        // Bleed back to zero when parallax is disabled
+        curPX += (0 - curPX) * 0.08;
+        curPY += (0 - curPY) * 0.08;
       }
       // Base scale 1.08 ensures parallax translate never reveals edges.
       // Ending: grows 0.03 more over p 0.85→1.0 for subtle push-in feel.
       const endP = p < 0.85 ? 0 : Math.min(1, (p - 0.85) / 0.15);
       const vidScale = (1.08 + endP * 0.03).toFixed(4);
       if (seq1Video) {
-        seq1Video.style.transform = !isMobDevice
-          ? `translate(${curPX.toFixed(2)}px,${curPY.toFixed(2)}px) scale(${vidScale})`
-          : `scale(${vidScale})`;
+        // Skip DOM write when movement is below perceptible threshold (prevents micro-jitter)
+        const dX = Math.abs(curPX - lastPX);
+        const dY = Math.abs(curPY - lastPY);
+        const scaleChanged = vidScale !== seq1Video.dataset.lastScale;
+        if (dX > PARALLAX_WRITE_THRESHOLD || dY > PARALLAX_WRITE_THRESHOLD || scaleChanged) {
+          lastPX = curPX;
+          lastPY = curPY;
+          seq1Video.dataset.lastScale = vidScale;
+          seq1Video.style.transform = !isMobDevice
+            ? `translate(${curPX.toFixed(2)}px,${curPY.toFixed(2)}px) scale(${vidScale})`
+            : `scale(${vidScale})`;
+        }
       }
     }
 
@@ -2609,24 +2653,33 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
     updateProgress(p);
     if (seq1Duration > 0 && seq1Video && !reducedMotion && !isMobDevice) {
       const targetT = p * seq1Duration;
-      const diff    = targetT - seq1Video.currentTime;
+      // Use rVFC mediaTime when fresh (within 0.1s), else fall back to currentTime.
+      // rVFC gives actual rendered position; currentTime is the decode target.
+      const refTime = (seq1MediaTime > 0 && Math.abs(seq1MediaTime - seq1Video.currentTime) < 0.1)
+        ? seq1MediaTime
+        : seq1Video.currentTime;
+      const diff = targetT - refTime;
 
       if (Math.abs(diff) > CHASE_THRESHOLD) {
         // Large jump — hard seek unavoidable
         seq1Video.pause();
         seq1Video.currentTime = targetT;
       } else if (diff > FINE_THRESHOLD) {
-        // Behind target — chase via playbackRate
-        const rate = Math.min(MAX_RATE, 0.5 + diff * 6);
+        // Behind target — chase via playbackRate (softer ramp = less overshoot)
+        const rate = Math.min(MAX_RATE, 0.4 + diff * 5);
         if (seq1Video.paused) seq1Video.play().catch(() => {});
         if (Math.abs(seq1Video.playbackRate - rate) > 0.04) seq1Video.playbackRate = rate;
       } else if (diff < -FINE_THRESHOLD) {
-        // Ahead of target (backward scroll) — pause and seek
+        // Ahead of target (backward scroll) — rate-limited seek.
+        // Throttle: too-frequent seeks stack in the decode queue and cause stalls.
         if (!seq1Video.paused) seq1Video.pause();
-        const t = Math.max(0, targetT);
-        // fastSeek lands on nearest keyframe — faster decode than exact seek
-        if (typeof seq1Video.fastSeek === 'function') seq1Video.fastSeek(t);
-        else seq1Video.currentTime = t;
+        const now = performance.now();
+        if (now - lastBackwardSeekTs >= BACK_SEEK_INTERVAL) {
+          lastBackwardSeekTs = now;
+          const t = Math.max(0, targetT);
+          if (typeof seq1Video.fastSeek === 'function') seq1Video.fastSeek(t);
+          else seq1Video.currentTime = t;
+        }
       } else {
         // At target
         if (!seq1Video.paused) { seq1Video.pause(); seq1Video.playbackRate = 1; }

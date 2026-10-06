@@ -1,4 +1,8 @@
 {
+  "rewrites": [
+    { "source": "/test-mp4",  "destination": "/test-mp4.html" },
+    { "source": "/test-seq",  "destination": "/test-seq.html" }
+  ],
   "headers": [
     {
       "source": "/assets/(.*)",
