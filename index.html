@@ -983,7 +983,10 @@ footer a:hover { color: var(--ink); }
   object-fit: cover;
   object-position: center 38%;
   display: block;
-  will-change: auto;
+  will-change: transform;
+  /* Base scale for parallax overscan — JS replaces this with translate+scale combo */
+  transform: scale(1.08);
+  transform-origin: center center;
 }
 /* seq1 progress bar — thin bottom edge */
 #seq1-progress-bar {
@@ -1046,12 +1049,7 @@ footer a:hover { color: var(--ink); }
 }
 
 /* ─── SEQUENCE 1 ENDING TRANSITION ─────────────────────────── */
-/* Subtle video scale driven by JS via --seq1-scale custom property */
-#seq1-stage.seq1-ending #seq1-video {
-  transform-origin: center center;
-  transform: scale(var(--seq1-scale, 1.0));
-  transition: transform 0.05s linear;
-}
+/* Scale folded into unified tick transform — no separate CSS rule needed */
 
 /* ─── SELECTED WORK — CINEMATIC FLAGSHIP ─────────────────────── */
 #selected-work {
@@ -1873,11 +1871,7 @@ document.addEventListener('mousemove', e => {
   mx = e.clientX; my = e.clientY;
   dot.style.left = mx+'px'; dot.style.top = my+'px';
 });
-(function rl() {
-  rx += (mx-rx)*0.12; ry += (my-ry)*0.12;
-  ring.style.left = rx+'px'; ring.style.top = ry+'px';
-  requestAnimationFrame(rl);
-})();
+// Cursor ring lerp runs inside the unified RAF tick (see below)
 document.querySelectorAll('a,button,.g-cell,.showreel-video,.hi-btn').forEach(el => {
   el.addEventListener('mouseenter', () => ring.classList.add('expand'));
   el.addEventListener('mouseleave', () => ring.classList.remove('expand'));
@@ -1986,8 +1980,9 @@ let currentProgress = 0;
 let currentWorldIndex = 0;
 let animTime = 0;
 
+// Canvas draw — called from unified tick only when canvas is visible
 function draw(ts) {
-  if (!ctx) { requestAnimationFrame(draw); return; }
+  if (!ctx) return;
   animTime = ts / 1000;
   const frame = getFrameForProgress(currentWorldIndex, currentProgress);
   if (frame) {
@@ -2004,9 +1999,9 @@ function draw(ts) {
   } else {
     drawFallback(currentWorldIndex, currentProgress, animTime);
   }
-  requestAnimationFrame(draw);
+  // No requestAnimationFrame here — driven by unified tick
 }
-requestAnimationFrame(draw);
+// Intentionally NOT starting RAF here — unified tick controls this
 
 // ═══════════════════════════════════════════════════════
 //  HUD
@@ -2334,7 +2329,9 @@ document.querySelectorAll('.genai-cell').forEach((el, i) => {
 // ═══════════════════════════════════════════════════════
 //  MOUSE PARALLAX ON CANVAS
 // ═══════════════════════════════════════════════════════
-// Subtle camera-like parallax — the stage shifts slightly with mouse
+// Mouse parallax — lerp state updated by unified RAF tick
+// Applied to #seq1-video (absolute child), NOT to #seq1-stage (sticky).
+// Sticky + transform forces full composite layer re-eval every frame.
 let targetPX = 0, targetPY = 0, curPX = 0, curPY = 0;
 const MAX_SHIFT = 14; // px
 
@@ -2343,13 +2340,9 @@ document.addEventListener('mousemove', e => {
   targetPY = ((e.clientY / window.innerHeight) - 0.5) * MAX_SHIFT * 0.6;
 });
 
-const stage = document.getElementById('seq1-stage') || document.getElementById('stage');
-(function pl() {
-  curPX += (targetPX - curPX) * 0.05;
-  curPY += (targetPY - curPY) * 0.05;
-  if (stage) stage.style.transform = `translate(${curPX}px, ${curPY}px) scale(1.04)`;
-  requestAnimationFrame(pl);
-})();
+// scrollWrap ref for canvas visibility gating
+const scrollWrap = document.getElementById('scroll-wrap');
+// Parallax lerp runs inside unified RAF tick (see seq1 block below)
 
 // ═══════════════════════════════════════════════════════
 //  ADS CAROUSEL DRAG-TO-SCROLL
@@ -2533,7 +2526,6 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
   const seq1Bar   = document.getElementById('seq1-progress-bar');
 
   let seq1Duration  = 0;
-  let seq1P         = 0;
   let reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let isMobDevice   = matchMedia('(max-width:768px),(pointer:coarse)').matches;
 
@@ -2560,42 +2552,6 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
     if (seq1Bar) { seq1Bar.style.transform = `scaleX(${p.toFixed(4)})`; seq1Bar.style.width = '100%'; }
   }
 
-  // ─ ALWAYS-RUNNING RAF LOOP ──────────────────────────
-  // Velocity-based: play video at rate that chases target time.
-  // Avoids GOP stalls from direct currentTime assignment.
-  function seq1Frame() {
-    seq1P = getSeq1Progress();
-    updateProgress(seq1P);
-
-    if (seq1Duration > 0 && seq1Video && !reducedMotion && !isMobDevice) {
-      const targetT = seq1P * seq1Duration;
-      const diff    = targetT - seq1Video.currentTime;
-
-      if (Math.abs(diff) > CHASE_THRESHOLD) {
-        // Large gap (e.g. fast scroll or page jump) — hard seek is unavoidable
-        seq1Video.pause();
-        seq1Video.currentTime = targetT;
-      } else if (diff > FINE_THRESHOLD) {
-        // Target is ahead — play forward at dynamic rate to catch up smoothly
-        const rate = Math.min(MAX_RATE, 0.5 + diff * 6);
-        if (seq1Video.paused) seq1Video.play().catch(() => {});
-        if (Math.abs(seq1Video.playbackRate - rate) > 0.04) seq1Video.playbackRate = rate;
-      } else if (diff < -FINE_THRESHOLD) {
-        // Target is behind (scroll reversed) — pause and seek back
-        if (!seq1Video.paused) seq1Video.pause();
-        seq1Video.currentTime = Math.max(0, targetT);
-      } else {
-        // At target — settle to pause
-        if (!seq1Video.paused) {
-          seq1Video.pause();
-          seq1Video.playbackRate = 1;
-        }
-      }
-    }
-
-    requestAnimationFrame(seq1Frame);
-  }
-
   // ─ MOBILE — autoplay presentation ───────────────────
   if (isMobDevice && seq1Video) {
     seq1Video.addEventListener('loadedmetadata', () => {
@@ -2604,28 +2560,89 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
     }, { once: true });
   }
 
-  // Start the always-running loop
-  requestAnimationFrame(seq1Frame);
+  // ─ PROMOTE VIDEO PRELOAD ON FIRST SCROLL ─────────────
+  // Keep preload="metadata" for fast initial paint, then upgrade
+  // to full buffering the moment the user shows scroll intent.
+  window.addEventListener('scroll', () => {
+    if (seq1Video && seq1Video.preload !== 'auto') seq1Video.preload = 'auto';
+  }, { once: true, passive: true });
 
-  // ─ SEQUENCE 1 ENDING — subtle video scale (secondary effect) ──
-  // Scale: 1.0 → 1.03 from p=0.85→1.0. Pure CSS custom property.
-  const seq1Stage = document.getElementById('seq1-stage');
-  function updateSeq1Ending(p) {
-    if (p < 0.85) {
-      if (seq1Stage) { seq1Stage.classList.remove('seq1-ending'); seq1Stage.style.removeProperty('--seq1-scale'); }
-      return;
+  // ═══════════════════════════════════════════════════════
+  //  UNIFIED RAF TICK
+  //  Single requestAnimationFrame drives: cursor ring lerp,
+  //  mouse parallax (on video, not sticky stage), seq1 video
+  //  scrub, seq1 ending scale, canvas world draw.
+  //  5 previous independent RAF loops → 1.
+  // ═══════════════════════════════════════════════════════
+  function tick(ts) {
+    // ── 1. Progress (computed once, reused below) ───────
+    const p = getSeq1Progress();
+
+    // ── 2. Cursor ring lerp ─────────────────────────────
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top  = ry + 'px';
+
+    // ── 3. Parallax + ending scale — single combined transform ─
+    // Parallax applied to video (position:absolute), NOT sticky stage.
+    // Sticky + transform forces full compositor re-eval every frame.
+    // Ending scale (last 15% of scroll) folded into same transform
+    // to avoid a second conflicting CSS rule on the same element.
+    {
+      if (!isMobDevice) {
+        curPX += (targetPX - curPX) * 0.05;
+        curPY += (targetPY - curPY) * 0.05;
+      }
+      // Base scale 1.08 ensures parallax translate never reveals edges.
+      // Ending: grows 0.03 more over p 0.85→1.0 for subtle push-in feel.
+      const endP = p < 0.85 ? 0 : Math.min(1, (p - 0.85) / 0.15);
+      const vidScale = (1.08 + endP * 0.03).toFixed(4);
+      if (seq1Video) {
+        seq1Video.style.transform = !isMobDevice
+          ? `translate(${curPX.toFixed(2)}px,${curPY.toFixed(2)}px) scale(${vidScale})`
+          : `scale(${vidScale})`;
+      }
     }
-    const endP = Math.max(0, Math.min(1, (p - 0.85) / 0.15));
-    const scale = 1.0 + endP * 0.03;
-    if (seq1Stage) {
-      seq1Stage.classList.add('seq1-ending');
-      seq1Stage.style.setProperty('--seq1-scale', scale.toFixed(4));
+
+    // ── 4. Seq1 video scrub ─────────────────────────────
+    updateProgress(p);
+    if (seq1Duration > 0 && seq1Video && !reducedMotion && !isMobDevice) {
+      const targetT = p * seq1Duration;
+      const diff    = targetT - seq1Video.currentTime;
+
+      if (Math.abs(diff) > CHASE_THRESHOLD) {
+        // Large jump — hard seek unavoidable
+        seq1Video.pause();
+        seq1Video.currentTime = targetT;
+      } else if (diff > FINE_THRESHOLD) {
+        // Behind target — chase via playbackRate
+        const rate = Math.min(MAX_RATE, 0.5 + diff * 6);
+        if (seq1Video.paused) seq1Video.play().catch(() => {});
+        if (Math.abs(seq1Video.playbackRate - rate) > 0.04) seq1Video.playbackRate = rate;
+      } else if (diff < -FINE_THRESHOLD) {
+        // Ahead of target (backward scroll) — pause and seek
+        if (!seq1Video.paused) seq1Video.pause();
+        const t = Math.max(0, targetT);
+        // fastSeek lands on nearest keyframe — faster decode than exact seek
+        if (typeof seq1Video.fastSeek === 'function') seq1Video.fastSeek(t);
+        else seq1Video.currentTime = t;
+      } else {
+        // At target
+        if (!seq1Video.paused) { seq1Video.pause(); seq1Video.playbackRate = 1; }
+      }
     }
+
+    // ── 5. Canvas world draw (only when canvas parent is visible) ─
+    if (ctx && scrollWrap && scrollWrap.style.display !== 'none') {
+      draw(ts);
+    }
+
+    requestAnimationFrame(tick);
   }
-  (function endingLoop() {
-    updateSeq1Ending(getSeq1Progress());
-    requestAnimationFrame(endingLoop);
-  })();
+
+  // Start the single unified tick
+  requestAnimationFrame(tick);
 }
 
 // ═══════════════════════════════════════════════════════
