@@ -984,50 +984,6 @@ footer a:hover { color: var(--ink); }
   display: block;
   will-change: auto;
 }
-/* Identity — bottom-left, appears only in final ~14% of Sequence1 */
-#seq1-identity {
-  position: absolute;
-  bottom: clamp(56px, 8vh, 100px);
-  left: clamp(28px, 5vw, 72px);
-  z-index: 10;
-  pointer-events: none;
-}
-.seq1-label {
-  font-family: var(--f-semi);
-  font-size: 0.5rem;
-  letter-spacing: 0.36em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.42);
-  margin-bottom: 11px;
-  opacity: 0;
-  text-shadow: 0 2px 18px rgba(0,0,0,0.9);
-}
-.seq1-name {
-  font-family: var(--f-display);
-  font-size: clamp(2.2rem, 4.5vw, 5rem);
-  font-weight: 300;
-  line-height: 0.95;
-  letter-spacing: -0.03em;
-  color: var(--ink);
-  opacity: 0;
-  text-shadow: 0 3px 40px rgba(0,0,0,0.85);
-  margin-bottom: 13px;
-}
-/* Additional lines shown only in the ending card */
-.seq1-years {
-  font-family: var(--f-semi);
-  font-size: 0.48rem;
-  letter-spacing: 0.34em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.32);
-  opacity: 0;
-  text-shadow: 0 2px 14px rgba(0,0,0,0.9);
-  line-height: 2;
-}
-/* Metadata — bottom-right (hidden; preserved for possible future use) */
-#seq1-meta { display: none; }
-/* CTA replaced by identity card — hidden */
-#seq1-cta { display: none; }
 /* seq1 progress bar — thin bottom edge */
 #seq1-progress-bar {
   position: absolute;
@@ -1041,18 +997,11 @@ footer a:hover { color: var(--ink); }
 /* Mobile */
 @media (max-width: 768px) {
   #seq1-wrap { height: 260vh; }
-  .seq1-name { font-size: clamp(1.8rem, 9vw, 3rem); }
   #seq1-video { object-position: 38% 38%; }
-  .seq1-label { font-size: 0.48rem; letter-spacing: 0.28em; }
-  .seq1-years { font-size: 0.44rem; }
-}
-@media (max-width: 400px) {
-  .seq1-name { font-size: clamp(1.6rem, 10vw, 2.4rem); }
 }
 /* Reduced motion — static first frame, no scrub */
 @media (prefers-reduced-motion: reduce) {
   #seq1-video { transition: none; }
-  #seq1-cta .seq1-cta-arrow { animation: none; }
 }
 
 /* ─── GHOST SECTION WORDS ───────────────────────────────────── */
@@ -1106,32 +1055,11 @@ footer a:hover { color: var(--ink); }
 }
 
 /* ─── SEQUENCE 1 ENDING TRANSITION ─────────────────────────── */
-/* Applied via JS at progress 0.82–1.0 */
+/* Subtle video scale driven by JS via --seq1-scale custom property */
 #seq1-stage.seq1-ending #seq1-video {
   transform-origin: center center;
-  /* CSS transform driven by JS via --seq1-scale custom property */
   transform: scale(var(--seq1-scale, 1.0));
   transition: transform 0.05s linear;
-}
-#seq1-vignette-end {
-  position: absolute; inset: 0; pointer-events: none; z-index: 2;
-  background: radial-gradient(ellipse 80% 80% at 50% 50%,
-    transparent 20%, rgba(6,5,12,0.0) 60%, rgba(6,5,12,0.0) 100%);
-  opacity: 0;
-  transition: none;
-}
-#seq1-rule {
-  position: absolute;
-  left: clamp(28px, 5vw, 72px);
-  right: clamp(28px, 5vw, 72px);
-  bottom: clamp(64px, 9vh, 110px);
-  height: 1px;
-  background: rgba(255,255,255,0.18);
-  transform: scaleX(0);
-  transform-origin: left center;
-  opacity: 0;
-  z-index: 10;
-  pointer-events: none;
 }
 
 /* ─── SELECTED WORK — CINEMATIC FLAGSHIP ─────────────────────── */
@@ -1155,7 +1083,7 @@ footer a:hover { color: var(--ink); }
 }
 #selected-work.sw-visible .sw-label { opacity: 1; }
 
-/* Full-bleed cinematic image block */
+/* Full-bleed cinematic image block — clip-path driven by GSAP scroll scrub */
 .sw-cinematic {
   position: relative;
   width: 100%;
@@ -1163,6 +1091,8 @@ footer a:hover { color: var(--ink); }
   min-height: 520px;
   overflow: hidden;
   background: var(--bg-2);
+  clip-path: inset(100% 0 0 0);
+  will-change: clip-path;
 }
 .sw-cinematic img {
   position: absolute;
@@ -1171,14 +1101,13 @@ footer a:hover { color: var(--ink); }
   height: 100%;
   object-fit: cover;
   object-position: center 38%;
-  filter: saturate(0.82) brightness(0.72);
+  filter: saturate(0.96) brightness(0.88);
   transform: scale(1.03);
-  transition: transform 2.4s var(--ease-out), filter 1s;
+  transition: transform 1.2s var(--ease-out);
   will-change: transform;
 }
 #selected-work.sw-visible .sw-cinematic img {
   transform: scale(1.0);
-  filter: saturate(0.88) brightness(0.78);
 }
 /* Bottom gradient for text legibility */
 .sw-gradient {
@@ -1420,29 +1349,8 @@ footer a:hover { color: var(--ink); }
     <div class="vignette"></div>
     <div class="top-fade"></div>
     <div class="grain"></div>
-    <!-- Identity — bottom left, final 10-15% of scroll only -->
-    <div id="seq1-identity">
-      <div class="seq1-label" id="seq1-label">3D Generalist &nbsp;·&nbsp; Environment Artist &nbsp;·&nbsp; CGI / VFX</div>
-      <div class="seq1-name" id="seq1-name">Jatin Shinde</div>
-      <div class="seq1-years" id="seq1-years">7+ Years of Creative Production</div>
-    </div>
-    <!-- Technical metadata — bottom right -->
-    <div id="seq1-meta">
-      <div class="seq1-meta-line">CGI / VFX</div>
-      <div class="seq1-meta-line">Realtime &nbsp;·&nbsp; Environment</div>
-      <div class="seq1-meta-line">7+ Years Production</div>
-    </div>
-    <!-- CTA — bottom centre -->
-    <div id="seq1-cta">
-      <div class="seq1-cta-text">Selected Work</div>
-      <div class="seq1-cta-arrow">↓</div>
-    </div>
     <!-- Thin progress bar along bottom edge -->
     <div id="seq1-progress-bar"></div>
-    <!-- Sequence1 ending: thickening vignette overlay -->
-    <div id="seq1-vignette-end"></div>
-    <!-- Sequence1 ending: thin rule that fades in before identity emerges -->
-    <div id="seq1-rule"></div>
   </div>
 </div>
 
@@ -1451,7 +1359,7 @@ footer a:hover { color: var(--ink); }
   <div class="sw-label">02 / Selected Work</div>
   <div class="sw-cinematic">
     <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-03/frame_0061.webp"
-         alt="Verdant — UE5 cinematic environment" loading="lazy">
+         alt="Verdant — UE5 cinematic environment" loading="eager" fetchpriority="low">
     <div class="sw-gradient"></div>
     <div class="sw-overlay">
       <div class="sw-left">
@@ -2287,19 +2195,23 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
   const EASE = 'cubic-bezier(0.23, 1, 0.32, 1)';
   const isMob = matchMedia('(max-width:768px)').matches;
 
-  // 1. CANVAS → CONTENT CROSSFADE
-  // Fixed black overlay fades in at world scroll end, fades out as content enters
-  const cover = document.createElement('div');
-  cover.style.cssText = 'position:fixed;inset:0;background:#06050c;pointer-events:none;z-index:4;opacity:0;';
-  document.body.appendChild(cover);
-
-  // Crossfade: seq1-wrap bottom → selected-work (identity section removed)
-  gsap.to(cover, { opacity: 1, ease: 'none',
-    scrollTrigger: { trigger: '#seq1-wrap', start: 'bottom 70%', end: 'bottom top', scrub: 0.4 }
-  });
-  gsap.to(cover, { opacity: 0, ease: 'none',
-    scrollTrigger: { trigger: '#selected-work', start: 'top 95%', end: 'top 30%', scrub: 0.4 }
-  });
+  // 1. WORLD-03 CLIP-PATH REVEAL — direct visual handoff from Sequence1
+  // sw-cinematic starts as inset(100%) — fully masked.
+  // As #selected-work enters viewport (bottom→top), mask opens from bottom up.
+  // Scrub 0.5 = slight lag for cinematic feel. Reversible in both directions.
+  const swCinematic = document.querySelector('.sw-cinematic');
+  if (swCinematic) {
+    gsap.to(swCinematic, {
+      clipPath: 'inset(0% 0 0 0)',
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '#selected-work',
+        start: 'top bottom',   // World-03 top hits viewport bottom
+        end: 'top 12%',        // World-03 top reaches near viewport top → fully revealed
+        scrub: 0.5,
+      }
+    });
+  }
 
   // 2b. HERO ROLE LINES staggered reveal
   {
@@ -2385,7 +2297,7 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
 } // end animation guard
 
 // ═══════════════════════════════════════════════════════
-//  SEQUENCE 1 — VELOCITY-BASED PLAYBACK + IDENTITY CHOREOGRAPHY
+//  SEQUENCE 1 — VELOCITY-BASED PLAYBACK
 //  Strategy: chase target time via playbackRate, not direct seeking.
 //  Hard-seek only for backward scroll or jumps > CHASE_THRESHOLD.
 //  This avoids GOP keyframe stalls that make direct seeking choppy.
@@ -2394,11 +2306,6 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
   const seq1Wrap  = document.getElementById('seq1-wrap');
   const seq1Video = document.getElementById('seq1-video');
   const seq1Bar   = document.getElementById('seq1-progress-bar');
-  const idName    = document.getElementById('seq1-name');
-  const idLabel   = document.getElementById('seq1-label');
-  const idYears   = document.getElementById('seq1-years');
-  const idMeta    = document.getElementById('seq1-meta');
-  const idCta     = document.getElementById('seq1-cta');
 
   let seq1Duration  = 0;
   let seq1P         = 0;
@@ -2424,26 +2331,7 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
     return Math.max(0, Math.min(1, window.scrollY / totalScroll));
   }
 
-  // ─ IDENTITY CHOREOGRAPHY ────────────────────────────
-  let prevP = -1;
-  function lerp01(p, lo, hi) {
-    return Math.max(0, Math.min(1, (p - lo) / (hi - lo)));
-  }
-
-  function updateIdentity(p) {
-    if (Math.abs(p - prevP) < 0.003) return;
-    prevP = p;
-
-    // Identity only in final 10-15%: 0.84→0.88 in, full 0.88→0.95, 0.95→0.98 out
-    const nameOp = p < 0.84 ? 0 : p < 0.88 ? lerp01(p, 0.84, 0.88) : p > 0.98 ? 0 : p > 0.95 ? 1 - lerp01(p, 0.95, 0.98) : 1;
-    if (idName)  idName.style.opacity  = nameOp.toFixed(3);
-    if (idLabel) idLabel.style.opacity = nameOp.toFixed(3);
-
-    // Years: slight delay — 0.86→0.90 in, same fade out
-    const yearsOp = p < 0.86 ? 0 : p < 0.90 ? lerp01(p, 0.86, 0.90) : p > 0.98 ? 0 : p > 0.95 ? 1 - lerp01(p, 0.95, 0.98) : 1;
-    if (idYears) idYears.style.opacity = yearsOp.toFixed(3);
-
-    // Progress bar
+  function updateProgress(p) {
     if (seq1Bar) { seq1Bar.style.transform = `scaleX(${p.toFixed(4)})`; seq1Bar.style.width = '100%'; }
   }
 
@@ -2452,7 +2340,7 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
   // Avoids GOP stalls from direct currentTime assignment.
   function seq1Frame() {
     seq1P = getSeq1Progress();
-    updateIdentity(seq1P);
+    updateProgress(seq1P);
 
     if (seq1Duration > 0 && seq1Video && !reducedMotion && !isMobDevice) {
       const targetT = seq1P * seq1Duration;
@@ -2488,71 +2376,27 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
     seq1Video.addEventListener('loadedmetadata', () => {
       seq1Video.currentTime = 0;
       seq1Video.play().catch(() => {});
-      seq1Video.addEventListener('timeupdate', function holdAt4() {
-        if (seq1Video.currentTime >= 4) {
-          seq1Video.pause();
-          seq1Video.removeEventListener('timeupdate', holdAt4);
-          if (idLabel) idLabel.style.opacity = '1';
-          if (idName)  idName.style.opacity  = '1';
-          if (idYears) idYears.style.opacity = '1';
-        }
-      });
     }, { once: true });
-  }
-
-  // ─ REDUCED MOTION ───────────────────────────────────
-  if (reducedMotion && seq1Video) {
-    seq1Video.currentTime = 0;
-    if (idLabel) { idLabel.style.opacity = '1'; idLabel.style.transition = 'none'; }
-    if (idName)  { idName.style.opacity  = '1'; idName.style.transition  = 'none'; }
-    if (idYears) { idYears.style.opacity = '1'; idYears.style.transition = 'none'; }
   }
 
   // Start the always-running loop
   requestAnimationFrame(seq1Frame);
 
-  // ─ SEQUENCE 1 ENDING TRANSITION (progress 0.82–1.0) ─────────
-  // Subtle env scale + vignette thicken + rule emergence
-  const seq1Stage  = document.getElementById('seq1-stage');
-  const seq1VigEnd = document.getElementById('seq1-vignette-end');
-  const seq1Rule   = document.getElementById('seq1-rule');
-
+  // ─ SEQUENCE 1 ENDING — subtle video scale (secondary effect) ──
+  // Scale: 1.0 → 1.03 from p=0.85→1.0. Pure CSS custom property.
+  const seq1Stage = document.getElementById('seq1-stage');
   function updateSeq1Ending(p) {
-    if (p < 0.80) {
-      if (seq1Stage) seq1Stage.style.removeProperty('--seq1-scale');
-      if (seq1VigEnd) { seq1VigEnd.style.opacity = '0'; seq1VigEnd.style.background = 'none'; }
-      if (seq1Rule) { seq1Rule.style.opacity = '0'; seq1Rule.style.transform = 'scaleX(0)'; }
+    if (p < 0.85) {
+      if (seq1Stage) { seq1Stage.classList.remove('seq1-ending'); seq1Stage.style.removeProperty('--seq1-scale'); }
       return;
     }
-    // Scale: 1.0 → 1.04 from p=0.82→1.0
-    const endP = Math.max(0, Math.min(1, (p - 0.82) / 0.18));
-    const scale = 1.0 + endP * 0.04;
-    if (seq1Stage) seq1Stage.style.setProperty('--seq1-scale', scale.toFixed(4));
-    seq1Stage && seq1Stage.classList.toggle('seq1-ending', p >= 0.82);
-
-    // Vignette: thickens from p=0.82 → 0.98
-    const vigOp = endP * 0.55;
-    if (seq1VigEnd) {
-      seq1VigEnd.style.opacity = vigOp.toFixed(3);
-      seq1VigEnd.style.background = `radial-gradient(ellipse 85% 85% at 50% 50%,
-        transparent 20%, rgba(6,5,12,${(endP * 0.35).toFixed(3)}) 65%, rgba(6,5,12,${(endP * 0.82).toFixed(3)}) 100%)`;
-    }
-
-    // Rule: fades in at p=0.86→0.92
-    const ruleP = Math.max(0, Math.min(1, (p - 0.86) / 0.06));
-    if (seq1Rule) {
-      seq1Rule.style.opacity = ruleP.toFixed(3);
-      seq1Rule.style.transform = `scaleX(${ruleP.toFixed(3)})`;
+    const endP = Math.max(0, Math.min(1, (p - 0.85) / 0.15));
+    const scale = 1.0 + endP * 0.03;
+    if (seq1Stage) {
+      seq1Stage.classList.add('seq1-ending');
+      seq1Stage.style.setProperty('--seq1-scale', scale.toFixed(4));
     }
   }
-
-  // Extend the identity update to call ending transition too
-  const _origUpdateIdentity = updateIdentity;
-  const _seq1PatchedUpdate = (p) => { _origUpdateIdentity(p); updateSeq1Ending(p); };
-  // Swap out — patch the RAF loop to call the extended updater
-  // (done by redefining updateIdentity in same scope won't work after hoisting,
-  //  so we handle it inside seq1Frame via a flag ref)
-  // Instead, directly observe scrollY in a separate RAF branch:
   (function endingLoop() {
     updateSeq1Ending(getSeq1Progress());
     requestAnimationFrame(endingLoop);
