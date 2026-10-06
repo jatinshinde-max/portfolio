@@ -24,7 +24,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400&family=Barlow:ital,wght@0,300;0,400;0,500;1,300&family=Barlow+Semi+Condensed:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
 
 <!-- Animation libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
@@ -59,9 +59,10 @@
   --a4: #2872c4;  /* world 4 — cold blue */
   --a5: #c4a028;  /* world 5 — gold */
 
-  --f-display: 'Barlow Condensed', sans-serif;
-  --f-body:    'Barlow', sans-serif;
-  --f-semi:    'Barlow Semi Condensed', sans-serif;
+  --f-display: 'Cormorant Garamond', serif;
+  --f-body:    'Cormorant Garamond', serif;
+  --f-semi:    'DM Mono', monospace;
+  --f-mono:    'DM Mono', monospace;
 
   --ease-out:  cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in:   cubic-bezier(0.76, 0, 0.24, 1);
@@ -484,13 +485,13 @@ body {
   position: relative; overflow: clip;
 }
 .contact-section::before {
-  content: 'JATIN';
+  content: 'AVAILABLE';
   position: absolute; top:50%; left:50%;
   transform: translate(-50%,-50%);
   font-family: var(--f-display);
-  font-size: clamp(8rem, 25vw, 22rem);
-  font-weight: 700; letter-spacing: -0.04em;
-  color: rgba(255,255,255,0.025);
+  font-size: clamp(5rem, 16vw, 16rem);
+  font-weight: 300; letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.022);
   pointer-events: none; white-space: nowrap;
 }
 .c-eyebrow {
@@ -771,7 +772,7 @@ footer a:hover { color: var(--ink); }
 
   /* Contact */
   .contact-section { padding-left: clamp(24px,6vw,48px); padding-right: clamp(24px,6vw,48px); }
-  .contact-section::before { font-size: clamp(3.5rem, 22vw, 9rem); }
+  .contact-section::before { font-size: clamp(2.5rem, 14vw, 7rem); }
   .c-headline { font-size: clamp(2.5rem, 10vw, 6rem); }
   .c-btn { display: flex; width: 100%; justify-content: center; }
 
@@ -907,11 +908,11 @@ footer a:hover { color: var(--ink); }
 }
 .genai-inner {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
+  max-width: 720px;
   gap: clamp(40px,8vw,120px);
   align-items: start;
 }
-@media (max-width:800px) { .genai-inner { grid-template-columns: 1fr; } }
 .genai-text { padding-top: clamp(16px,3vh,40px); }
 .genai-text .a-body { margin-bottom: 32px; }
 .genai-tags {
@@ -960,7 +961,7 @@ footer a:hover { color: var(--ink); }
 /* ─── SEQUENCE 1 — CINEMATIC OPENING ──────────────────────── */
 #seq1-wrap {
   position: relative;
-  height: 220vh;
+  height: 300vh;
   z-index: 0;
 }
 #seq1-stage {
@@ -1003,13 +1004,13 @@ footer a:hover { color: var(--ink); }
 }
 .seq1-name {
   font-family: var(--f-display);
-  font-size: clamp(3.5rem, 8vw, 8.5rem);
+  font-size: clamp(4rem, 9.5vw, 10rem);
   font-weight: 200;
-  line-height: 0.93;
-  letter-spacing: -0.025em;
+  line-height: 0.9;
+  letter-spacing: -0.02em;
   color: var(--ink);
   opacity: 0;
-  text-shadow: 0 4px 40px rgba(0,0,0,0.7);
+  text-shadow: 0 4px 60px rgba(0,0,0,0.8);
 }
 /* Metadata — bottom-right */
 #seq1-meta {
@@ -1070,7 +1071,7 @@ footer a:hover { color: var(--ink); }
 }
 /* Mobile */
 @media (max-width: 768px) {
-  #seq1-wrap { height: 200vh; }
+  #seq1-wrap { height: 260vh; }
   .seq1-name { font-size: clamp(2.8rem, 13vw, 5.5rem); }
   #seq1-video { object-position: 38% 38%; }
   #seq1-meta { display: none; }
@@ -1083,6 +1084,56 @@ footer a:hover { color: var(--ink); }
 @media (prefers-reduced-motion: reduce) {
   #seq1-video { transition: none; }
   #seq1-cta .seq1-cta-arrow { animation: none; }
+}
+
+/* ─── GHOST SECTION WORDS ───────────────────────────────────── */
+/* Low-opacity environmental typography — adds depth without noise */
+.ads-section::before {
+  content: 'COMMERCIAL';
+  position: absolute; bottom: -0.06em; right: clamp(20px,4vw,60px);
+  font-family: var(--f-display);
+  font-size: clamp(6rem, 14vw, 17rem);
+  font-weight: 300; letter-spacing: -0.03em;
+  color: rgba(255,255,255,0.024);
+  pointer-events: none; user-select: none;
+  line-height: 1; white-space: nowrap; z-index: 0;
+}
+
+.gallery-section { position: relative; overflow: hidden; }
+.gallery-section::before {
+  content: 'WORK';
+  position: absolute; top: 50%; left: -0.04em;
+  transform: translateY(-50%);
+  font-family: var(--f-display);
+  font-size: clamp(10rem, 22vw, 26rem);
+  font-weight: 300; letter-spacing: -0.04em;
+  color: rgba(255,255,255,0.016);
+  pointer-events: none; user-select: none;
+  line-height: 1; white-space: nowrap; z-index: 0;
+}
+
+.tools-section { position: relative; overflow: hidden; }
+.tools-section::before {
+  content: 'PIPELINE';
+  position: absolute; bottom: -0.06em; left: -0.03em;
+  font-family: var(--f-display);
+  font-size: clamp(6rem, 13vw, 16rem);
+  font-weight: 300; letter-spacing: -0.03em;
+  color: rgba(255,255,255,0.022);
+  pointer-events: none; user-select: none;
+  line-height: 1; white-space: nowrap; z-index: 0;
+}
+
+.genai-section { position: relative; overflow: hidden; }
+.genai-section::before {
+  content: 'GENERATIVE';
+  position: absolute; bottom: -0.06em; right: -0.03em;
+  font-family: var(--f-display);
+  font-size: clamp(5rem, 12vw, 14rem);
+  font-weight: 300; letter-spacing: -0.03em;
+  color: rgba(255,255,255,0.02);
+  pointer-events: none; user-select: none;
+  line-height: 1; white-space: nowrap; z-index: 0;
 }
 
 /* ─── CHARACTER SPINNER ─────────────────────────────────────── */
@@ -1298,7 +1349,7 @@ footer a:hover { color: var(--ink); }
       <h2 class="s-title reveal reveal-delay-1">Production<br>Toolkit.</h2>
       <div class="stats-row reveal reveal-delay-2">
         <div class="stat-cell">
-          <div class="stat-n">5+</div>
+          <div class="stat-n">7+</div>
           <div class="stat-l">Years</div>
         </div>
         <div class="stat-cell">
@@ -1387,8 +1438,8 @@ footer a:hover { color: var(--ink); }
     </div>
     <div class="about-text">
       <div class="a-eyebrow reveal">About</div>
-      <h2 class="a-headline reveal reveal-delay-1">6+ Years of<br>Creative Production<br>Experience.</h2>
-      <p class="a-body reveal reveal-delay-2">Six years of hands-on creative production — cinematic environments, character work, product CGI, and VFX. Comfortable across the 3D pipeline, from early concept through to final render and delivery. Tools of choice: Unreal Engine 5, Blender, Substance 3D, After Effects, DaVinci Resolve.</p>
+      <h2 class="a-headline reveal reveal-delay-1">7+ Years of<br>Creative Production<br>Experience.</h2>
+      <p class="a-body reveal reveal-delay-2">Seven years of hands-on creative production — cinematic environments, character work, product CGI, and VFX. Comfortable across the full 3D pipeline, from early concept through to final render and delivery. Tools of choice: Unreal Engine 5, Blender, Substance 3D, After Effects, DaVinci Resolve.</p>
       <p class="a-body reveal reveal-delay-3" style="margin-top:20px;">Based in India. Open to full-time roles and relocation. Strong interest in game studios, VFX houses, and creative technology teams.</p>
     </div>
   </div>
@@ -1396,8 +1447,8 @@ footer a:hover { color: var(--ink); }
   <!-- CONTACT -->
   <div class="contact-section" id="contact">
     <div class="c-eyebrow reveal">Open to Opportunities</div>
-    <h2 class="c-headline reveal reveal-delay-1">Available for<br>Full-Time Roles.</h2>
-    <p class="a-body reveal reveal-delay-1" style="max-width:44ch;margin:0 auto 40px;text-align:center;position:relative;z-index:1;">3D Generalist · Environment Artist · CGI/VFX Artist<br>Based in India · Open to relocation</p>
+    <h2 class="c-headline reveal reveal-delay-1">Let's Build<br>Something Memorable.</h2>
+    <p class="a-body reveal reveal-delay-1" style="max-width:44ch;margin:0 auto 40px;text-align:center;position:relative;z-index:1;">3D Generalist · Environment Artist · CGI/VFX Artist<br>Based in India · Open to relocation worldwide.</p>
     <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1;">
       <a href="mailto:jatinshinde118@gmail.com" class="c-btn reveal reveal-delay-2">
         Send Email <span>→</span>
@@ -2105,7 +2156,10 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
 } // end animation guard
 
 // ═══════════════════════════════════════════════════════
-//  SEQUENCE 1 — SCROLL SCRUB ENGINE + IDENTITY CHOREOGRAPHY
+//  SEQUENCE 1 — VELOCITY-BASED PLAYBACK + IDENTITY CHOREOGRAPHY
+//  Strategy: chase target time via playbackRate, not direct seeking.
+//  Hard-seek only for backward scroll or jumps > CHASE_THRESHOLD.
+//  This avoids GOP keyframe stalls that make direct seeking choppy.
 // ═══════════════════════════════════════════════════════
 {
   const seq1Wrap  = document.getElementById('seq1-wrap');
@@ -2117,31 +2171,19 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
   const idCta     = document.getElementById('seq1-cta');
 
   let seq1Duration  = 0;
-  let seq1TargetT   = 0;   // raw target video time
-  let seq1DisplayT  = 0;   // smoothed time (damped)
-  let seq1P         = 0;   // scroll progress 0–1
-  let seq1Ticking   = false;
+  let seq1P         = 0;
   let reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let isMobDevice   = matchMedia('(max-width:768px),(pointer:coarse)').matches;
 
-  // Seek performance tracking
-  let lastSeekRequest = 0;
-  let seekCount = 0, slowSeeks = 0;
+  // Velocity-based playback constants
+  const CHASE_THRESHOLD = 1.2;   // seconds — hard-seek if gap is larger
+  const FINE_THRESHOLD  = 0.055; // seconds — pause when this close
+  const MAX_RATE        = 4.0;   // max playback speed to chase target
 
   if (seq1Video) {
     seq1Video.addEventListener('loadedmetadata', () => {
       seq1Duration = seq1Video.duration || 0;
     }, { once: true });
-
-    seq1Video.addEventListener('seeked', () => {
-      const dt = performance.now() - lastSeekRequest;
-      seekCount++;
-      if (dt > 120) {
-        slowSeeks++;
-        if (slowSeeks <= 5) console.warn('[SEQ1] Slow seek:', dt.toFixed(0)+'ms ('+seekCount+'th seek)');
-        if (slowSeeks === 5) console.warn('[SEQ1] Repeated slow seeks — MP4 keyframe spacing may need optimisation for scrubbing');
-      }
-    });
   }
 
   // ─ PROGRESS CALCULATION ─────────────────────────────
@@ -2153,17 +2195,13 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
   }
 
   // ─ IDENTITY CHOREOGRAPHY ────────────────────────────
-  // Each element fades in/out across distinct scroll ranges.
-  // All opacity transitions handled via CSS (transition: opacity 0.6s) so JS
-  // only needs to set the final opacity value on meaningful changes.
   let prevP = -1;
-
   function lerp01(p, lo, hi) {
     return Math.max(0, Math.min(1, (p - lo) / (hi - lo)));
   }
 
   function updateIdentity(p) {
-    if (Math.abs(p - prevP) < 0.004) return;
+    if (Math.abs(p - prevP) < 0.003) return;
     prevP = p;
 
     // Name + label: 0.04→0.12 in, full 0.12→0.88, 0.88→0.96 out
@@ -2179,79 +2217,73 @@ if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
     const ctaOp = lerp01(p, 0.84, 0.94);
     if (idCta) idCta.style.opacity = ctaOp.toFixed(3);
 
-    // Progress bar width
-    if (seq1Bar) seq1Bar.style.transform = `scaleX(${p.toFixed(4)})`;
-    if (seq1Bar) seq1Bar.style.width = '100%';
+    // Progress bar
+    if (seq1Bar) { seq1Bar.style.transform = `scaleX(${p.toFixed(4)})`; seq1Bar.style.width = '100%'; }
   }
 
-  // ─ SCRUB TICK ───────────────────────────────────────
-  function seq1Tick() {
-    seq1Ticking = false;
-
+  // ─ ALWAYS-RUNNING RAF LOOP ──────────────────────────
+  // Velocity-based: play video at rate that chases target time.
+  // Avoids GOP stalls from direct currentTime assignment.
+  function seq1Frame() {
     seq1P = getSeq1Progress();
     updateIdentity(seq1P);
 
-    if (seq1Duration > 0 && seq1Video && !reducedMotion) {
-      seq1TargetT = seq1P * seq1Duration;
-      // Damp — reduce jitter without over-smoothing
-      seq1DisplayT += (seq1TargetT - seq1DisplayT) * 0.22;
-      const delta = Math.abs(seq1DisplayT - seq1Video.currentTime);
-      if (delta > 0.05) {
-        lastSeekRequest = performance.now();
-        seq1Video.currentTime = seq1DisplayT;
+    if (seq1Duration > 0 && seq1Video && !reducedMotion && !isMobDevice) {
+      const targetT = seq1P * seq1Duration;
+      const diff    = targetT - seq1Video.currentTime;
+
+      if (Math.abs(diff) > CHASE_THRESHOLD) {
+        // Large gap (e.g. fast scroll or page jump) — hard seek is unavoidable
+        seq1Video.pause();
+        seq1Video.currentTime = targetT;
+      } else if (diff > FINE_THRESHOLD) {
+        // Target is ahead — play forward at dynamic rate to catch up smoothly
+        const rate = Math.min(MAX_RATE, 0.5 + diff * 6);
+        if (seq1Video.paused) seq1Video.play().catch(() => {});
+        if (Math.abs(seq1Video.playbackRate - rate) > 0.04) seq1Video.playbackRate = rate;
+      } else if (diff < -FINE_THRESHOLD) {
+        // Target is behind (scroll reversed) — pause and seek back
+        if (!seq1Video.paused) seq1Video.pause();
+        seq1Video.currentTime = Math.max(0, targetT);
+      } else {
+        // At target — settle to pause
+        if (!seq1Video.paused) {
+          seq1Video.pause();
+          seq1Video.playbackRate = 1;
+        }
       }
     }
 
-    // Keep ticking while within the seq1 section
-    if (seq1P > 0 && seq1P < 1) {
-      seq1Ticking = true;
-      requestAnimationFrame(seq1Tick);
-    }
+    requestAnimationFrame(seq1Frame);
   }
 
-  window.addEventListener('scroll', () => {
-    if (!seq1Ticking) {
-      seq1Ticking = true;
-      requestAnimationFrame(seq1Tick);
-    }
-  }, { passive: true });
-
-  // ─ MOBILE — simpler autoplay presentation ───────────
+  // ─ MOBILE — autoplay presentation ───────────────────
   if (isMobDevice && seq1Video) {
-    // On mobile: autoplay a short loop (first 4s) rather than scrubbing
     seq1Video.addEventListener('loadedmetadata', () => {
       seq1Video.currentTime = 0;
       seq1Video.play().catch(() => {});
-      // Pause at 4s and hold
       seq1Video.addEventListener('timeupdate', function holdAt4() {
         if (seq1Video.currentTime >= 4) {
           seq1Video.pause();
           seq1Video.removeEventListener('timeupdate', holdAt4);
-          // Show identity immediately on mobile (no scroll choreography)
           if (idLabel) idLabel.style.opacity = '1';
           if (idName)  idName.style.opacity  = '1';
           if (idCta)   idCta.style.opacity   = '1';
         }
       });
-      console.log('[SEQ1] Mobile mode: autoplay to 4s, then hold');
     }, { once: true });
   }
 
   // ─ REDUCED MOTION ───────────────────────────────────
   if (reducedMotion && seq1Video) {
     seq1Video.currentTime = 0;
-    // Show static first frame, identity always visible
-    if (idLabel) idLabel.style.opacity = '1'; if (idLabel) idLabel.style.transition = 'none';
-    if (idName)  idName.style.opacity  = '1'; if (idName)  idName.style.transition  = 'none';
-    if (idCta)   idCta.style.opacity   = '1'; if (idCta)   idCta.style.transition   = 'none';
-    console.log('[SEQ1] Reduced motion: static first frame');
+    if (idLabel) { idLabel.style.opacity = '1'; idLabel.style.transition = 'none'; }
+    if (idName)  { idName.style.opacity  = '1'; idName.style.transition  = 'none'; }
+    if (idCta)   { idCta.style.opacity   = '1'; idCta.style.transition   = 'none'; }
   }
 
-  // ─ NETWORK OBSERVATION ──────────────────────────────
-  if ('connection' in navigator) {
-    const c = navigator.connection;
-    console.log('[SEQ1] Network:', c.effectiveType, 'downlink:', c.downlink+'Mbps');
-  }
+  // Start the always-running loop
+  requestAnimationFrame(seq1Frame);
 }
 
 // ═══════════════════════════════════════════════════════
