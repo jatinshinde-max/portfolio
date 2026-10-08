@@ -355,6 +355,7 @@ body {
 .commercial-section {
   padding:clamp(80px,11vh,140px) clamp(28px,7vw,100px);
   background:var(--bg-1); position:relative; overflow:hidden;
+  scroll-margin-top:72px;
 }
 .commercial-section::before {
   content:'COMMERCIAL';
@@ -373,55 +374,43 @@ body {
   font-family:var(--f-display); font-size:clamp(1.6rem,3.5vw,3rem);
   font-weight:300; letter-spacing:-0.02em; color:var(--ink);
 }
-.comm-featured {
-  display:grid; grid-template-columns:1.62fr 1fr; gap:12px;
-  margin-bottom:40px;
+/* portrait 9:16 card grid — 3 col desktop, 2 tablet, 1 mobile */
+.comm-grid {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
 }
-@media (max-width:900px) { .comm-featured { grid-template-columns:1fr; } }
-.comm-hero-card, .comm-small-card {
+@media (max-width:900px) { .comm-grid { grid-template-columns:repeat(2,1fr); } }
+@media (max-width:500px) { .comm-grid { grid-template-columns:1fr; } }
+.comm-card {
   position:relative; overflow:hidden; background:var(--bg-2);
-  border:1px solid var(--ink-ghost);
+  border:1px solid var(--ink-ghost); aspect-ratio:9/16;
 }
-.comm-hero-card { aspect-ratio:16/9; }
-.comm-small-card { aspect-ratio:16/9; }
-.comm-pair { display:flex; flex-direction:column; gap:12px; }
-.comm-hero-card video, .comm-small-card video {
-  width:100%; height:100%; object-fit:cover;
+.comm-card.hidden { display:none; } /* hide cards whose source 404s */
+.comm-card video {
+  width:100%; height:100%; object-fit:cover; display:block;
   transition:transform 0.6s var(--ease-out);
 }
-.comm-hero-card:hover video, .comm-small-card:hover video { transform:scale(1.03); }
+.comm-card:hover video { transform:scale(1.03); }
 .comm-card-info {
   position:absolute; bottom:0; left:0; right:0;
-  padding:18px 20px;
-  background:linear-gradient(transparent,rgba(6,5,12,0.82));
+  padding:16px 18px;
+  background:linear-gradient(transparent,rgba(6,5,12,0.85));
 }
 .comm-card-meta {
   font-family:var(--f-mono); font-size:8px; letter-spacing:0.24em;
-  text-transform:uppercase; color:var(--ink-mute); margin-bottom:5px;
+  text-transform:uppercase; color:var(--ink-mute); margin-bottom:4px;
 }
 .comm-card-title {
-  font-family:var(--f-display); font-size:1.1rem; font-weight:400;
+  font-family:var(--f-display); font-size:1rem; font-weight:400;
   letter-spacing:-0.01em; color:var(--ink);
 }
-.comm-index {
-  display:flex; align-items:baseline; gap:24px; flex-wrap:wrap;
-  padding-top:28px; border-top:1px solid var(--ink-ghost);
-}
-.comm-index-label {
-  font-family:var(--f-mono); font-size:8px; letter-spacing:0.3em;
-  text-transform:uppercase; color:var(--ink-mute);
-}
-.comm-index-items { display:flex; gap:16px; flex-wrap:wrap; }
-.comm-index-item {
-  font-family:var(--f-body); font-size:0.8rem; font-weight:300;
-  color:var(--ink-dim); letter-spacing:0.01em;
-}
-.comm-index-item::before { content:'· '; color:var(--ink-mute); }
 
 /* ─── TRANSFORMATIONS SECTION ─────────────────────────── */
 .transforms-section {
   padding:clamp(80px,11vh,140px) clamp(28px,7vw,100px);
   background:var(--bg); position:relative; overflow:hidden;
+  scroll-margin-top:72px;
 }
 .transforms-section::before {
   content:'BEFORE / AFTER';
@@ -432,34 +421,78 @@ body {
   white-space:nowrap;
 }
 .transforms-header { margin-bottom:48px; }
-.transforms-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:2px; }
-.transform-item {
-  position:relative; overflow:hidden; background:var(--bg-2);
-  aspect-ratio:4/3; cursor:pointer;
+.transforms-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; }
+
+/* before/after comparison slider */
+.ba-wrap {
+  position:relative; overflow:hidden; aspect-ratio:16/9;
+  border:1px solid var(--ink-ghost); background:var(--bg-2);
+  cursor:col-resize; user-select:none;
+}
+.ba-before, .ba-after {
+  position:absolute; inset:0;
+  pointer-events:none;
+}
+.ba-before img, .ba-after img {
+  width:100%; height:100%; object-fit:cover; display:block;
+}
+.ba-range {
+  position:absolute; inset:0; width:100%; height:100%;
+  opacity:0; cursor:col-resize; z-index:10;
+  -webkit-appearance:none; appearance:none; margin:0;
+}
+.ba-divider {
+  position:absolute; top:0; bottom:0; left:50%;
+  width:2px; background:rgba(255,255,255,0.72);
+  transform:translateX(-50%); pointer-events:none; z-index:9;
+}
+.ba-knob {
+  position:absolute; top:50%; left:50%;
+  width:30px; height:30px; border-radius:50%;
+  background:white; border:2px solid rgba(6,5,12,0.5);
+  box-shadow:0 2px 10px rgba(0,0,0,0.5);
+  transform:translate(-50%,-50%);
+  pointer-events:none; z-index:9;
   display:flex; align-items:center; justify-content:center;
-  border:1px solid var(--ink-ghost);
 }
-.transform-placeholder {
-  text-align:center; padding:40px;
+.ba-knob::before {
+  content:'◂ ▸';
+  font-size:7px; color:var(--bg); letter-spacing:-1px;
+  font-family:sans-serif;
 }
-.transform-placeholder .tp-label {
-  font-family:var(--f-mono); font-size:7px; letter-spacing:0.32em;
-  text-transform:uppercase; color:var(--ink-mute); display:block; margin-bottom:12px;
+.ba-label {
+  position:absolute; top:10px; z-index:8; pointer-events:none;
+  font-family:var(--f-mono); font-size:8px; letter-spacing:0.22em;
+  text-transform:uppercase; padding:4px 8px;
+  background:rgba(6,5,12,0.55); color:var(--ink-dim);
 }
-.transform-placeholder .tp-title {
-  font-family:var(--f-display); font-size:1.4rem; font-weight:300;
-  color:rgba(255,255,255,0.35); letter-spacing:-0.01em;
+.ba-label-before { left:10px; }
+.ba-label-after  { right:10px; }
+
+.ba-caption {
+  margin-top:10px;
+  font-family:var(--f-mono); font-size:8px; letter-spacing:0.18em;
+  text-transform:uppercase; color:var(--ink-mute);
 }
-.transforms-note {
-  margin-top:28px; padding-top:20px; border-top:1px solid var(--ink-ghost);
+.transforms-footer {
+  margin-top:36px; padding-top:20px; border-top:1px solid var(--ink-ghost);
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;
+}
+.transforms-footer-note {
   font-family:var(--f-mono); font-size:8px; letter-spacing:0.22em;
   color:var(--ink-mute); text-transform:uppercase;
 }
+.transforms-footer a {
+  font-family:var(--f-mono); font-size:8px; letter-spacing:0.22em;
+  text-transform:uppercase; color:var(--ink-dim); text-decoration:none;
+  border-bottom:1px solid var(--ink-ghost); padding-bottom:2px; transition:color 0.3s;
+}
+.transforms-footer a:hover { color:var(--ink); }
 
 /* ─── SHOWREEL / CHARACTER ─────────────────────────────── */
 .showreel-section {
   padding:clamp(80px,11vh,140px) clamp(28px,7vw,100px);
-  background:var(--bg-1);
+  background:var(--bg-1); scroll-margin-top:72px;
 }
 .showreel-inner {
   display:grid; grid-template-columns:1fr 1fr; gap:72px; align-items:center;
@@ -504,7 +537,7 @@ body {
 /* ─── GALLERY ─────────────────────────────────────────── */
 .gallery-section {
   padding:clamp(80px,12vh,140px) clamp(28px,7vw,100px);
-  background:var(--bg-2);
+  background:var(--bg-2); scroll-margin-top:72px;
 }
 .gallery-head-row {
   display:flex; justify-content:space-between; align-items:baseline;
@@ -791,47 +824,8 @@ footer {
       <span class="comm-eyebrow reveal">Commercial CGI</span>
       <div class="comm-descriptor">Product · Advertising · Motion</div>
     </div>
-    <div class="comm-featured" id="comm-featured">
-      <div class="comm-hero-card">
-        <video muted loop playsinline preload="none">
-          <source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/car-commercial.mp4" type="video/mp4">
-        </video>
-        <div class="comm-card-info">
-          <div class="comm-card-meta">Product · Blender</div>
-          <div class="comm-card-title">Automotive Concept</div>
-        </div>
-      </div>
-      <div class="comm-pair">
-        <div class="comm-small-card">
-          <video muted loop playsinline preload="none">
-            <source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/pepsi.mp4" type="video/mp4">
-          </video>
-          <div class="comm-card-info">
-            <div class="comm-card-meta">Advertising · After Effects</div>
-            <div class="comm-card-title">Pepsi Commercial</div>
-          </div>
-        </div>
-        <div class="comm-small-card">
-          <video muted loop playsinline preload="none">
-            <source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/smart-watch.mp4" type="video/mp4">
-          </video>
-          <div class="comm-card-info">
-            <div class="comm-card-meta">Product · Blender</div>
-            <div class="comm-card-title">Smart Watch</div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="comm-index">
-      <span class="comm-index-label">More Commercial</span>
-      <div class="comm-index-items">
-        <span class="comm-index-item">Automotive Interior</span>
-        <span class="comm-index-item">Chocolate Bar</span>
-        <span class="comm-index-item">EarBuds</span>
-        <span class="comm-index-item">Facewash</span>
-        <span class="comm-index-item">Sneaker Render</span>
-        <span class="comm-index-item">Serum</span>
-      </div>
+    <div class="comm-grid" id="comm-grid">
+      <!-- Cards injected by JS; each hides itself on video error -->
     </div>
   </div>
 
@@ -841,27 +835,63 @@ footer {
       <span class="s-eyebrow reveal">Transformations</span>
       <h2 class="s-title reveal reveal-delay-1">Before.<br>After.</h2>
     </div>
-    <div class="transforms-grid">
-      <div class="transform-item">
-        <div class="transform-placeholder">
-          <span class="tp-label">Transformation 01</span>
-          <div class="tp-title">Before / After</div>
+    <div class="transforms-grid reveal reveal-delay-1">
+      <!-- Pair 1: renders 01 / 02 -->
+      <div>
+        <div class="ba-wrap" data-val="50">
+          <div class="ba-before">
+            <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/01.webp" loading="lazy" alt="Before — Comparison 1">
+          </div>
+          <div class="ba-after" style="clip-path:inset(0 0 0 50%)">
+            <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/02.webp" loading="lazy" alt="After — Comparison 1">
+          </div>
+          <input type="range" class="ba-range" min="0" max="100" value="50" aria-label="Drag to compare before and after">
+          <div class="ba-divider"></div>
+          <div class="ba-knob"></div>
+          <span class="ba-label ba-label-before">Before</span>
+          <span class="ba-label ba-label-after">After</span>
         </div>
+        <div class="ba-caption">Comparison 01</div>
       </div>
-      <div class="transform-item">
-        <div class="transform-placeholder">
-          <span class="tp-label">Transformation 02</span>
-          <div class="tp-title">Before / After</div>
+      <!-- Pair 2: renders 03 / 04 -->
+      <div>
+        <div class="ba-wrap" data-val="50">
+          <div class="ba-before">
+            <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/03.webp" loading="lazy" alt="Before — Comparison 2">
+          </div>
+          <div class="ba-after" style="clip-path:inset(0 0 0 50%)">
+            <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/04.webp" loading="lazy" alt="After — Comparison 2">
+          </div>
+          <input type="range" class="ba-range" min="0" max="100" value="50" aria-label="Drag to compare before and after">
+          <div class="ba-divider"></div>
+          <div class="ba-knob"></div>
+          <span class="ba-label ba-label-before">Before</span>
+          <span class="ba-label ba-label-after">After</span>
         </div>
+        <div class="ba-caption">Comparison 02</div>
       </div>
-      <div class="transform-item">
-        <div class="transform-placeholder">
-          <span class="tp-label">Transformation 03</span>
-          <div class="tp-title">Before / After</div>
+      <!-- Pair 3: renders 05 / 06 -->
+      <div>
+        <div class="ba-wrap" data-val="50">
+          <div class="ba-before">
+            <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/05.webp" loading="lazy" alt="Before — Comparison 3">
+          </div>
+          <div class="ba-after" style="clip-path:inset(0 0 0 50%)">
+            <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/06.webp" loading="lazy" alt="After — Comparison 3">
+          </div>
+          <input type="range" class="ba-range" min="0" max="100" value="50" aria-label="Drag to compare before and after">
+          <div class="ba-divider"></div>
+          <div class="ba-knob"></div>
+          <span class="ba-label ba-label-before">Before</span>
+          <span class="ba-label ba-label-after">After</span>
         </div>
+        <div class="ba-caption">Comparison 03</div>
       </div>
     </div>
-    <p class="transforms-note">Assets in preparation — uploading shortly</p>
+    <div class="transforms-footer">
+      <span class="transforms-footer-note">Drag slider or use arrow keys · Touch supported</span>
+      <a href="/archive#transformations">All 7 comparisons →</a>
+    </div>
   </div>
 
   <!-- CHARACTER PIPELINE -->
@@ -891,11 +921,11 @@ footer {
   <div class="gallery-section" id="gallery">
     <div class="gallery-head-row">
       <span class="gallery-archive-label reveal">Archive</span>
-      <span class="gallery-count reveal">60+ Works · Environments · VFX &amp; Motion</span>
+      <span class="gallery-count reveal">40+ Works · Environments · VFX &amp; Motion</span>
     </div>
     <div class="gallery-filters reveal">
       <button class="g-filter active" data-filter="all">All</button>
-      <button class="g-filter" data-filter="renders">Environments</button>
+      <button class="g-filter" data-filter="environments">Environments</button>
       <button class="g-filter" data-filter="concept-art">VFX &amp; Motion</button>
     </div>
     <div class="gallery-grid" id="g-grid"></div>
@@ -1097,20 +1127,13 @@ setAccent(0);
 
 // ── GALLERY CELLS ───────────────────────────────────────
 const GALLERY_ITEMS = [
-  { title:'Render 01', tag:'UE5 · Lumen',           cat:'renders', src:`${CDN}/gallery/renders/01.webp` },
-  { title:'Render 02', tag:'Blender · Cycles',       cat:'renders', src:`${CDN}/gallery/renders/02.webp` },
-  { title:'Render 03', tag:'UE5 · Nanite',           cat:'renders', src:`${CDN}/gallery/renders/03.webp` },
-  { title:'Render 04', tag:'Blender · HDRI',         cat:'renders', src:`${CDN}/gallery/renders/04.webp` },
-  { title:'Render 05', tag:'Substance 3D · Blender', cat:'renders', src:`${CDN}/gallery/renders/05.webp` },
-  { title:'Render 06', tag:'UE5 · Lumen',            cat:'renders', src:`${CDN}/gallery/renders/06.webp` },
-  { title:'Render 07', tag:'Blender · Cycles',       cat:'renders', src:`${CDN}/gallery/renders/07.webp` },
-  { title:'Render 08', tag:'UE5 · Nanite',           cat:'renders', src:`${CDN}/gallery/renders/08.webp` },
-  { title:'Render 09', tag:'Blender · HDRI',         cat:'renders', src:`${CDN}/gallery/renders/09.webp` },
-  { title:'Render 10', tag:'Substance 3D',           cat:'renders', src:`${CDN}/gallery/renders/10.webp` },
-  { title:'Render 11', tag:'UE5 · Lumen',            cat:'renders', src:`${CDN}/gallery/renders/11.webp` },
-  { title:'Render 12', tag:'Blender · Cycles',       cat:'renders', src:`${CDN}/gallery/renders/12.webp` },
-  { title:'Render 13', tag:'UE5 · Nanite',           cat:'renders', src:`${CDN}/gallery/renders/13.webp` },
-  { title:'Render 14', tag:'Blender · Compositing',  cat:'renders', src:`${CDN}/gallery/renders/14.webp` },
+  // Environments — world poster stills
+  { title:'Ashfall',  tag:'World 01 · UE5',  cat:'environments', src:`${CDN}/world-01/frame_0001.webp`, link:'/work/ashfall' },
+  { title:'Luminara', tag:'World 02 · UE5',  cat:'environments', src:`${CDN}/world-02/frame_0000.webp`, link:'/work/luminara' },
+  { title:'Verdant',  tag:'World 03 · UE5',  cat:'environments', src:`${CDN}/world-03/frame_0061.webp`, link:'/work/verdant' },
+  { title:'Helios',   tag:'World 04 · UE5',  cat:'environments', src:`${CDN}/world-04/frame_0004.webp`, link:'/work/helios' },
+  { title:'Aurum',    tag:'World 05 · UE5',  cat:'environments', src:`${CDN}/world-05/frame_0000.webp`, link:'/work/aurum' },
+  // VFX & Motion — concept art videos
   { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H1.mp4`  },
   { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H2.mp4`  },
   { cat:'concept-art', size:'tall',   video:`${CDN}/gallery/concept%20art/V1.mp4`  },
@@ -1141,8 +1164,12 @@ GALLERY_ITEMS.forEach(item => {
   }
   if (item.title) {
     const info = document.createElement('div'); info.className='g-cell-info';
-    info.innerHTML=`<div class="g-cell-title">${item.title}</div><div class="g-cell-tag">${item.tag}</div>`;
+    info.innerHTML=`<div class="g-cell-title">${item.title}</div><div class="g-cell-tag">${item.tag||''}</div>`;
     cell.appendChild(info);
+  }
+  if (item.link) {
+    cell.style.cursor = 'pointer';
+    cell.addEventListener('click', () => { window.location.href = item.link; });
   }
   gGrid.appendChild(cell);
 });
@@ -1174,7 +1201,52 @@ const vidObs = new IntersectionObserver(entries => {
 document.querySelectorAll('.g-cell video').forEach(v => vidObs.observe(v));
 const srVid = document.getElementById('reel-video');
 if (srVid) vidObs.observe(srVid);
-document.querySelectorAll('.comm-hero-card video, .comm-small-card video').forEach(v => vidObs.observe(v));
+
+// ── COMMERCIAL GRID ─────────────────────────────────────
+const ADS = [
+  { src:'gallery/ads/car-commercial.mp4',      title:'Automotive Concept',  meta:'Product · CGI' },
+  { src:'gallery/ads/pepsi.mp4',               title:'Pepsi Commercial',    meta:'Advertising · CGI' },
+  { src:'gallery/ads/smart-watch.mp4',         title:'Smart Watch',         meta:'Product · CGI' },
+  { src:'gallery/ads/automotive-interior.mp4', title:'Automotive Interior', meta:'Product · CGI' },
+  { src:'gallery/ads/chocolate-bar.mp4',       title:'Chocolate Bar',       meta:'Product · CGI' },
+  { src:'gallery/ads/earbuds.mp4',             title:'EarBuds',             meta:'Product · CGI' },
+  { src:'gallery/ads/facewash.mp4',            title:'Facewash',            meta:'Product · CGI' },
+  { src:'gallery/ads/sneaker-render.mp4',      title:'Sneaker Render',      meta:'Product · CGI' },
+  { src:'gallery/ads/serum.mp4',               title:'Serum',               meta:'Product · CGI' },
+];
+const commGrid = document.getElementById('comm-grid');
+if (commGrid) {
+  ADS.forEach(ad => {
+    const card = document.createElement('div'); card.className = 'comm-card';
+    const vid = document.createElement('video');
+    vid.muted=true; vid.loop=true; vid.playsInline=true; vid.preload='none';
+    const src = document.createElement('source'); src.src=`${CDN}/${ad.src}`; src.type='video/mp4';
+    vid.appendChild(src); card.appendChild(vid);
+    const info = document.createElement('div'); info.className='comm-card-info';
+    info.innerHTML=`<div class="comm-card-meta">${ad.meta}</div><div class="comm-card-title">${ad.title}</div>`;
+    card.appendChild(info);
+    vid.addEventListener('error', () => { card.style.display='none'; });
+    commGrid.appendChild(card);
+    vidObs.observe(vid);
+  });
+}
+
+// ── BEFORE / AFTER SLIDERS ──────────────────────────────
+document.querySelectorAll('.ba-wrap').forEach(wrap => {
+  const range   = wrap.querySelector('.ba-range');
+  const before  = wrap.querySelector('.ba-before');
+  const after   = wrap.querySelector('.ba-after');
+  const divider = wrap.querySelector('.ba-divider');
+  const knob    = wrap.querySelector('.ba-knob');
+  function updateSlider(v) {
+    before.style.clipPath = `inset(0 ${100-v}% 0 0)`;
+    after.style.clipPath  = `inset(0 0 0 ${v}%)`;
+    divider.style.left    = v + '%';
+    knob.style.left       = v + '%';
+  }
+  range.addEventListener('input', () => updateSlider(+range.value));
+  updateSlider(50);
+});
 
 // Preload showreel metadata
 {
@@ -1378,14 +1450,16 @@ if (typeof gsap!=='undefined' && typeof ScrollTrigger!=='undefined') {
     )
   });
 
-  // Commercial cards
-  const commCards = [...document.querySelectorAll('.comm-hero-card,.comm-small-card')];
-  if (commCards.length) {
-    gsap.set(commCards, {opacity:0,y:16});
-    ScrollTrigger.create({ trigger:'#comm-featured', start:'top 84%', once:true,
-      onEnter:() => gsap.to(commCards, {opacity:1,y:0,duration:0.9,stagger:0.12,ease:EASE})
-    });
-  }
+  // Commercial cards (injected dynamically — observe after a tick)
+  setTimeout(() => {
+    const commCards = [...document.querySelectorAll('#comm-grid .comm-card')];
+    if (commCards.length) {
+      gsap.set(commCards, {opacity:0,y:16});
+      ScrollTrigger.create({ trigger:'#comm-grid', start:'top 84%', once:true,
+        onEnter:() => gsap.to(commCards, {opacity:1,y:0,duration:0.9,stagger:0.07,ease:EASE})
+      });
+    }
+  }, 100);
 
   // Showreel parallax (desktop)
   if (!isMob) {
