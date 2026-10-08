@@ -16,7 +16,7 @@
   --ink-dim:   rgba(255,255,255,0.40);
   --ink-mute:  rgba(255,255,255,0.16);
   --ink-ghost: rgba(255,255,255,0.05);
-  --accent:    #c46428; /* Ashfall default — JS overrides per world */
+  --accent:    #c46428;
 
   --f-display: 'Inter Tight', sans-serif;
   --f-body:    'Inter', sans-serif;
@@ -24,6 +24,8 @@
 
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-cin: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --transition-ms: 550ms;
 }
 
 /* ── RESET ──────────────────────────────────────────────── */
@@ -67,8 +69,7 @@ body {
 
 /* ═══════════════════════════════════════════════════════════ */
 /* SEQ1 PROXY — PROTOTYPE SCAFFOLD ONLY                       */
-/* In production: actual Sequence1 scroll experience lives    */
-/* here — this section does not exist as a real page element. */
+/* In production: actual Sequence1 scroll experience.         */
 /* ═══════════════════════════════════════════════════════════ */
 #seq1-proxy {
   position: relative;
@@ -105,19 +106,15 @@ body {
 .seq1-scaffold-label span {
   display: block;
   font-family: var(--f-mono);
-  font-size: 8px;
-  font-weight: 300;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
+  font-size: 8px; font-weight: 300;
+  letter-spacing: 0.28em; text-transform: uppercase;
   color: var(--ink-mute);
 }
 .seq1-scaffold-label strong {
   display: block;
   font-family: var(--f-mono);
-  font-size: 7px;
-  font-weight: 300;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
+  font-size: 7px; font-weight: 300;
+  letter-spacing: 0.22em; text-transform: uppercase;
   color: rgba(255,255,255,0.1);
   margin-top: 6px;
 }
@@ -156,28 +153,37 @@ body {
   transition: opacity 1s var(--ease-out);
 }
 
-/* ── CANVASES ────────────────────────────────────────────── */
-/* Two canvases stack: A is current world, B is incoming.    */
-/* CSS transition on B handles the GPU-composited crossfade. */
-#worlds-canvas-a,
-#worlds-canvas-b {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-  display: block;
-}
-#worlds-canvas-a { z-index: 1; }
-#worlds-canvas-b {
-  z-index: 2;
+/* ── POSTER IMAGES (replaces canvas) ────────────────────── */
+/*                                                            */
+/* Five <img> elements stack absolutely, one per world.       */
+/* Only the active world has opacity:1. CSS transitions       */
+/* handle the crossfade — GPU-composited, no JS animation.    */
+/* Rapid clicks work because CSS handles concurrent fades.    */
+/*                                                            */
+.world-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
   opacity: 0;
-  transform: scale(1.04);
-  /* Scale settles slightly longer than opacity for natural depth feel */
-  transition:
-    opacity 0.75s var(--ease-out),
-    transform 1.0s var(--ease-cin);
+  transition: opacity var(--transition-ms) var(--ease-out);
+  will-change: opacity;
+  z-index: 1;
+  /* block CLS flash; background shows --bg until img loads */
+  background: var(--bg);
 }
-#worlds-canvas-b.transitioning {
+.world-bg.active {
   opacity: 1;
-  transform: scale(1);
+}
+/* While loading: pulse the active slot so the screen is never silent */
+.world-bg.active.loading {
+  animation: poster-pulse 1.8s ease-in-out infinite;
+}
+@keyframes poster-pulse {
+  0%, 100% { opacity: 0.0; }
+  50%       { opacity: 0.08; }
 }
 
 /* ── OVERLAYS ────────────────────────────────────────────── */
@@ -203,45 +209,22 @@ body {
   80% { background-position:  32px -12px; }
 }
 
-/* ── LOADING OVERLAY ─────────────────────────────────────── */
-#worlds-loading {
-  position: absolute; inset: 0; z-index: 7;
-  background: var(--bg);
-  display: flex; align-items: center; justify-content: center;
-  transition: opacity 0.5s var(--ease-out);
-}
-#worlds-loading.hidden { opacity: 0; pointer-events: none; }
-.wl-track {
-  width: 100px; height: 1px; background: var(--ink-ghost); position: relative; overflow: hidden;
-}
-.wl-track::after {
-  content: '';
-  position: absolute; left: -100%; top: 0; width: 100%; height: 100%;
-  background: var(--accent);
-  animation: wl-scan 1.1s var(--ease-out) infinite;
-}
-@keyframes wl-scan { to { left: 100%; } }
-
 /* ── WORLD INFO ─────────────────────────────────────────── */
-/* Bottom-left: current world identity */
 #world-info {
   position: absolute;
   bottom: 88px; left: 44px;
   z-index: 10;
   pointer-events: none;
-  /* Transition defined here; switching/arriving override transform+opacity */
   transition: transform 0.48s var(--ease-out), opacity 0.48s var(--ease-out);
 }
-/* Slide down + fade on deactivate */
 #world-info.switching {
   transform: translateY(12px);
   opacity: 0;
 }
-/* Snap to above + invisible before new world's info arrives */
 #world-info.arriving {
   transform: translateY(-14px);
   opacity: 0;
-  transition: none; /* Snap immediately; normal transition handles settle */
+  transition: none;
 }
 
 .wi-frac {
@@ -263,7 +246,6 @@ body {
   margin-bottom: 10px;
   position: relative;
 }
-/* Left accent bar: 2px line, per-world color */
 .wi-name::before {
   content: '';
   position: absolute;
@@ -282,8 +264,6 @@ body {
 }
 
 /* ── WORLD INDEX ─────────────────────────────────────────── */
-/* Horizontal strip, bottom-right — environment dominates,   */
-/* index remains subordinate and quiet                        */
 #world-index {
   position: absolute;
   bottom: 28px; right: 36px;
@@ -295,21 +275,16 @@ body {
 
 .wi-btn {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 5px;
+  display: flex; flex-direction: column;
+  align-items: flex-start; gap: 5px;
   padding: 12px 13px 10px;
   cursor: pointer;
-  background: transparent;
-  border: none;
+  background: transparent; border: none;
   color: inherit;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
-  /* Each button transitions its content independently */
   transition: opacity 0.3s var(--ease-out);
 }
-/* Top accent line: thin, quiet when inactive */
 .wi-btn::before {
   content: '';
   position: absolute;
@@ -343,7 +318,7 @@ body {
 }
 .wi-btn.active .wi-btn-name { color: rgba(255,255,255,0.75); }
 
-/* Mobile: span full width */
+/* Mobile */
 @media (max-width: 768px) {
   #world-index {
     left: 0; right: 0; bottom: 0;
@@ -359,7 +334,6 @@ body {
 }
 
 /* ── PROGRESS BAR ────────────────────────────────────────── */
-/* Top edge: thin, shows ambient animation cycle position */
 #worlds-progress {
   position: absolute; top: 0; left: 0;
   height: 1px; z-index: 11;
@@ -370,18 +344,23 @@ body {
   pointer-events: none;
 }
 
-/* ── FRAME RATE BADGE (diagnostic) ──────────────────────── */
+/* ── DIAGNOSTIC PANEL ────────────────────────────────────── */
 #diag-panel {
   position: absolute;
-  bottom: 28px; left: 44px;
+  top: 16px; left: 16px;
   z-index: 12;
   font-family: var(--f-mono);
-  font-size: 8px; font-weight: 300; letter-spacing: 0.2em;
-  color: rgba(255,255,255,0.25);
+  font-size: 8px; font-weight: 300; letter-spacing: 0.18em;
+  color: rgba(255,255,255,0.55);
   pointer-events: none;
-  text-transform: uppercase;
-  line-height: 1.7;
-  display: none; /* visible via ?diag=1 */
+  text-transform: none;
+  line-height: 1.85;
+  display: none;
+  background: rgba(6,5,12,0.72);
+  padding: 10px 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+  max-width: 520px;
+  white-space: pre;
 }
 body.show-diag #diag-panel { display: block; }
 body.show-diag #world-info { bottom: 148px; }
@@ -415,12 +394,11 @@ body.show-diag #world-info { bottom: 148px; }
 
 <div id="c-dot"></div>
 <div id="c-ring"></div>
-<div id="proto-badge">worlds-test prototype</div>
+<div id="proto-badge">worlds-test · poster phase</div>
 
 <!-- ═══════════════════════════════════════════════════════════ -->
 <!-- PROTOTYPE SCAFFOLD — NOT IN PRODUCTION                     -->
-<!-- This section is REPLACED by actual Sequence1 on homepage.  -->
-<!-- Production flow: Sequence1 final frame → Selected Worlds.  -->
+<!-- Production flow: Sequence1 scroll → Selected Worlds.       -->
 <!-- ═══════════════════════════════════════════════════════════ -->
 <div id="seq1-proxy">
   <div class="seq1-bg"></div>
@@ -439,13 +417,20 @@ body.show-diag #world-info { bottom: 148px; }
 <!-- ═══════════════════════════════════════════════════════════ -->
 <section id="worlds-section" aria-label="Selected Worlds">
 
-  <canvas id="worlds-canvas-a"></canvas>
-  <canvas id="worlds-canvas-b"></canvas>
+  <!--
+    One <img> per world. All load immediately in parallel.
+    CSS opacity transition handles crossfade — no canvas, no JS animation.
+    The active world has class "active" (opacity:1). Others are opacity:0.
+    "loading" class is removed when the img fires onload.
+  -->
+  <img class="world-bg active loading" id="bg-0" alt="" draggable="false">
+  <img class="world-bg        loading" id="bg-1" alt="" draggable="false">
+  <img class="world-bg        loading" id="bg-2" alt="" draggable="false">
+  <img class="world-bg        loading" id="bg-3" alt="" draggable="false">
+  <img class="world-bg        loading" id="bg-4" alt="" draggable="false">
 
   <div id="worlds-vignette"></div>
   <div id="worlds-grain"></div>
-
-  <div id="worlds-loading"><div class="wl-track"></div></div>
 
   <!-- World identity — bottom-left -->
   <div id="world-info">
@@ -485,12 +470,7 @@ body.show-diag #world-info { bottom: 148px; }
   <div id="worlds-progress"></div>
 
   <!-- Diagnostic panel: visible via ?diag=1 -->
-  <div id="diag-panel">
-    <div id="d-fps">fps: —</div>
-    <div id="d-frames">frames: 0 / 0</div>
-    <div id="d-mem">decoded: 0</div>
-    <div id="d-worlds"></div>
-  </div>
+  <pre id="diag-panel"></pre>
 
 </section>
 
@@ -504,64 +484,44 @@ body.show-diag #world-info { bottom: 148px; }
 <!-- ═══════════════════════════════════════════════════════════ -->
 <!-- ENGINE                                                     -->
 <!-- ═══════════════════════════════════════════════════════════ -->
-<script type="module">
-
-// ──────────────────────────────────────────────────────────────
-// CONSTANTS
-// ──────────────────────────────────────────────────────────────
-const CDN = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev';
-
-// Memory: maximum decoded frames kept per world.
-// At 1920×1080 RGBA → ~8 MB per frame.
-// 40 frames × 8 MB = ~320 MB for the one active world.
-// Inactive worlds: zero decoded frames (only poster bitmap ~8 MB).
-// Total ceiling: active world frames (~320 MB) + 5 posters (~40 MB) ≈ 360 MB.
-const PREVIEW_CAP    = 40;
-
-// Ambient animation: 10fps.
-// Source is UE5 frames sampled every-4th of an ~30fps render ≈ 7.5fps native.
-// 10fps plays the strided preview sequence at ~1.3× speed — good for ambient.
-// 12fps felt rushed; 8fps felt sluggish. 10fps is the balance.
-const FRAME_INTERVAL = 100; // ms
-
-const TRANSITION_MS  = 750; // crossfade duration
-const BG_BATCH       = 6;   // concurrent frame fetches per round
-const BG_DELAY       = 55;  // ms between batches
+<script>
+'use strict';
 
 // ──────────────────────────────────────────────────────────────
 // WORLD DATA
 // ──────────────────────────────────────────────────────────────
+const CDN = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev';
+
+/*
+  posterCandidates: ordered list of frame filenames to try.
+  If the first URL returns a 404 / network error, the next is tried.
+
+  world-01 (sourceStart:1): UE5 render started at frame 1.
+  world-02 (sourceStart:0): UE5 render started at frame 0 → frame_0000.webp first.
+  world-03 (sourceStart:0): frame_0061.webp confirmed working in production.
+  world-04 (sourceStart:4): UE5 render started at frame 4 → frame_0004.webp first.
+  world-05 (sourceStart:0): UE5 render started at frame 0 → frame_0000.webp first.
+*/
 const WORLDS = [
   {
-    slug: 'world-01', name: 'Ashfall',
-    frameCount: 111, accent: '#c46428',
-    // world-01 is in worlds.config.js; not in production canvas WORLDS array.
-    // Session log states all 5 worlds uploaded to R2 on 19/05/2026.
-    // Poster probe result will be reported via diag panel + console.
-    posterFrame: 1,
+    slug: 'world-01', name: 'Ashfall',  accent: '#c46428',
+    posterCandidates: ['frame_0001.webp', 'frame_0002.webp', 'frame_0003.webp'],
   },
   {
-    slug: 'world-02', name: 'Luminara',
-    frameCount: 165, accent: '#7c5cc4',
-    posterFrame: 1, // confirmed: production WORLDS array
+    slug: 'world-02', name: 'Luminara', accent: '#7c5cc4',
+    posterCandidates: ['frame_0000.webp', 'frame_0001.webp', 'frame_0002.webp'],
   },
   {
-    slug: 'world-03', name: 'Verdant',
-    frameCount: 124, accent: '#3a8c52',
-    posterFrame: 61, // confirmed: frame_0061.webp in production <img> tag
+    slug: 'world-03', name: 'Verdant',  accent: '#3a8c52',
+    posterCandidates: ['frame_0061.webp', 'frame_0001.webp', 'frame_0000.webp'],
   },
   {
-    slug: 'world-04', name: 'Helios',
-    frameCount: 179, accent: '#2872c4',
-    // world-04 is in worlds.config.js; not in production canvas WORLDS array.
-    posterFrame: 1,
+    slug: 'world-04', name: 'Helios',   accent: '#2872c4',
+    posterCandidates: ['frame_0004.webp', 'frame_0005.webp', 'frame_0001.webp'],
   },
   {
-    slug: 'world-05', name: 'Aurum',
-    frameCount: 375, accent: '#c4a028',
-    // 375 frames — PREVIEW_CAP = 40 limits ambient preview.
-    // Strided loading samples every ~9th frame, covering the full sequence range.
-    posterFrame: 1, // confirmed: production WORLDS array
+    slug: 'world-05', name: 'Aurum',    accent: '#c4a028',
+    posterCandidates: ['frame_0000.webp', 'frame_0001.webp', 'frame_0002.webp'],
   },
 ];
 
@@ -569,449 +529,247 @@ const WORLDS = [
 // STATE
 // ──────────────────────────────────────────────────────────────
 let activeWorld = 0;
-let isTransition = false;
 
-const worldState = WORLDS.map(() => ({
-  poster:     null,   // HTMLImageElement
-  posterBmp:  null,   // ImageBitmap (decoded poster)
-  posterOK:   null,   // null=pending, true=loaded, false=error
-  frames:     [],     // ImageBitmap[] ambient preview frames (bounded by PREVIEW_CAP)
-  frameNums:  [],     // parallel: which frame numbers are loaded
-  animIdx:    0,
-  loadState:  'idle', // idle | loading | done | error
-  abortCtrl:  null,
+// Per-world load tracking for diagnostics
+const worldDiag = WORLDS.map((w, i) => ({
+  triedIdx:   0,         // which candidate index is currently being tried
+  triedUrl:   '',        // full URL requested
+  status:     'pending', // pending | loading | ok | error | all-failed
+  naturalW:   0,
+  naturalH:   0,
+  errorCount: 0,
 }));
 
-// Verification tracking for diag panel
-const worldVerify = WORLDS.map(() => ({ poster: null }));
-
-let lastTs     = 0;
-let frameTimer = 0;
-let animDirty  = true;
-
-// Parallax (desktop only)
-const PARALLAX_AMP_X = 8, PARALLAX_AMP_Y = 5;
-const PARALLAX_K     = 0.022;
-const PARALLAX_THR   = 0.04;
-let tPX = 0, tPY = 0, cPX = 0, cPY = 0, lPX = 0, lPY = 0;
-
-// DOM refs
-const canvasA    = document.getElementById('worlds-canvas-a');
-const canvasB    = document.getElementById('worlds-canvas-b');
-const ctxA       = canvasA.getContext('2d');
-const ctxB       = canvasB.getContext('2d');
+// ──────────────────────────────────────────────────────────────
+// DOM REFS
+// ──────────────────────────────────────────────────────────────
+const bgImgs     = WORLDS.map((_, i) => document.getElementById(`bg-${i}`));
 const worldInfo  = document.getElementById('world-info');
 const wiName     = document.getElementById('wi-name');
 const wiCur      = document.getElementById('wi-cur');
 const progBar    = document.getElementById('worlds-progress');
-const loadOverlay= document.getElementById('worlds-loading');
 const indexBtns  = [...document.querySelectorAll('.wi-btn')];
 const diagPanel  = document.getElementById('diag-panel');
+const section    = document.getElementById('worlds-section');
 
-let W = 0, H = 0;
-const DPR = Math.min(devicePixelRatio, 2);
-const isMob = matchMedia('(max-width:768px),(pointer:coarse)').matches;
 const showDiag = location.search.includes('diag=1');
 if (showDiag) document.body.classList.add('show-diag');
 
 // ──────────────────────────────────────────────────────────────
-// RESIZE
+// POSTER LOADING — one img per world, all start immediately
+//
+// Each img tries posterCandidates[0] first. On error it tries
+// the next candidate. This handles worlds where the first frame
+// number doesn't exist on R2 (e.g. world-04 starts at frame 4).
 // ──────────────────────────────────────────────────────────────
-function resize() {
-  W = window.innerWidth;
-  H = window.innerHeight;
-  const pw = W * DPR, ph = H * DPR;
-  for (const cv of [canvasA, canvasB]) {
-    cv.width  = pw; cv.height = ph;
-    cv.style.width  = W + 'px'; cv.style.height = H + 'px';
+function tryPoster(idx, candidateIdx) {
+  const w    = WORLDS[idx];
+  const img  = bgImgs[idx];
+  const diag = worldDiag[idx];
+
+  if (candidateIdx >= w.posterCandidates.length) {
+    diag.status = 'all-failed';
+    console.error(`[worlds] ${w.slug} ALL poster candidates failed`);
+    img.classList.remove('loading');
+    updateDiag();
+    return;
   }
-  animDirty = true;
-}
-window.addEventListener('resize', resize);
-resize();
 
-// ──────────────────────────────────────────────────────────────
-// DRAW — cover-fit image onto a canvas context with parallax
-// ──────────────────────────────────────────────────────────────
-function drawCover(ctx, img) {
-  if (!img) return;
-  const sw = img.width  || img.naturalWidth  || 0;
-  const sh = img.height || img.naturalHeight || 0;
-  if (!sw || !sh) return;
-
-  // 1.06 overscan gives parallax headroom without visible border
-  const overscan = isMob ? 1.0 : 1.06;
-  const scale    = Math.max((W * DPR) / sw, (H * DPR) / sh) * overscan;
-  const dw = sw * scale, dh = sh * scale;
-  const ox = isMob ? 0 : cPX * DPR;
-  const oy = isMob ? 0 : cPY * DPR;
-  const dx = ((W * DPR) - dw) / 2 + ox;
-  const dy = ((H * DPR) - dh) / 2 + oy;
-  ctx.drawImage(img, dx, dy, dw, dh);
-}
-
-// ──────────────────────────────────────────────────────────────
-// POSTER LOAD — one per world; light (1 frame); kept forever
-// ──────────────────────────────────────────────────────────────
-function loadPoster(idx) {
-  const w  = WORLDS[idx];
-  const st = worldState[idx];
-  if (st.posterOK !== null) return; // already attempted
-  st.posterOK = 'pending';
-
-  const img = new Image();
-  img.crossOrigin = 'anonymous';
-  const n = String(w.posterFrame).padStart(4, '0');
-  img.src = `${CDN}/${w.slug}/frame_${n}.webp`;
+  const filename = w.posterCandidates[candidateIdx];
+  const url      = `${CDN}/${w.slug}/${filename}`;
+  diag.triedIdx  = candidateIdx;
+  diag.triedUrl  = url;
+  diag.status    = 'loading';
+  console.log(`[worlds] ${w.slug} trying poster [${candidateIdx}]: ${url}`);
+  updateDiag();
 
   img.onload = () => {
-    st.poster   = img;
-    st.posterOK = true;
-    worldVerify[idx].poster = 'OK';
-    console.log(`[worlds] ${w.slug} poster OK — frame_${n}.webp`);
-    createImageBitmap(img).then(bmp => { st.posterBmp = bmp; animDirty = true; }).catch(() => {});
-    if (idx === activeWorld) {
-      loadOverlay.classList.add('hidden');
-      animDirty = true;
-    }
+    diag.status   = 'ok';
+    diag.naturalW = img.naturalWidth;
+    diag.naturalH = img.naturalHeight;
+    img.classList.remove('loading');
+    console.log(`[worlds] ${w.slug} poster OK: ${filename}  ${img.naturalWidth}×${img.naturalHeight}`);
     updateDiag();
   };
+
   img.onerror = () => {
-    st.posterOK = false;
-    worldVerify[idx].poster = `ERROR — ${CDN}/${w.slug}/frame_${n}.webp`;
-    console.warn(`[worlds] ${w.slug} poster FAILED — frame_${n}.webp — check R2`);
-    if (idx === activeWorld) loadOverlay.classList.add('hidden');
-    updateDiag();
+    diag.errorCount++;
+    console.warn(`[worlds] ${w.slug} poster FAILED [${candidateIdx}]: ${url}`);
+    // Try next candidate
+    tryPoster(idx, candidateIdx + 1);
   };
+
+  img.src = url;
 }
 
-// Active world poster immediately; others stagger after ~1s
-loadPoster(0);
-setTimeout(() => { for (let i = 1; i < WORLDS.length; i++) loadPoster(i); }, 1100);
+// Start all 5 poster loads immediately, in parallel
+WORLDS.forEach((_, i) => tryPoster(i, 0));
 
 // ──────────────────────────────────────────────────────────────
-// EVICT WORLD — release decoded frames; keep poster
-// Called when a world becomes inactive after a transition.
-// ──────────────────────────────────────────────────────────────
-function evictWorld(idx) {
-  const st = worldState[idx];
-  // Cancel any in-progress load
-  if (st.abortCtrl) {
-    st.abortCtrl.abort();
-    st.abortCtrl = null;
-  }
-  // Close and release all decoded ImageBitmap objects
-  for (const bmp of st.frames) {
-    if (bmp && typeof bmp.close === 'function') bmp.close();
-  }
-  st.frames    = [];
-  st.frameNums = [];
-  st.animIdx   = 0;
-  // Reset to idle: world can be re-loaded on next activation
-  // HTTP cache retains downloaded data, so re-fetch is fast
-  if (st.loadState !== 'done') st.loadState = 'idle';
-  // Keep: st.poster, st.posterBmp, st.posterOK
-}
-
-// ──────────────────────────────────────────────────────────────
-// FRAME SEQUENCE LOAD — strided, bounded by PREVIEW_CAP
-// Stride = floor(frameCount / PREVIEW_CAP), so frames sample
-// evenly across the entire sequence range (not just the first N).
-// ──────────────────────────────────────────────────────────────
-async function loadWorldFrames(idx) {
-  const st = worldState[idx];
-  if (st.loadState === 'loading' || st.loadState === 'done') return;
-  st.loadState = 'loading';
-
-  const ctrl = new AbortController();
-  st.abortCtrl = ctrl;
-  const w = WORLDS[idx];
-
-  // Build strided frame list covering full sequence range
-  const stride = Math.max(1, Math.floor(w.frameCount / PREVIEW_CAP));
-  const frameNums = [];
-  for (let i = 1; i <= w.frameCount && frameNums.length < PREVIEW_CAP; i += stride) {
-    frameNums.push(i);
-  }
-
-  let firstReveal = false;
-
-  for (let i = 0; i < frameNums.length; i += BG_BATCH) {
-    if (ctrl.signal.aborted) return;
-
-    const batch = frameNums.slice(i, i + BG_BATCH);
-    await Promise.all(batch.map(async (num) => {
-      if (ctrl.signal.aborted) return;
-      try {
-        const n   = String(num).padStart(4, '0');
-        const res = await fetch(`${CDN}/${w.slug}/frame_${n}.webp`, {
-          signal: ctrl.signal,
-          cache:  'force-cache',
-        });
-        if (!res.ok) return;
-        const bmp = await createImageBitmap(await res.blob());
-        // Keep frames ordered by frame number
-        const pos = st.frameNums.findIndex(x => x > num);
-        if (pos === -1) { st.frameNums.push(num); st.frames.push(bmp); }
-        else            { st.frameNums.splice(pos, 0, num); st.frames.splice(pos, 0, bmp); }
-        if (idx === activeWorld) animDirty = true;
-      } catch (e) { /* silently skip; AbortError or missing frame */ }
-    }));
-
-    // Hide loading overlay after first batch completes
-    if (!firstReveal && st.frames.length >= Math.min(BG_BATCH, frameNums.length)) {
-      firstReveal = true;
-      if (idx === activeWorld) loadOverlay.classList.add('hidden');
-    }
-
-    if (i + BG_BATCH < frameNums.length && !ctrl.signal.aborted) {
-      await new Promise(r => setTimeout(r, BG_DELAY));
-    }
-  }
-
-  if (!ctrl.signal.aborted) { st.loadState = 'done'; updateDiag(); }
-}
-
-// ──────────────────────────────────────────────────────────────
-// CURRENT VISUAL — best available for a world index
-// ──────────────────────────────────────────────────────────────
-function getBestVisual(idx) {
-  const st = worldState[idx];
-  if (st.frames.length > 0) return st.frames[st.animIdx % st.frames.length];
-  return st.posterBmp || st.poster;
-}
-
-// ──────────────────────────────────────────────────────────────
-// DRAW ACTIVE WORLD → canvas A
-// ──────────────────────────────────────────────────────────────
-function drawActiveWorld() {
-  ctxA.clearRect(0, 0, canvasA.width, canvasA.height);
-  drawCover(ctxA, getBestVisual(activeWorld));
-}
-
-// ──────────────────────────────────────────────────────────────
-// SET ACCENT COLOR — CSS custom property + progress bar + accent bar
+// ACCENT COLOR
 // ──────────────────────────────────────────────────────────────
 function setAccent(idx) {
-  const a = WORLDS[idx].accent;
-  document.documentElement.style.setProperty('--accent', a);
-  progBar.style.background = a;
+  document.documentElement.style.setProperty('--accent', WORLDS[idx].accent);
+  progBar.style.background = WORLDS[idx].accent;
 }
 
 // ──────────────────────────────────────────────────────────────
-// WORLD SWITCH — coordinated crossfade
-// Phase 0 (0ms):        Index updates, old info slides down
-// Phase 1 (0–750ms):    Canvas-B fades in + scale(1.04→1.0)
-// Phase 2 (~400ms):     Info text swaps; arrives from above
-// Phase 3 (800ms):      Canvas-A inherits, B resets, old world evicted
+// WORLD SWITCH — CSS crossfade only
+//
+// Rapid clicks: safe. We just move the 'active' class.
+// CSS handles concurrent opacity transitions gracefully.
+// No lock, no canvas, no ImageBitmap required.
 // ──────────────────────────────────────────────────────────────
 function switchWorld(idx) {
-  if (idx === activeWorld || isTransition) return;
-  const prev = activeWorld;
-  isTransition = true;
+  if (idx === activeWorld) return;
 
+  const prev = activeWorld;
+  activeWorld = idx;
   const w = WORLDS[idx];
 
-  // Phase 0: draw incoming world on canvas-B; start fade-out of info
-  ctxB.clearRect(0, 0, canvasB.width, canvasB.height);
-  drawCover(ctxB, getBestVisual(idx));
-  worldInfo.classList.add('switching');
-
-  // Phase 0: index state and accent update immediately (crisp)
-  indexBtns.forEach((el, i) => {
-    el.classList.toggle('active', i === idx);
-    el.style.opacity = i === idx ? '1' : '0.4';
-  });
+  // 1. Update accent immediately
   setAccent(idx);
 
-  // Phase 1 (next paint): trigger canvas-B CSS transition
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    canvasB.classList.add('transitioning');
-  }));
+  // 2. Update index buttons immediately
+  indexBtns.forEach((el, i) => {
+    el.classList.toggle('active', i === idx);
+  });
 
-  // Phase 2 (~55% of transition): swap info text with arrive-from-above animation
+  // 3. Crossfade: deactivate prev, activate next
+  bgImgs[prev].classList.remove('active');
+  bgImgs[idx].classList.add('active');
+
+  // 4. Info text: slide down, swap, arrive from above
+  worldInfo.classList.add('switching');
   setTimeout(() => {
     wiName.textContent = w.name;
     wiCur.textContent  = String(idx + 1).padStart(2, '0');
-    // Snap to above-and-hidden, then let normal transition settle it
     worldInfo.classList.remove('switching');
     worldInfo.classList.add('arriving');
     requestAnimationFrame(() => requestAnimationFrame(() => {
       worldInfo.classList.remove('arriving');
     }));
-  }, Math.round(TRANSITION_MS * 0.55));
+  }, 260); // ~47% of 550ms transition
 
-  // Phase 3: complete — swap canvases, evict old world, start new load
-  setTimeout(() => {
-    ctxA.clearRect(0, 0, canvasA.width, canvasA.height);
-    ctxA.drawImage(canvasB, 0, 0);
-    canvasB.classList.remove('transitioning');
-    ctxB.clearRect(0, 0, canvasB.width, canvasB.height);
-
-    // Evict previous world: close all decoded ImageBitmaps
-    evictWorld(prev);
-
-    activeWorld  = idx;
-    isTransition = false;
-    animDirty    = true;
-
-    // Begin loading new active world's frame sequence
-    loadWorldFrames(idx);
-    updateDiag();
-  }, TRANSITION_MS + 60);
-}
-
-// ──────────────────────────────────────────────────────────────
-// CURSOR
-// ──────────────────────────────────────────────────────────────
-const cDot  = document.getElementById('c-dot');
-const cRing = document.getElementById('c-ring');
-let mX = 0, mY = 0, rX = 0, rY = 0;
-if (!isMob) {
-  document.addEventListener('mousemove', e => {
-    mX = e.clientX; mY = e.clientY;
-    cDot.style.left = mX + 'px'; cDot.style.top = mY + 'px';
-    tPX = ((mX / W) - 0.5) * PARALLAX_AMP_X;
-    tPY = ((mY / H) - 0.5) * PARALLAX_AMP_Y;
-  });
-  document.addEventListener('mouseleave', () => { tPX = 0; tPY = 0; });
-  indexBtns.forEach(el => {
-    el.addEventListener('mouseenter', () => cRing.classList.add('expand'));
-    el.addEventListener('mouseleave', () => cRing.classList.remove('expand'));
-  });
-}
-
-// ──────────────────────────────────────────────────────────────
-// ANIMATION LOOP — unified RAF tick
-// ──────────────────────────────────────────────────────────────
-let fpsTime = 0, fpsCnt = 0, fpsDisplay = 0;
-
-function tick(ts) {
-  requestAnimationFrame(tick);
-  const dt = Math.min(ts - lastTs, 80);
-  lastTs = ts;
-
-  // 1. Cursor ring lerp
-  if (!isMob) {
-    rX += (mX - rX) * 0.13; rY += (mY - rY) * 0.13;
-    cRing.style.left = rX + 'px'; cRing.style.top = rY + 'px';
-  }
-
-  // 2. Parallax lerp — threshold-gated to prevent micro-jitter
-  if (!isMob) {
-    cPX += (tPX - cPX) * PARALLAX_K;
-    cPY += (tPY - cPY) * PARALLAX_K;
-    if (Math.abs(cPX - lPX) > PARALLAX_THR || Math.abs(cPY - lPY) > PARALLAX_THR) {
-      lPX = cPX; lPY = cPY;
-      animDirty = true;
-    }
-  }
-
-  // 3. Ambient frame advance — only when not transitioning
-  const st = worldState[activeWorld];
-  if (st.frames.length > 1 && !isTransition) {
-    frameTimer += dt;
-    if (frameTimer >= FRAME_INTERVAL) {
-      frameTimer %= FRAME_INTERVAL;
-      st.animIdx = (st.animIdx + 1) % st.frames.length;
-      animDirty = true;
-    }
-  }
-
-  // 4. Redraw only when something changed
-  if (animDirty && !isTransition) {
-    drawActiveWorld();
-    animDirty = false;
-  }
-
-  // 5. Progress bar: position in animation loop
-  if (!isTransition && st.frames.length > 1) {
-    const pct = ((st.animIdx + 1) / st.frames.length) * 100;
-    progBar.style.width = pct + '%';
-  }
-
-  // 6. FPS counter (diag only)
-  if (showDiag) {
-    fpsCnt++;
-    if (ts - fpsTime >= 1000) {
-      fpsDisplay = fpsCnt; fpsCnt = 0; fpsTime = ts;
-      updateDiag();
-    }
-  }
-}
-
-requestAnimationFrame(tick);
-
-// ──────────────────────────────────────────────────────────────
-// DIAGNOSTIC UPDATE
-// ──────────────────────────────────────────────────────────────
-function updateDiag() {
-  if (!showDiag) return;
-  const st    = worldState[activeWorld];
-  const total = WORLDS.reduce((s, _, i) => s + worldState[i].frames.length, 0);
-
-  document.getElementById('d-fps').textContent = `fps: ${fpsDisplay}`;
-  document.getElementById('d-frames').textContent =
-    `frames: ${st.frames.length} / ${PREVIEW_CAP}  stride: ${Math.max(1,Math.floor(WORLDS[activeWorld].frameCount/PREVIEW_CAP))}`;
-  document.getElementById('d-mem').textContent =
-    `decoded total: ${total}  (~${Math.round(total * 8)}MB)`;
-
-  const lines = WORLDS.map((w, i) => {
-    const s   = worldState[i];
-    const p   = s.posterOK === true ? '✓' : s.posterOK === false ? '✗' : '…';
-    const f   = s.frames.length;
-    const act = i === activeWorld ? '▶' : ' ';
-    return `${act} ${w.slug}  poster:${p}  frames:${f}`;
-  });
-  document.getElementById('d-worlds').textContent = lines.join('\n');
+  updateDiag();
 }
 
 // ──────────────────────────────────────────────────────────────
 // INDEX INTERACTIONS
 // ──────────────────────────────────────────────────────────────
 indexBtns.forEach((el, i) => {
-  el.style.opacity = i === 0 ? '1' : '0.4';
   el.addEventListener('click', () => switchWorld(i));
 });
 
-// Mobile swipe on index bar
+// Mobile swipe
 let touchX0 = 0;
 document.getElementById('world-index').addEventListener('touchstart', e => {
   touchX0 = e.touches[0].clientX;
 }, { passive: true });
 document.getElementById('world-index').addEventListener('touchend', e => {
   const dx = e.changedTouches[0].clientX - touchX0;
-  if (Math.abs(dx) < 36) return; // not a swipe
+  if (Math.abs(dx) < 36) return;
   const dir  = dx < 0 ? 1 : -1;
   const next = Math.max(0, Math.min(WORLDS.length - 1, activeWorld + dir));
   switchWorld(next);
 }, { passive: true });
 
 // ──────────────────────────────────────────────────────────────
-// WORLDS SECTION REVEAL
+// SECTION REVEAL — IntersectionObserver
 // ──────────────────────────────────────────────────────────────
-const section = document.getElementById('worlds-section');
 new IntersectionObserver(entries => {
   entries.forEach(e => {
     if (e.isIntersecting && !section.classList.contains('is-revealed')) {
       section.classList.add('is-revealed');
-      // Trigger info "arrive from above" on initial reveal
+      // Info arrive-from-above on reveal
       setTimeout(() => {
         worldInfo.classList.add('arriving');
         requestAnimationFrame(() => requestAnimationFrame(() => {
           worldInfo.classList.remove('arriving');
         }));
       }, 280);
-      // Begin loading active world
-      loadWorldFrames(activeWorld);
     }
   });
 }, { threshold: 0.12 }).observe(section);
 
 // ──────────────────────────────────────────────────────────────
+// CURSOR — minimal RAF tick (cursor ring lerp only)
+// ──────────────────────────────────────────────────────────────
+const cDot  = document.getElementById('c-dot');
+const cRing = document.getElementById('c-ring');
+const isMob = matchMedia('(hover:none),(pointer:coarse)').matches;
+let mX = 0, mY = 0, rX = 0, rY = 0;
+
+if (!isMob) {
+  document.addEventListener('mousemove', e => {
+    mX = e.clientX; mY = e.clientY;
+    cDot.style.left = mX + 'px'; cDot.style.top = mY + 'px';
+  });
+  indexBtns.forEach(el => {
+    el.addEventListener('mouseenter', () => cRing.classList.add('expand'));
+    el.addEventListener('mouseleave', () => cRing.classList.remove('expand'));
+  });
+
+  (function tick() {
+    requestAnimationFrame(tick);
+    rX += (mX - rX) * 0.13;
+    rY += (mY - rY) * 0.13;
+    cRing.style.left = rX + 'px';
+    cRing.style.top  = rY + 'px';
+  })();
+}
+
+// ──────────────────────────────────────────────────────────────
 // INITIAL STATE
 // ──────────────────────────────────────────────────────────────
 setAccent(0);
+
+// ──────────────────────────────────────────────────────────────
+// DIAGNOSTIC UPDATE
+// ──────────────────────────────────────────────────────────────
+function updateDiag() {
+  if (!showDiag) return;
+
+  const lines = [
+    `worlds-test — poster phase (no animation)`,
+    `active world: ${activeWorld} — ${WORLDS[activeWorld].name}`,
+    ``,
+    `WORLD  SLUG       STATUS       URL TRIED`,
+  ];
+
+  WORLDS.forEach((w, i) => {
+    const d   = worldDiag[i];
+    const act = i === activeWorld ? '▶' : ' ';
+    const st  = d.status.padEnd(11);
+    const res = d.status === 'ok'
+      ? `${w.posterCandidates[d.triedIdx]}  ${d.naturalW}×${d.naturalH}`
+      : d.status === 'all-failed'
+        ? 'ALL CANDIDATES FAILED'
+        : d.triedUrl
+          ? `${w.posterCandidates[d.triedIdx]}  (trying…)`
+          : '—';
+    lines.push(`${act} ${String(i+1).padStart(2,'0')}   ${w.slug}   ${st}  ${res}`);
+    if (d.errorCount > 0 && d.status !== 'ok' && d.status !== 'all-failed') {
+      const tried = w.posterCandidates.slice(0, d.triedIdx).join(', ');
+      if (tried) lines.push(`         failed: ${tried}`);
+    }
+  });
+
+  lines.push(``);
+  lines.push(`img.src set immediately for all 5 worlds (no setTimeout delay)`);
+  lines.push(`transition: CSS opacity ${getComputedStyle(document.documentElement)
+    .getPropertyValue('--transition-ms').trim()} — no canvas, no ImageBitmap`);
+
+  diagPanel.textContent = lines.join('\n');
+}
+
+updateDiag();
+// Refresh diag every 1.5s while posters are still loading
+const diagInterval = setInterval(() => {
+  updateDiag();
+  const allDone = worldDiag.every(d => d.status === 'ok' || d.status === 'all-failed');
+  if (allDone) clearInterval(diagInterval);
+}, 1500);
 
 </script>
 </body>
