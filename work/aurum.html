@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aurum — Jatin Shinde</title>
+<meta name="description" content="Aurum — cinematic environment built in Unreal Engine 5. World 05 of 5.">
+<meta name="theme-color" content="#06050c">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,200;0,300;0,400;0,500;1,200;1,300&family=Inter:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#06050c;--bg-1:#0b0a14;--bg-2:#100f1c;--ink:rgba(255,255,255,0.92);--ink-dim:rgba(255,255,255,0.45);--ink-mute:rgba(255,255,255,0.20);--ink-ghost:rgba(255,255,255,0.06);--accent:#c4a028;--f-display:'Inter Tight',sans-serif;--f-body:'Inter',sans-serif;--f-mono:'DM Mono',monospace}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);min-height:100vh}
+a{color:inherit;text-decoration:none}
+img,video{display:block;width:100%;height:100%;object-fit:cover}
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:24px 48px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(to bottom,rgba(6,5,12,0.9) 0%,transparent 100%)}
+.nav-logo{font-family:var(--f-display);font-weight:300;font-size:1rem;letter-spacing:0.04em}
+.nav-links{display:flex;gap:32px;font-family:var(--f-mono);font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--ink-dim)}
+.nav-links a:hover{color:var(--ink)}
+@media(max-width:768px){.nav{padding:20px 24px}.nav-links{display:none}}
+.hero{position:relative;height:100vh;overflow:hidden}
+.hero-img{position:absolute;inset:0}
+.hero-img img{width:100%;height:100%;object-fit:cover}
+.hero-vignette{position:absolute;inset:0;background:linear-gradient(to top,rgba(6,5,12,0.9) 0%,transparent 50%)}
+.hero-content{position:absolute;bottom:0;left:0;right:0;padding:60px 48px}
+.world-label{font-family:var(--f-mono);font-size:0.72rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.hero h1{font-family:var(--f-display);font-weight:200;font-size:clamp(3rem,8vw,7rem);letter-spacing:-0.03em;line-height:1}
+.hero-sub{margin-top:16px;font-size:1rem;color:var(--ink-dim);max-width:480px}
+@media(max-width:768px){.hero-content{padding:40px 24px}}
+.body-section{padding:80px 48px;max-width:900px;margin:0 auto}
+.body-section+.body-section{padding-top:0}
+.overline{font-family:var(--f-mono);font-size:0.7rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:20px}
+.body-section h2{font-family:var(--f-display);font-weight:300;font-size:clamp(1.6rem,3vw,2.4rem);letter-spacing:-0.02em;margin-bottom:16px}
+.body-section p{font-size:1rem;line-height:1.75;color:var(--ink-dim);max-width:600px}
+.body-section p+p{margin-top:14px}
+.specs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:24px;margin-top:40px}
+.spec-item{border-top:1px solid var(--ink-ghost);padding-top:16px}
+.spec-label{font-family:var(--f-mono);font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:8px}
+.spec-val{font-family:var(--f-display);font-weight:300;font-size:1.1rem;color:var(--ink)}
+.frames-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin:40px 0}
+.frame-cell{aspect-ratio:16/9;overflow:hidden;background:var(--bg-1)}
+.frame-cell img{width:100%;height:100%;object-fit:cover;transition:transform 0.6s cubic-bezier(0.23,1,0.32,1)}
+.frame-cell:hover img{transform:scale(1.04)}
+@media(max-width:768px){.frames-grid{grid-template-columns:1fr}.body-section{padding:60px 24px}}
+.nav-worlds{padding:80px 48px;border-top:1px solid var(--ink-ghost);display:flex;align-items:center;justify-content:space-between}
+.nw-btn{font-family:var(--f-mono);font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--ink-dim);display:flex;align-items:center;gap:8px}
+.nw-btn:hover{color:var(--ink)}
+@media(max-width:768px){.nav-worlds{padding:60px 24px;flex-direction:column;gap:20px;text-align:center}}
+footer{padding:40px 48px;border-top:1px solid var(--ink-ghost);display:flex;align-items:center;justify-content:space-between}
+footer span{font-family:var(--f-mono);font-size:0.7rem;letter-spacing:0.15em;color:var(--ink-mute)}
+@media(max-width:768px){footer{padding:32px 24px;flex-direction:column;gap:12px;text-align:center}}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="/v4" class="nav-logo">Jatin Shinde</a>
+  <div class="nav-links">
+    <a href="/v4">Home</a>
+    <a href="/archive">Archive</a>
+    <a href="mailto:jatinshinde118@gmail.com">Contact</a>
+  </div>
+</nav>
+<section class="hero">
+  <div class="hero-img">
+    <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-05/frame_0000.webp" alt="Aurum">
+  </div>
+  <div class="hero-vignette"></div>
+  <div class="hero-content">
+    <div class="world-label">World 05 — Environment</div>
+    <h1>Aurum</h1>
+    <p class="hero-sub">Forged in golden light — ancient architecture suspended in amber dusk. The final world. Built in Unreal Engine 5.</p>
+  </div>
+</section>
+<section class="body-section">
+  <div class="overline">Overview</div>
+  <h2>Environment Design</h2>
+  <p>Aurum is the closing world — warm, weighted, and final. Golden-hour light falls across stone and metal, creating an environment that feels earned rather than discovered.</p>
+  <p>1,000+ frames rendered in Unreal Engine 5 at 1920×1080. The camera move is slower and more deliberate than the preceding worlds — the visitor has arrived.</p>
+</section>
+<section class="body-section">
+  <div class="overline">Selected Frames</div>
+  <div class="frames-grid">
+    <div class="frame-cell"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-05/frame_0000.webp" alt="Aurum frame 0" loading="lazy"></div>
+    <div class="frame-cell"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-05/frame_0010.webp" alt="Aurum frame 10" loading="lazy"></div>
+    <div class="frame-cell"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-05/frame_0020.webp" alt="Aurum frame 20" loading="lazy"></div>
+    <div class="frame-cell"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-05/frame_0030.webp" alt="Aurum frame 30" loading="lazy"></div>
+    <div class="frame-cell"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-05/frame_0040.webp" alt="Aurum frame 40" loading="lazy"></div>
+    <div class="frame-cell"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-05/frame_0050.webp" alt="Aurum frame 50" loading="lazy"></div>
+  </div>
+</section>
+<section class="body-section">
+  <div class="overline">Production</div>
+  <div class="specs-grid">
+    <div class="spec-item"><div class="spec-label">Engine</div><div class="spec-val">Unreal Engine 5</div></div>
+    <div class="spec-item"><div class="spec-label">Resolution</div><div class="spec-val">1920 × 1080</div></div>
+    <div class="spec-item"><div class="spec-label">Format</div><div class="spec-val">WebP sequence</div></div>
+    <div class="spec-item"><div class="spec-label">Frames rendered</div><div class="spec-val">1,000+</div></div>
+    <div class="spec-item"><div class="spec-label">Lighting</div><div class="spec-val">Lumen GI</div></div>
+    <div class="spec-item"><div class="spec-label">World</div><div class="spec-val">05 of 05</div></div>
+  </div>
+</section>
+<div class="nav-worlds">
+  <a href="/work/helios" class="nw-btn">← Helios</a>
+  <a href="/v4" class="nw-btn">Back to Portfolio →</a>
+</div>
+<footer>
+  <span>© 2026 Jatin Shinde</span>
+  <span>CGI &amp; VFX Artist</span>
+</footer>
+</body>
+</html>

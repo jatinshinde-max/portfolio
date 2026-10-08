@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Archive — Jatin Shinde</title>
+<meta name="description" content="Full archive of CGI, environments, commercial and character work by Jatin Shinde.">
+<meta name="theme-color" content="#06050c">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,200;0,300;0,400;0,500;1,200;1,300&family=Inter:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #06050c;
+  --bg-1:      #0b0a14;
+  --bg-2:      #100f1c;
+  --ink:       rgba(255,255,255,0.92);
+  --ink-dim:   rgba(255,255,255,0.45);
+  --ink-mute:  rgba(255,255,255,0.20);
+  --ink-ghost: rgba(255,255,255,0.06);
+  --accent:    #e8d5b0;
+  --f-display: 'Inter Tight', sans-serif;
+  --f-body:    'Inter', sans-serif;
+  --f-mono:    'DM Mono', monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);min-height:100vh}
+a{color:inherit;text-decoration:none}
+img,video{display:block;width:100%;height:100%;object-fit:cover}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:24px 48px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(to bottom,rgba(6,5,12,0.9) 0%,transparent 100%)}
+.nav-logo{font-family:var(--f-display);font-weight:300;font-size:1rem;letter-spacing:0.04em}
+.nav-links{display:flex;gap:32px;font-family:var(--f-mono);font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--ink-dim)}
+.nav-links a:hover{color:var(--ink)}
+@media(max-width:768px){.nav{padding:20px 24px}.nav-links{gap:20px;font-size:0.65rem}}
+
+/* HEADER */
+.archive-header{padding:160px 48px 80px;border-bottom:1px solid var(--ink-ghost)}
+.archive-header h1{font-family:var(--f-display);font-weight:200;font-size:clamp(2.5rem,6vw,5rem);letter-spacing:-0.03em;line-height:1.05;margin-bottom:16px}
+.archive-header p{font-family:var(--f-body);font-size:1rem;color:var(--ink-dim);max-width:480px}
+@media(max-width:768px){.archive-header{padding:120px 24px 60px}}
+
+/* FILTERS */
+.filters{padding:32px 48px;display:flex;gap:8px;flex-wrap:wrap;border-bottom:1px solid var(--ink-ghost);position:sticky;top:0;z-index:50;background:var(--bg)}
+.filter-btn{font-family:var(--f-mono);font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;padding:8px 18px;border:1px solid var(--ink-mute);background:transparent;color:var(--ink-dim);cursor:pointer;border-radius:2px;transition:all 0.2s}
+.filter-btn:hover{color:var(--ink);border-color:var(--ink-dim)}
+.filter-btn.active{background:var(--ink-ghost);color:var(--ink);border-color:var(--ink)}
+@media(max-width:768px){.filters{padding:20px 24px;gap:6px}}
+
+/* GRID */
+.archive-grid{padding:48px;display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.archive-cell{position:relative;aspect-ratio:16/9;overflow:hidden;cursor:pointer;background:var(--bg-1)}
+.archive-cell:hover .cell-overlay{opacity:1}
+.archive-cell:hover .cell-media{transform:scale(1.04)}
+.archive-cell .cell-media{width:100%;height:100%;object-fit:cover;transition:transform 0.6s cubic-bezier(0.23,1,0.32,1)}
+.cell-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(6,5,12,0.85) 0%,transparent 60%);opacity:0;transition:opacity 0.3s;display:flex;flex-direction:column;justify-content:flex-end;padding:20px}
+.cell-title{font-family:var(--f-display);font-weight:300;font-size:0.95rem;margin-bottom:4px}
+.cell-cat{font-family:var(--f-mono);font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--ink-dim)}
+/* portrait cards (ads) */
+.archive-cell[data-orient="portrait"]{aspect-ratio:9/16}
+@media(max-width:1024px){.archive-grid{grid-template-columns:repeat(2,1fr);padding:32px}}
+@media(max-width:600px){.archive-grid{grid-template-columns:1fr;padding:16px}}
+
+/* SECTION LABEL */
+.section-label{padding:40px 48px 16px;font-family:var(--f-mono);font-size:0.7rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--ink-mute)}
+@media(max-width:768px){.section-label{padding:32px 24px 12px}}
+
+/* EMPTY */
+.empty-state{grid-column:1/-1;padding:80px 0;text-align:center;color:var(--ink-mute);font-family:var(--f-mono);font-size:0.8rem;letter-spacing:0.15em}
+
+/* FOOTER */
+footer{padding:40px 48px;border-top:1px solid var(--ink-ghost);display:flex;align-items:center;justify-content:space-between;margin-top:80px}
+footer span{font-family:var(--f-mono);font-size:0.7rem;letter-spacing:0.15em;color:var(--ink-mute)}
+@media(max-width:768px){footer{padding:32px 24px;flex-direction:column;gap:12px;text-align:center}}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/v4" class="nav-logo">Jatin Shinde</a>
+  <div class="nav-links">
+    <a href="/v4">Home</a>
+    <a href="/archive" style="color:var(--ink)">Archive</a>
+    <a href="mailto:jatinshinde118@gmail.com">Contact</a>
+  </div>
+</nav>
+
+<header class="archive-header">
+  <h1>Full Archive</h1>
+  <p>Environments, commercial CGI, concept & motion, transformations, characters.</p>
+</header>
+
+<div class="filters">
+  <button class="filter-btn active" data-cat="all">All</button>
+  <button class="filter-btn" data-cat="environments">Environments</button>
+  <button class="filter-btn" data-cat="commercial">Commercial CGI</button>
+  <button class="filter-btn" data-cat="concept">Concept &amp; Motion</button>
+  <button class="filter-btn" data-cat="transforms">Transformations</button>
+  <button class="filter-btn" data-cat="characters">Characters</button>
+</div>
+
+<main id="archive-main"></main>
+
+<footer>
+  <span>© 2026 Jatin Shinde</span>
+  <span>CGI &amp; VFX Artist</span>
+</footer>
+
+<script type="module">
+const R2 = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev';
+
+const ITEMS = [
+  // Environments — world posters
+  { id:'w01', cat:'environments', title:'Ashfall',   type:'img',   src:`${R2}/world-01/frame_0001.webp`, link:'/work/ashfall' },
+  { id:'w02', cat:'environments', title:'Luminara',  type:'img',   src:`${R2}/world-02/frame_0000.webp`, link:'/work/luminara' },
+  { id:'w03', cat:'environments', title:'Verdant',   type:'img',   src:`${R2}/world-03/frame_0061.webp`, link:'/work/verdant' },
+  { id:'w04', cat:'environments', title:'Helios',    type:'img',   src:`${R2}/world-04/frame_0004.webp`, link:'/work/helios' },
+  { id:'w05', cat:'environments', title:'Aurum',     type:'img',   src:`${R2}/world-05/frame_0000.webp`, link:'/work/aurum' },
+  // Renders — gallery
+  { id:'r01', cat:'environments', title:'Render 01', type:'img',   src:`${R2}/gallery/renders/01.webp` },
+  { id:'r02', cat:'environments', title:'Render 02', type:'img',   src:`${R2}/gallery/renders/02.webp` },
+  { id:'r03', cat:'environments', title:'Render 03', type:'img',   src:`${R2}/gallery/renders/03.webp` },
+  { id:'r04', cat:'environments', title:'Render 04', type:'img',   src:`${R2}/gallery/renders/04.webp` },
+  { id:'r05', cat:'environments', title:'Render 05', type:'img',   src:`${R2}/gallery/renders/05.webp` },
+  { id:'r06', cat:'environments', title:'Render 06', type:'img',   src:`${R2}/gallery/renders/06.webp` },
+  { id:'r07', cat:'environments', title:'Render 07', type:'img',   src:`${R2}/gallery/renders/07.webp` },
+  { id:'r08', cat:'environments', title:'Render 08', type:'img',   src:`${R2}/gallery/renders/08.webp` },
+  { id:'r09', cat:'environments', title:'Render 09', type:'img',   src:`${R2}/gallery/renders/09.webp` },
+  { id:'r10', cat:'environments', title:'Render 10', type:'img',   src:`${R2}/gallery/renders/10.webp` },
+  { id:'r11', cat:'environments', title:'Render 11', type:'img',   src:`${R2}/gallery/renders/11.webp` },
+  { id:'r12', cat:'environments', title:'Render 12', type:'img',   src:`${R2}/gallery/renders/12.webp` },
+  { id:'r13', cat:'environments', title:'Render 13', type:'img',   src:`${R2}/gallery/renders/13.webp` },
+  { id:'r14', cat:'environments', title:'Render 14', type:'img',   src:`${R2}/gallery/renders/14.webp` },
+  // Commercial CGI
+  { id:'c01', cat:'commercial', title:'Car Commercial',   type:'video', src:`${R2}/gallery/ads/car-commercial.mp4`,  orient:'portrait' },
+  { id:'c02', cat:'commercial', title:'Pepsi',            type:'video', src:`${R2}/gallery/ads/pepsi.mp4`,           orient:'portrait' },
+  { id:'c03', cat:'commercial', title:'Smart Watch',      type:'video', src:`${R2}/gallery/ads/smart-watch.mp4`,     orient:'portrait' },
+  // Concept & Motion
+  { id:'h01', cat:'concept', title:'Concept H01', type:'video', src:`${R2}/gallery/concept%20art/H1.mp4` },
+  { id:'h02', cat:'concept', title:'Concept H02', type:'video', src:`${R2}/gallery/concept%20art/H2.mp4` },
+  { id:'h03', cat:'concept', title:'Concept H03', type:'video', src:`${R2}/gallery/concept%20art/H3.mp4` },
+  { id:'h04', cat:'concept', title:'Concept H04', type:'video', src:`${R2}/gallery/concept%20art/H4.mp4` },
+  { id:'h05', cat:'concept', title:'Concept H05', type:'video', src:`${R2}/gallery/concept%20art/H5.mp4` },
+  { id:'h06', cat:'concept', title:'Concept H06', type:'video', src:`${R2}/gallery/concept%20art/H6.mp4` },
+  { id:'h07', cat:'concept', title:'Concept H07', type:'video', src:`${R2}/gallery/concept%20art/H7.mp4` },
+  { id:'h08', cat:'concept', title:'Concept H08', type:'video', src:`${R2}/gallery/concept%20art/H8.mp4` },
+  { id:'v01', cat:'concept', title:'Concept V01', type:'video', src:`${R2}/gallery/concept%20art/V1.mp4`, orient:'portrait' },
+  { id:'v02', cat:'concept', title:'Concept V02', type:'video', src:`${R2}/gallery/concept%20art/V2.mp4`, orient:'portrait' },
+  { id:'v03', cat:'concept', title:'Concept V03', type:'video', src:`${R2}/gallery/concept%20art/V3.mp4`, orient:'portrait' },
+  { id:'v04', cat:'concept', title:'Concept V04', type:'video', src:`${R2}/gallery/concept%20art/V4.mp4`, orient:'portrait' },
+  // Characters
+  { id:'ch01', cat:'characters', title:'Character Reel', type:'video', src:`${R2}/showreel/character-reel.mp4` },
+];
+
+const CAT_LABELS = {
+  all:'All Work', environments:'Environments', commercial:'Commercial CGI',
+  concept:'Concept & Motion', transforms:'Transformations', characters:'Characters'
+};
+
+const main = document.getElementById('archive-main');
+let activeCat = 'all';
+
+function renderGrid(cat) {
+  const items = cat === 'all' ? ITEMS : ITEMS.filter(i => i.cat === cat);
+  main.innerHTML = '';
+
+  if (!items.length) {
+    const label = document.createElement('div');
+    label.className = 'section-label';
+    label.textContent = CAT_LABELS[cat] || cat;
+    main.appendChild(label);
+    const grid = document.createElement('div');
+    grid.className = 'archive-grid';
+    grid.innerHTML = '<div class="empty-state">Assets in preparation — uploading shortly</div>';
+    main.appendChild(grid);
+    return;
+  }
+
+  // Group by category when showing all
+  const groups = cat === 'all'
+    ? Object.keys(CAT_LABELS).filter(k => k !== 'all')
+    : [cat];
+
+  for (const g of groups) {
+    const groupItems = cat === 'all' ? items.filter(i => i.cat === g) : items;
+    if (!groupItems.length) continue;
+    const label = document.createElement('div');
+    label.className = 'section-label';
+    label.textContent = CAT_LABELS[g] || g;
+    main.appendChild(label);
+
+    const grid = document.createElement('div');
+    grid.className = 'archive-grid';
+
+    for (const item of groupItems) {
+      const cell = document.createElement('div');
+      cell.className = 'archive-cell';
+      if (item.orient === 'portrait') cell.dataset.orient = 'portrait';
+
+      let mediaEl;
+      if (item.type === 'video') {
+        mediaEl = document.createElement('video');
+        mediaEl.className = 'cell-media';
+        mediaEl.src = item.src;
+        mediaEl.muted = true;
+        mediaEl.loop = true;
+        mediaEl.playsInline = true;
+        mediaEl.preload = 'metadata';
+        cell.addEventListener('mouseenter', () => mediaEl.play());
+        cell.addEventListener('mouseleave', () => { mediaEl.pause(); mediaEl.currentTime = 0; });
+      } else {
+        mediaEl = document.createElement('img');
+        mediaEl.className = 'cell-media';
+        mediaEl.src = item.src;
+        mediaEl.alt = item.title;
+        mediaEl.loading = 'lazy';
+      }
+
+      const overlay = document.createElement('div');
+      overlay.className = 'cell-overlay';
+      overlay.innerHTML = `<div class="cell-title">${item.title}</div><div class="cell-cat">${CAT_LABELS[item.cat] || item.cat}</div>`;
+
+      cell.appendChild(mediaEl);
+      cell.appendChild(overlay);
+
+      if (item.link) {
+        cell.style.cursor = 'pointer';
+        cell.addEventListener('click', () => { window.location.href = item.link; });
+      }
+
+      grid.appendChild(cell);
+    }
+
+    main.appendChild(grid);
+    if (cat !== 'all') break;
+  }
+}
+
+// Filter buttons
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeCat = btn.dataset.cat;
+    renderGrid(activeCat);
+  });
+});
+
+renderGrid('all');
+</script>
+</body>
+</html>

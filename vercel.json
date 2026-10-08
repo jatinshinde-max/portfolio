@@ -1,11 +1,18 @@
 {
   "rewrites": [
-    { "source": "/test-mp4",    "destination": "/test-mp4.html" },
-    { "source": "/test-seq",    "destination": "/test-seq.html" },
-    { "source": "/type-a",      "destination": "/type-a.html" },
-    { "source": "/type-b",      "destination": "/type-b.html" },
-    { "source": "/type-c",      "destination": "/type-c.html" },
-    { "source": "/worlds-test", "destination": "/worlds-test.html" }
+    { "source": "/test-mp4",       "destination": "/test-mp4.html" },
+    { "source": "/test-seq",       "destination": "/test-seq.html" },
+    { "source": "/type-a",         "destination": "/type-a.html" },
+    { "source": "/type-b",         "destination": "/type-b.html" },
+    { "source": "/type-c",         "destination": "/type-c.html" },
+    { "source": "/worlds-test",    "destination": "/worlds-test.html" },
+    { "source": "/v4",             "destination": "/v4.html" },
+    { "source": "/archive",        "destination": "/archive.html" },
+    { "source": "/work/ashfall",   "destination": "/work/ashfall.html" },
+    { "source": "/work/luminara",  "destination": "/work/luminara.html" },
+    { "source": "/work/verdant",   "destination": "/work/verdant.html" },
+    { "source": "/work/helios",    "destination": "/work/helios.html" },
+    { "source": "/work/aurum",     "destination": "/work/aurum.html" }
   ],
   "headers": [
     {
