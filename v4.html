@@ -542,6 +542,42 @@ body {
 .c-btn.secondary { border-color:rgba(255,255,255,0.18); color:var(--ink-dim); }
 .c-btn.secondary:hover { background:rgba(255,255,255,0.08); color:var(--ink); }
 
+/* V8 editorial art direction — compact, deliberate, and image-led */
+.accent-dot{color:var(--accent)}
+.sw-section{background:#0b0b0d;padding:clamp(64px,9vw,128px) clamp(20px,6vw,96px) clamp(28px,4vw,56px)}
+.sw-editorial{display:grid;grid-template-columns:minmax(260px,.82fr) minmax(0,1.18fr);gap:clamp(24px,5vw,90px);align-items:center}
+.sw-editorial-intro{padding:25px 0}
+.sw-editorial .sw-title{padding:0;margin:28px 0 24px;font-size:clamp(3.1rem,6.8vw,7.4rem);line-height:.94;letter-spacing:-.06em;font-weight:300}
+.sw-editorial-intro p{font-size:clamp(.95rem,1.2vw,1.1rem);line-height:1.75;max-width:35ch;color:var(--ink-dim);margin-bottom:35px}
+.sw-editorial-link{display:inline-flex;gap:32px;border-bottom:1px solid rgba(255,255,255,.35);padding:0 0 12px;color:white;text-decoration:none;font-size:12px;letter-spacing:.04em}
+.sw-editorial-feature{position:relative;min-height:440px;height:min(68vh,720px);overflow:hidden;background:#161618}
+.sw-editorial-feature img{height:100%;width:100%;object-fit:cover;transition:transform 1s ease}
+.sw-editorial-feature:hover img{transform:scale(1.035)}
+.sw-editorial-feature .sw-hero-label{background:rgba(0,0,0,.48);padding:10px 14px;color:white}
+.sw-editorial-strip{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;margin-left:28%}
+.sw-editorial-strip figure{position:relative;margin:0;aspect-ratio:16/9;overflow:hidden;background:#19191c}
+.sw-editorial-strip img{width:100%;height:100%;object-fit:cover;display:block}
+.sw-editorial-strip figcaption{position:absolute;bottom:12px;left:14px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;text-shadow:0 1px 10px black}
+.mdl-section{margin-top:clamp(45px,7vw,100px)}
+.mdl-head{display:flex;justify-content:space-between;align-items:end;gap:30px;margin-bottom:26px}
+.mdl-head h3{font-family:var(--f-display);font-weight:300;font-size:clamp(2.6rem,5.5vw,6rem);line-height:1;letter-spacing:-.05em;margin:14px 0 0}
+.mdl-head p{color:var(--ink-dim);font-size:14px;line-height:1.6;max-width:30ch}
+.mdl-viewer{aspect-ratio:21/10;background:radial-gradient(ellipse at 50% 45%,#29282e,#101014 68%);border:1px solid rgba(255,255,255,.09);border-radius:3px}
+.mdl-btn{font-size:11px;letter-spacing:.07em;padding:12px 22px;background:rgba(9,9,12,.82);border-radius:2px}
+.mdl-section-eyebrow{font-size:10px;letter-spacing:.24em}
+.cap-section{padding:clamp(70px,10vw,145px) clamp(24px,7vw,110px);background:#111115}
+.cap-intro h2{font-family:var(--f-display);font-size:clamp(3.1rem,7vw,8.5rem);font-weight:300;letter-spacing:-.065em;line-height:.97;margin:24px 0 clamp(45px,6vw,95px)}
+.cap-intro h2 em,.c-headline em{font-weight:300;font-style:italic;color:#a8a2ae}
+.cap-new-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(35px,9vw,150px);border-top:1px solid rgba(255,255,255,.18);padding-top:34px}
+.cap-mini-label{font-family:var(--f-mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#aaa3b2;display:block;margin-bottom:25px}
+.cap-new-bio p{font-size:clamp(1.05rem,1.6vw,1.45rem);line-height:1.6;max-width:42ch;margin:0 0 20px;color:#d1ced6}
+.cap-new-bio p+p{font-size:15px;color:var(--ink-dim)}
+.cap-new-skills>div{padding:16px 0;border-bottom:1px solid rgba(255,255,255,.13);font-size:clamp(14px,1.4vw,19px);display:flex;gap:25px}
+.cap-new-skills>div span{font-size:10px;color:#a8a2ae;padding-top:5px}
+.cap-new-tools{color:var(--ink-mute);font-size:12px;line-height:1.7;margin-top:26px}
+.contact-section{padding:clamp(75px,10vw,130px) 24px}
+.c-headline{font-size:clamp(3.5rem,8vw,9rem);letter-spacing:-.06em}
+@media(max-width:800px){.sw-editorial{grid-template-columns:1fr}.sw-editorial-feature{height:55vh;min-height:320px}.sw-editorial-strip{margin-left:0;gap:8px}.mdl-head{display:block}.mdl-head p{margin-top:16px}.mdl-viewer{aspect-ratio:4/5}.cap-new-grid{grid-template-columns:1fr}.cap-intro h2{font-size:clamp(2.8rem,9vw,5rem)}}
 /* ─── FOOTER ──────────────────────────────────────────── */
 footer {
   padding:28px clamp(28px,7vw,100px);
@@ -652,23 +688,24 @@ footer {
 <!-- ══════════════════════════════════════════════════════════ -->
 <div id="content">
 
-  <!-- SELECTED WORK -->
-  <section class="sw-section" id="selected-work">
-    <div class="sw-header">
-      <span class="sw-label">Selected Work</span>
-      <span class="sw-count">—01</span>
+  <!-- CURATED WORK — single concise editorial presentation -->
+  <section class="sw-section" id="selected-work" aria-label="Selected renders">
+    <div class="sw-editorial">
+      <div class="sw-editorial-intro reveal">
+        <span class="sw-label">A closer look / 01</span>
+        <h2 class="sw-title">The detail<br>makes it real<span class="accent-dot">.</span></h2>
+        <p>Materials. Light. Atmosphere. A small selection of finished CGI frames — the rest lives in the archive.</p>
+        <a class="sw-editorial-link" href="/archive#renders">Explore the render archive <span aria-hidden="true">↗</span></a>
+      </div>
+      <div class="sw-editorial-feature reveal">
+        <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/09.webp" loading="lazy" alt="Selected CGI render 09">
+        <span class="sw-hero-label">Selected render / 09</span>
+      </div>
     </div>
-    <h2 class="sw-title reveal">Render &amp; Reality.</h2>
-    <div class="sw-hero reveal">
-      <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/09.webp" loading="lazy" alt="CGI render">
-      <span class="sw-hero-label">Look Development · Final Output</span>
+    <div class="sw-editorial-strip">
+      <figure><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/03.webp" loading="lazy" alt="CGI render 03"><figcaption>Frame 03</figcaption></figure>
+      <figure><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/07.webp" loading="lazy" alt="CGI render 07"><figcaption>Frame 07</figcaption></figure>
     </div>
-    <div class="sw-trio">
-      <div class="sw-trio-item"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/01.webp" loading="lazy" alt="Render 01"><span class="sw-trio-label">R-01</span></div>
-      <div class="sw-trio-item"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/05.webp" loading="lazy" alt="Render 05"><span class="sw-trio-label">R-05</span></div>
-      <div class="sw-trio-item"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/13.webp" loading="lazy" alt="Render 13"><span class="sw-trio-label">R-13</span></div>
-    </div>
-    <div class="sw-footer"><a href="/archive#transforms">View all 13 renders →</a></div>
   </section>
 
   <!-- COMMERCIAL CGI -->
@@ -682,34 +719,6 @@ footer {
     </div>
     <div class="comm-grid" id="comm-grid"></div>
   </section>
-
-  <!-- SELECTED RENDERS -->
-  <section class="ld-section" id="look-development">
-    <div class="ld-header">
-      <div>
-        <span class="s-eyebrow reveal">Selected Renders</span>
-        <h2 class="ld-title reveal reveal-delay-1">CGI &amp;<br>Photoreal.</h2>
-      </div>
-      <span class="ld-archive-count reveal">13 renders in archive</span>
-    </div>
-    <!-- 6 curated renders in an asymmetric mosaic — all 13 accessible in Archive -->
-    <div class="ld-mosaic">
-      <div class="ld-cell span-tall" data-caption="R-01 · Environment Render"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/01.webp" loading="lazy" alt="Environment Render — R-01"></div>
-      <div class="ld-cell short" data-caption="R-03 · Environment Render"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/03.webp" loading="lazy" alt="Environment Render — R-03"></div>
-      <div class="ld-cell short" data-caption="R-05 · Environment Render"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/05.webp" loading="lazy" alt="Environment Render — R-05"></div>
-      <div class="ld-cell wide" data-caption="R-07 · Environment Render"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/07.webp" loading="lazy" alt="Environment Render — R-07"></div>
-      <div class="ld-cell short" data-caption="R-09 · Environment Render"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/09.webp" loading="lazy" alt="Environment Render — R-09"></div>
-      <div class="ld-cell short" data-caption="R-11 · Environment Render"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/11.webp" loading="lazy" alt="Environment Render — R-11"></div>
-    </div>
-    <div class="ld-footer"><a href="/archive#renders">View all 13 renders in archive →</a></div>
-  </section>
-
-  <!-- Render lightbox -->
-  <div id="render-lb" role="dialog" aria-modal="true" aria-label="Render preview">
-    <button id="render-lb-close" aria-label="Close">&times;</button>
-    <img id="render-lb-img" src="" alt="">
-    <span id="render-lb-label"></span>
-  </div>
 
   <!-- CHARACTER & MOTION -->
   <section class="char-section" id="showreel">
@@ -737,7 +746,7 @@ footer {
 
     <!-- 3D MODEL VIEWER -->
     <div class="mdl-section reveal">
-      <span class="mdl-section-eyebrow">Interactive 3D — Drag to Rotate</span>
+      <div class="mdl-head"><div><span class="mdl-section-eyebrow">Character study / 01</span><h3>Meet the character<span class="accent-dot">.</span></h3></div><p>Explore the model in real time. Rotate it, then switch between the available poses.</p></div>
       <div class="mdl-viewer" id="model-viewer" aria-label="Interactive 3D character model">
         <canvas id="mdl-canvas"></canvas>
         <div class="mdl-controls">
@@ -755,45 +764,20 @@ footer {
     </div>
   </section>
 
-  <!-- CAPABILITIES & ABOUT -->
+  <!-- CAPABILITIES & ABOUT — condensed editorial closing -->
   <section class="cap-section" id="about">
-    <div class="cap-grid">
-      <div>
-        <div class="cap-left-head">
-          <span class="s-eyebrow reveal">Capabilities</span>
-          <h2 class="s-title reveal reveal-delay-1">Full-Stack<br>3D Pipeline.</h2>
-        </div>
-        <div class="cap-disciplines reveal reveal-delay-2">
-          <div class="cap-disc">Cinematic Environment Design</div>
-          <div class="cap-disc">3D Modelling &amp; Texturing</div>
-          <div class="cap-disc">Lighting, Rendering &amp; Look Development</div>
-          <div class="cap-disc">Character Creation</div>
-          <div class="cap-disc">CGI Advertising</div>
-          <div class="cap-disc">VFX &amp; Compositing</div>
-          <div class="cap-disc">Motion Design &amp; Post-Production</div>
-        </div>
-      </div>
-      <div>
-        <div class="cap-about-head">
-          <span class="a-eyebrow reveal">About</span>
-          <h2 class="a-headline reveal reveal-delay-1">7+ Years of<br>Creative Production.</h2>
-        </div>
-        <p class="cap-bio reveal reveal-delay-2">Seven years of hands-on creative production — cinematic environments, character work, product CGI, and VFX. Comfortable across the full 3D pipeline, from early concept through to final render and delivery.</p>
-        <p class="cap-bio reveal reveal-delay-3">Based in India. Available for international projects, studio collaborations, and relocation. Strong interest in game studios, VFX houses, and creative technology teams worldwide.</p>
-        <div class="cap-tools-line reveal">
-          <strong>3D / Real-Time —</strong> Unreal Engine 5 · Blender · Substance 3D Painter · Character Creator 4 · Marvelous Designer<br>
-          <strong>Motion / Post —</strong> After Effects · DaVinci Resolve · Premiere Pro · Audition<br>
-          <strong>Design —</strong> Photoshop · Illustrator · Lightroom · Corel Draw
-        </div>
-      </div>
+    <div class="cap-intro reveal"><span class="s-eyebrow">The person behind the pixels</span><h2>Artist first.<br><em>Problem solver</em> always<span class="accent-dot">.</span></h2></div>
+    <div class="cap-new-grid">
+      <div class="cap-new-bio reveal"><span class="cap-mini-label">About / Jatin Shinde</span><p>I create cinematic environments, character work, and product CGI — connecting design, 3D production, motion and final delivery.</p><p>6+ years of hands-on creative production. Based in India and open to studio roles, international collaborations and relocation.</p></div>
+      <div class="cap-new-skills reveal"><span class="cap-mini-label">What I bring</span><div><span>01</span>Environment art &amp; worldbuilding</div><div><span>02</span>Lighting, materials &amp; look development</div><div><span>03</span>Character &amp; product CGI</div><div><span>04</span>VFX, motion &amp; post-production</div><p class="cap-new-tools">Unreal Engine · Blender · Substance 3D · After Effects · DaVinci Resolve</p></div>
     </div>
   </section>
 
   <!-- CONTACT -->
   <section class="contact-section" id="contact">
     <span class="c-eyebrow reveal">Contact</span>
-    <h2 class="c-headline reveal reveal-delay-1">Ready to<br>Collaborate.</h2>
-    <p class="c-body reveal reveal-delay-2">Cinematic environments, product CGI, and character work. Available for international projects, studio partnerships, and relocation.</p>
+    <h2 class="c-headline reveal reveal-delay-1">Have something<br><em>ambitious</em> in mind?</h2>
+    <p class="c-body reveal reveal-delay-2">I’m available for creative collaborations and studio opportunities worldwide. Let’s make something worth remembering.</p>
     <div class="c-btns">
       <a href="mailto:jatinshinde118@gmail.com" class="c-btn reveal reveal-delay-2">Send Email →</a>
       <a href="https://www.linkedin.com/in/jatin-shinde-202b671a9" class="c-btn secondary reveal reveal-delay-3" target="_blank" rel="noopener">LinkedIn →</a>
@@ -1030,7 +1014,7 @@ async function startWorldAnim(wi) {
     currentVideoWorld = wi;
   }
   try {
-    await worldVideo.play();
+    worldVideo.playbackRate = 0.65; // original 24fps sequences are too brief at real-time speed\n    await worldVideo.play();
     if (requestId !== worldRequestId || !worldsVisible || wi !== activeWorld) {
       worldVideo.pause();
       return;
