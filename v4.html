@@ -542,6 +542,12 @@ body {
 .c-btn.secondary { border-color:rgba(255,255,255,0.18); color:var(--ink-dim); }
 .c-btn.secondary:hover { background:rgba(255,255,255,0.08); color:var(--ink); }
 
+/* Non-negotiable portrait/reels presentation: nine original 9:16 films */
+.commercial-section .comm-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(8px,1.4vw,22px)}
+.commercial-section .comm-card,.commercial-section .comm-card:first-child,.commercial-section .comm-card:nth-child(4){grid-row:auto;grid-column:auto;aspect-ratio:9/16;min-height:0;width:100%;height:auto}
+.commercial-section .comm-card video{width:100%;height:100%;object-fit:cover}
+@media(max-width:700px){.commercial-section .comm-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:440px){.commercial-section .comm-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}}
 /* Curated film gallery — no nine-tile catalog on the homepage */
 .commercial-section{padding:clamp(70px,9vw,135px) clamp(20px,6vw,96px);background:#09090b}
 .comm-header{display:grid;grid-template-columns:1.2fr .8fr;align-items:end;gap:60px;margin-bottom:48px}
@@ -730,7 +736,7 @@ footer {
         <span class="comm-eyebrow">Commercial CGI</span>
         <div class="comm-title">Made to<br><em>move you.</em></div>
       </div>
-      <div class="comm-intro"><p>Commercial CGI is where precision meets impact. A curated selection of product films — click to play.</p><a href="/archive#commercial">Explore all commercial work ↗</a></div>
+      <div class="comm-intro"><p>Nine vertical CGI films. Hover to preview; click to pause or resume.</p><a href="/archive#commercial">Explore all commercial work ↗</a></div>
     </div>
     <div class="comm-grid" id="comm-grid"></div>
   </section>
@@ -941,7 +947,7 @@ class FramePlayer {
     this.playing  = false;
     this.frameIdx = 0;
     this.lastTs   = 0;
-    this.interval = 1000 / PLAYER_FPS;
+    this.interval = 1500; // fallback is a slow storyboard, never a rapid eight-frame loop
     this.raf      = null;
     this._loading = false;
     const manifest = FRAME_MANIFESTS[worldIdx];
@@ -1036,7 +1042,7 @@ async function startWorldAnim(wi) {
     currentVideoWorld = wi;
   }
   try {
-    worldVideo.playbackRate = 0.4; // 24fps source: cinematic slow playback, approx 11–39 seconds per loop
+    worldVideo.playbackRate = 0.2; // deliberate slow playback; 5x original sequence duration
     await worldVideo.play();
     if (requestId !== worldRequestId || !worldsVisible || wi !== activeWorld) {
       worldVideo.pause();
@@ -1125,9 +1131,14 @@ const VM = {
 // ── COMMERCIAL GRID — click to play ─────────────────────
 const ADS = [
   { src:'gallery/ads/car-commercial.mp4', title:'Automotive', meta:'CGI / Motion' },
-  { src:'gallery/ads/facewash.mp4', title:'Skincare', meta:'Product / CGI' },
-  { src:'gallery/ads/smart-watch.mp4', title:'Timepiece', meta:'Product / CGI' },
+  { src:'gallery/ads/car-commercial-2.mp4', title:'Automotive II', meta:'CGI / Motion' },
+  { src:'gallery/ads/chocolate-bar.mp4', title:'Chocolate', meta:'Product / CGI' },
+  { src:'gallery/ads/earbuds.mp4', title:'Earbuds', meta:'Product / CGI' },
+  { src:'gallery/ads/facewash.mp4', title:'Facewash', meta:'Product / CGI' },
+  { src:'gallery/ads/pepsi.mp4', title:'Pepsi', meta:'Advertising / CGI' },
+  { src:'gallery/ads/serum.mp4', title:'Serum', meta:'Product / CGI' },
   { src:'gallery/ads/shoe.mp4', title:'Footwear', meta:'Product / CGI' },
+  { src:'gallery/ads/smart-watch.mp4', title:'Smart Watch', meta:'Product / CGI' },
 ];
 const commGrid = document.getElementById('comm-grid');
 if (commGrid) {
@@ -1143,6 +1154,8 @@ if (commGrid) {
     const info = document.createElement('div'); info.className='comm-card-info';
     info.innerHTML=`<div class="comm-card-meta">${ad.meta}</div><div class="comm-card-title">${ad.title}</div>`;
     card.appendChild(info);
+    card.addEventListener('mouseenter', () => { if (matchMedia('(hover:hover)').matches) VM.play(card, vid); });
+    card.addEventListener('mouseleave', () => { if (matchMedia('(hover:hover)').matches && VM.current?.vid === vid) VM.stop(); });
     card.addEventListener('click', () => VM.toggle(card, vid));
     commGrid.appendChild(card);
   });
