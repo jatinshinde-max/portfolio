@@ -445,7 +445,7 @@ body {
   .ld-cell.wide       { grid-column:span 1; aspect-ratio:4/3; }
 }
 /* Render lightbox */
-#render-lb { display:none; position:fixed; inset:0; z-index:900; background:rgba(6,5,12,0.96); align-items:center; justify-content:center; }
+#render-lb { display:none; position:fixed; inset:0; z-index:9600; background:rgba(6,5,12,0.96); align-items:center; justify-content:center; }
 #render-lb.open { display:flex; }
 #render-lb-img { max-width:92vw; max-height:88vh; object-fit:contain; display:block; }
 #render-lb-close { position:absolute; top:24px; right:32px; background:none; border:none; color:rgba(232,230,240,0.5); font-size:22px; cursor:pointer; font-family:var(--f-mono); letter-spacing:0.1em; padding:8px; line-height:1; transition:color 0.2s; }
@@ -573,7 +573,7 @@ footer {
   <a href="#worlds-section">Worlds</a>
   <a href="#ads">Commercial</a>
   <a href="#showreel">Character</a>
-  <a href="#gallery">Archive</a>
+  <a href="/archive">Archive</a>
   <a href="#about">About</a>
   <a href="#contact">Contact</a>
 </div>
@@ -588,7 +588,7 @@ footer {
     <a href="#worlds-section">Worlds</a>
     <a href="#ads">Commercial</a>
     <a href="#showreel">Character</a>
-    <a href="#gallery">Archive</a>
+    <a href="#look-development">Renders</a>
     <a href="/archive">Full Archive</a>
     <a href="#contact">Contact</a>
   </nav>
@@ -694,12 +694,12 @@ footer {
     </div>
     <!-- 6 curated renders in an asymmetric mosaic — all 13 accessible in Archive -->
     <div class="ld-mosaic">
-      <div class="ld-cell span-tall"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/01.webp" loading="lazy" alt="Render 01"></div>
-      <div class="ld-cell short"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/03.webp" loading="lazy" alt="Render 03"></div>
-      <div class="ld-cell short"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/05.webp" loading="lazy" alt="Render 05"></div>
-      <div class="ld-cell wide"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/07.webp" loading="lazy" alt="Render 07"></div>
-      <div class="ld-cell short"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/09.webp" loading="lazy" alt="Render 09"></div>
-      <div class="ld-cell short"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/11.webp" loading="lazy" alt="Render 11"></div>
+      <div class="ld-cell span-tall" data-caption="R-01 · Environment Render"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/01.webp" loading="lazy" alt="Environment Render — R-01"></div>
+      <div class="ld-cell short" data-caption="R-03 · Environment Render"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/03.webp" loading="lazy" alt="Environment Render — R-03"></div>
+      <div class="ld-cell short" data-caption="R-05 · Environment Render"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/05.webp" loading="lazy" alt="Environment Render — R-05"></div>
+      <div class="ld-cell wide" data-caption="R-07 · Environment Render"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/07.webp" loading="lazy" alt="Environment Render — R-07"></div>
+      <div class="ld-cell short" data-caption="R-09 · Environment Render"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/09.webp" loading="lazy" alt="Environment Render — R-09"></div>
+      <div class="ld-cell short" data-caption="R-11 · Environment Render"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/11.webp" loading="lazy" alt="Environment Render — R-11"></div>
     </div>
     <div class="ld-footer"><a href="/archive#renders">View all 13 renders in archive →</a></div>
   </section>
@@ -1185,7 +1185,7 @@ async function initModelViewer() {
     import('three/addons/controls/OrbitControls.js'),
     import('three/addons/loaders/GLTFLoader.js'),
   ]);
-  const { WebGLRenderer, Scene, PerspectiveCamera, AmbientLight, DirectionalLight,
+  const { WebGLRenderer, Scene, PerspectiveCamera, DirectionalLight,
           HemisphereLight, AnimationMixer, Box3, Vector3, Sphere, Clock } = THREE_NS;
 
   const canvas    = document.getElementById('mdl-canvas');
@@ -1253,11 +1253,8 @@ async function initModelViewer() {
     const scaleFactor = TARGET_HEIGHT / height;
     obj.scale.setScalar(scaleFactor);
 
-    // Recompute after scaling
+    // Recompute after scaling, ground the model so feet sit at y=0
     box.setFromObject(obj);
-    const center2 = box.getCenter(new Vector3());
-    const size2   = box.getSize(new Vector3());
-    // Ground the model: shift so feet sit at y=0
     obj.position.y -= box.min.y;
     box.setFromObject(obj);
     const finalCenter = box.getCenter(new Vector3());
@@ -1274,13 +1271,25 @@ async function initModelViewer() {
     controls.update();
   }
 
+  function disposeObject(obj) {
+    obj.traverse(child => {
+      if (child.geometry) child.geometry.dispose();
+      if (child.material) {
+        const mats = Array.isArray(child.material) ? child.material : [child.material];
+        mats.forEach(m => {
+          Object.values(m).forEach(v => { if (v && v.isTexture) v.dispose(); });
+          m.dispose();
+        });
+      }
+    });
+  }
+
   async function loadModel(modelKey) {
     if (loadFill)  loadFill.style.width = '0%';
     if (loadingEl) loadingEl.classList.remove('done');
 
-    // Stop and dispose previous mixer
     if (mixer) { mixer.stopAllAction(); mixer = null; }
-    if (currentObj) { scene.remove(currentObj); currentObj = null; }
+    if (currentObj) { scene.remove(currentObj); disposeObject(currentObj); currentObj = null; }
 
     const gltf = await new Promise((res, rej) => {
       loader.load(MODELS[modelKey], res, p => {
@@ -1321,8 +1330,13 @@ async function initModelViewer() {
     camera.updateProjectionMatrix();
   }).observe(canvas.parentElement);
 
+  let viewerVisible = true;
+  new IntersectionObserver(([e]) => { viewerVisible = e.isIntersecting; }, { rootMargin:'100px' })
+    .observe(canvas.parentElement);
+
   (function renderLoop() {
     requestAnimationFrame(renderLoop);
+    if (!viewerVisible) return;
     const dt = clock.getDelta();
     if (mixer) mixer.update(dt);
     controls.update();
@@ -1564,7 +1578,7 @@ if (typeof gsap!=='undefined' && typeof ScrollTrigger!=='undefined') {
     cell.addEventListener('click', () => {
       const img = cell.querySelector('img');
       if (!img) return;
-      openRenderLb(img.src, img.alt);
+      openRenderLb(img.src, cell.dataset.caption || img.alt);
     });
   });
 
