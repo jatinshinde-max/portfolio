@@ -444,6 +444,14 @@ body {
   .ld-mosaic { grid-template-columns:1fr; }
   .ld-cell.wide       { grid-column:span 1; aspect-ratio:4/3; }
 }
+/* Render lightbox */
+#render-lb { display:none; position:fixed; inset:0; z-index:900; background:rgba(6,5,12,0.96); align-items:center; justify-content:center; }
+#render-lb.open { display:flex; }
+#render-lb-img { max-width:92vw; max-height:88vh; object-fit:contain; display:block; }
+#render-lb-close { position:absolute; top:24px; right:32px; background:none; border:none; color:rgba(232,230,240,0.5); font-size:22px; cursor:pointer; font-family:var(--f-mono); letter-spacing:0.1em; padding:8px; line-height:1; transition:color 0.2s; }
+#render-lb-close:hover { color:var(--ink); }
+#render-lb-label { position:absolute; bottom:24px; left:50%; transform:translateX(-50%); font-family:var(--f-mono); font-size:8px; letter-spacing:0.28em; text-transform:uppercase; color:rgba(232,230,240,0.35); white-space:nowrap; }
+
 .ld-footer { margin-top:24px; padding-top:18px; border-top:1px solid var(--ink-ghost); }
 .ld-footer a { font-family:var(--f-mono); font-size:8px; letter-spacing:0.28em; text-transform:uppercase; color:var(--ink-dim); text-decoration:none; border-bottom:1px solid var(--ink-ghost); padding-bottom:2px; transition:color 0.3s; }
 .ld-footer a:hover { color:var(--ink); }
@@ -695,6 +703,13 @@ footer {
     </div>
     <div class="ld-footer"><a href="/archive#renders">View all 13 renders in archive →</a></div>
   </section>
+
+  <!-- Render lightbox -->
+  <div id="render-lb" role="dialog" aria-modal="true" aria-label="Render preview">
+    <button id="render-lb-close" aria-label="Close">&times;</button>
+    <img id="render-lb-img" src="" alt="">
+    <span id="render-lb-label"></span>
+  </div>
 
   <!-- CHARACTER & MOTION -->
   <section class="char-section" id="showreel">
@@ -1525,6 +1540,33 @@ if (typeof gsap!=='undefined' && typeof ScrollTrigger!=='undefined') {
       onEnter:() => gsap.to(ldFrames, {opacity:1,y:0,scale:1,duration:0.8,stagger:0.07,ease:EASE})
     });
   }
+
+  // Render mosaic lightbox
+  const renderLb     = document.getElementById('render-lb');
+  const renderLbImg  = document.getElementById('render-lb-img');
+  const renderLbLbl  = document.getElementById('render-lb-label');
+  const renderLbClose= document.getElementById('render-lb-close');
+  function openRenderLb(src, label) {
+    renderLbImg.src = src;
+    renderLbLbl.textContent = label;
+    renderLb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeRenderLb() {
+    renderLb.classList.remove('open');
+    document.body.style.overflow = '';
+    renderLbImg.src = '';
+  }
+  renderLbClose.addEventListener('click', closeRenderLb);
+  renderLb.addEventListener('click', e => { if (e.target === renderLb) closeRenderLb(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && renderLb.classList.contains('open')) closeRenderLb(); });
+  document.querySelectorAll('.ld-cell').forEach(cell => {
+    cell.addEventListener('click', () => {
+      const img = cell.querySelector('img');
+      if (!img) return;
+      openRenderLb(img.src, img.alt);
+    });
+  });
 
   // Character section parallax (desktop)
   if (!isMob) {
