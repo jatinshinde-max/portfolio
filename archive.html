@@ -114,11 +114,11 @@ const R2 = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev';
 
 const ITEMS = [
   // Environments — world posters
-  { id:'w01', cat:'environments', title:'Ashfall',   type:'img',   src:`${R2}/world-01/frame_0001.webp`, link:'/work/ashfall' },
-  { id:'w02', cat:'environments', title:'Luminara',  type:'img',   src:`${R2}/world-02/frame_0001.webp`, link:'/work/luminara' },
-  { id:'w03', cat:'environments', title:'Verdant',   type:'img',   src:`${R2}/world-03/frame_0061.webp`, link:'/work/verdant' },
-  { id:'w04', cat:'environments', title:'Helios',    type:'img',   src:`${R2}/world-04/frame_0004.webp`, link:'/work/helios' },
-  { id:'w05', cat:'environments', title:'Aurum',     type:'img',   src:`${R2}/world-05/frame_0001.webp`, link:'/work/aurum' },
+  { id:'w01', cat:'environments', title:'Ashfall',   type:'img',   src:`${R2}/world-01/frame_0001.webp`, fallbacks:[`${R2}/world-01/frame_0002.webp`,`${R2}/world-01/frame_0003.webp`], link:'/work/ashfall' },
+  { id:'w02', cat:'environments', title:'Luminara',  type:'img',   src:`${R2}/world-02/frame_0002.webp`, fallbacks:[`${R2}/world-02/frame_0003.webp`,`${R2}/world-02/frame_0004.webp`,`${R2}/world-02/frame_0001.webp`], link:'/work/luminara' },
+  { id:'w03', cat:'environments', title:'Verdant',   type:'img',   src:`${R2}/world-03/frame_0061.webp`, fallbacks:[`${R2}/world-03/frame_0001.webp`,`${R2}/world-03/frame_0062.webp`], link:'/work/verdant' },
+  { id:'w04', cat:'environments', title:'Helios',    type:'img',   src:`${R2}/world-04/frame_0004.webp`, fallbacks:[`${R2}/world-04/frame_0005.webp`,`${R2}/world-04/frame_0001.webp`], link:'/work/helios' },
+  { id:'w05', cat:'environments', title:'Aurum',     type:'img',   src:`${R2}/world-05/frame_0001.webp`, fallbacks:[`${R2}/world-05/frame_0002.webp`,`${R2}/world-05/frame_0003.webp`], link:'/work/aurum' },
   // Transformations — before/after pairs (renders 01–14 = 7 pairs)
   { id:'r01', cat:'transforms', title:'Render 01', type:'img', src:`${R2}/gallery/renders/01.webp` },
   { id:'r02', cat:'transforms', title:'Render 02', type:'img', src:`${R2}/gallery/renders/02.webp` },
@@ -262,13 +262,21 @@ function renderGrid(cat) {
         mediaEl.src = item.src;
         mediaEl.alt = item.title;
         mediaEl.loading = 'lazy';
-        mediaEl.addEventListener('error', () => {
-          cell.style.background = 'rgba(80,20,20,0.4)';
-          cell.style.border = '1px solid rgba(200,60,60,0.3)';
-          const e = document.createElement('div');
-          e.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--f-mono);font-size:8px;letter-spacing:0.2em;color:rgba(255,100,100,0.6);text-align:center;padding:12px';
-          e.textContent = '⚠ Asset not found';
-          cell.appendChild(e);
+        // Fallback chain — try alternate URLs before showing error
+        let fbIdx = 0;
+        const fallbacks = item.fallbacks || [];
+        mediaEl.addEventListener('error', function onImgError() {
+          if (fbIdx < fallbacks.length) {
+            mediaEl.src = fallbacks[fbIdx++];
+          } else {
+            mediaEl.removeEventListener('error', onImgError);
+            cell.style.background = 'rgba(80,20,20,0.4)';
+            cell.style.border = '1px solid rgba(200,60,60,0.3)';
+            const e = document.createElement('div');
+            e.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--f-mono);font-size:8px;letter-spacing:0.2em;color:rgba(255,100,100,0.6);text-align:center;padding:12px';
+            e.textContent = '⚠ Asset not found';
+            cell.appendChild(e);
+          }
         });
       }
 

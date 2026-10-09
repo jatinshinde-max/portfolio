@@ -229,6 +229,15 @@ body {
   0%,100%{opacity:0} 50%{opacity:0.07}
 }
 
+/* Canvas animation overlay */
+#world-anim-canvas {
+  position:absolute; inset:0; z-index:2;
+  width:100%; height:100%;
+  opacity:0; transition:opacity 0.35s var(--ease-out);
+  pointer-events:none; display:block;
+}
+#world-anim-canvas.playing { opacity:1; }
+
 #worlds-vignette {
   position:absolute; inset:0; z-index:5; pointer-events:none;
   background:
@@ -437,6 +446,37 @@ body {
 .char-step { font-family:var(--f-mono); font-size:9px; letter-spacing:0.18em; color:var(--ink-mute); display:flex; gap:12px; align-items:baseline; }
 .char-step span { color:var(--accent); font-size:8px; min-width:28px; letter-spacing:0.14em; }
 
+/* ─── 3D MODEL VIEWER ─────────────────────────────────── */
+.mdl-section { margin-top:60px; }
+.mdl-section-eyebrow { font-family:var(--f-mono); font-size:8px; letter-spacing:0.38em; text-transform:uppercase; color:var(--ink-mute); margin-bottom:16px; display:block; }
+.mdl-viewer { position:relative; background:var(--bg-1); aspect-ratio:16/9; overflow:hidden; }
+#mdl-canvas { position:absolute; inset:0; width:100%; height:100%; display:block; }
+.mdl-controls {
+  position:absolute; bottom:20px; left:50%; transform:translateX(-50%);
+  display:flex; gap:8px; z-index:10;
+}
+.mdl-btn {
+  font-family:var(--f-mono); font-size:8px; letter-spacing:0.24em; text-transform:uppercase;
+  padding:8px 18px; border:1px solid rgba(255,255,255,0.18); color:var(--ink-dim);
+  background:rgba(6,5,12,0.55); cursor:pointer; transition:all 0.3s; backdrop-filter:blur(4px);
+}
+.mdl-btn.active, .mdl-btn:hover { border-color:var(--accent); color:var(--ink); }
+.mdl-hint {
+  position:absolute; top:16px; right:20px; z-index:10;
+  font-family:var(--f-mono); font-size:7px; letter-spacing:0.28em; text-transform:uppercase;
+  color:var(--ink-mute); pointer-events:none;
+}
+.mdl-loading {
+  position:absolute; inset:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:16px;
+  background:var(--bg-1); transition:opacity 0.6s var(--ease-out); z-index:5;
+}
+.mdl-loading.done { opacity:0; pointer-events:none; }
+.mdl-loading span { font-family:var(--f-mono); font-size:8px; letter-spacing:0.28em; text-transform:uppercase; color:var(--ink-mute); }
+.mdl-load-bar { width:160px; height:1px; background:var(--ink-ghost); }
+.mdl-load-fill { height:100%; width:0%; background:var(--accent); transition:width 0.3s; }
+.mdl-fallback { display:none; padding:40px; text-align:center; font-family:var(--f-mono); font-size:8px; letter-spacing:0.24em; color:var(--ink-mute); }
+
 /* ─── CAPABILITIES & ABOUT ───────────────────────────────── */
 .cap-section { padding:clamp(80px,11vh,140px) clamp(28px,7vw,100px); background:var(--bg-1); scroll-margin-top:72px; }
 .cap-grid { display:grid; grid-template-columns:1fr 1.6fr; gap:96px; align-items:start; }
@@ -445,12 +485,9 @@ body {
 .cap-disciplines { border-top:1px solid var(--ink-ghost); margin-top:28px; }
 .cap-disc { font-family:var(--f-display); font-size:clamp(0.95rem,1.8vw,1.18rem); font-weight:300; letter-spacing:-0.01em; color:var(--ink-dim); padding:12px 0; border-bottom:1px solid var(--ink-ghost); transition:color 0.3s var(--ease-out), padding-left 0.3s var(--ease-out); cursor:default; }
 .cap-disc:hover { color:var(--ink); padding-left:10px; }
-.cap-tools { display:grid; grid-template-columns:repeat(2,1fr); gap:40px 32px; margin-top:24px; }
-@media (max-width:600px) { .cap-tools { grid-template-columns:1fr; } }
-.tc-header { font-family:var(--f-mono); font-size:7px; letter-spacing:0.32em; text-transform:uppercase; color:var(--ink-mute); margin-bottom:16px; padding-bottom:10px; border-bottom:1px solid var(--ink-ghost); }
-.tool-item { font-family:var(--f-body); font-size:0.85rem; font-weight:300; color:var(--ink-dim); padding:6px 0; display:flex; align-items:center; gap:10px; border-bottom:1px solid rgba(255,255,255,0.03); }
-.tool-dot { width:4px; height:4px; border-radius:50%; background:var(--accent); flex-shrink:0; }
 .cap-about-head { margin-bottom:20px; }
+.cap-tools-line { font-family:var(--f-mono); font-size:8px; letter-spacing:0.16em; color:var(--ink-mute); line-height:1.8; margin-top:24px; padding-top:20px; border-top:1px solid var(--ink-ghost); }
+.cap-tools-line strong { color:var(--ink-dim); font-weight:400; }
 .a-eyebrow { font-family:var(--f-mono); font-size:8px; letter-spacing:0.38em; text-transform:uppercase; color:var(--ink-mute); margin-bottom:20px; display:block; }
 .a-headline { font-family:var(--f-display); font-size:clamp(2.2rem,5.5vw,5rem); font-weight:300; letter-spacing:-0.025em; line-height:1.02; color:var(--ink); margin-bottom:32px; }
 .cap-bio { font-family:var(--f-body); font-size:0.95rem; font-weight:300; line-height:1.72; color:var(--ink-dim); max-width:46ch; margin-bottom:20px; }
@@ -556,6 +593,7 @@ footer {
   <img class="world-bg        loading" id="bg-2" alt="" draggable="false">
   <img class="world-bg        loading" id="bg-3" alt="" draggable="false">
   <img class="world-bg        loading" id="bg-4" alt="" draggable="false">
+  <canvas id="world-anim-canvas" aria-hidden="true"></canvas>
   <div id="worlds-vignette"></div>
   <div id="worlds-grain"></div>
   <div id="world-info">
@@ -661,6 +699,25 @@ footer {
         </div>
       </div>
     </div>
+
+    <!-- 3D MODEL VIEWER -->
+    <div class="mdl-section reveal">
+      <span class="mdl-section-eyebrow">Interactive 3D — Drag to Rotate</span>
+      <div class="mdl-viewer" id="model-viewer" aria-label="Interactive 3D character model">
+        <canvas id="mdl-canvas"></canvas>
+        <div class="mdl-controls">
+          <button class="mdl-btn active" data-mdl="idle">Idle</button>
+          <button class="mdl-btn" data-mdl="wave">Wave</button>
+          <button class="mdl-btn" data-mdl="stand">Stand</button>
+        </div>
+        <div class="mdl-hint">Drag to rotate</div>
+        <div class="mdl-loading" id="mdl-loading">
+          <span>Loading model</span>
+          <div class="mdl-load-bar"><div class="mdl-load-fill" id="mdl-load-fill"></div></div>
+        </div>
+        <div class="mdl-fallback" id="mdl-fallback">3D viewer unavailable in this browser</div>
+      </div>
+    </div>
   </section>
 
   <!-- CAPABILITIES & ABOUT -->
@@ -688,43 +745,10 @@ footer {
         </div>
         <p class="cap-bio reveal reveal-delay-2">Seven years of hands-on creative production — cinematic environments, character work, product CGI, and VFX. Comfortable across the full 3D pipeline, from early concept through to final render and delivery.</p>
         <p class="cap-bio reveal reveal-delay-3">Based in India. Available for international projects, studio collaborations, and relocation. Strong interest in game studios, VFX houses, and creative technology teams worldwide.</p>
-        <div class="cap-tools reveal">
-          <div class="tools-category">
-            <div class="tc-header">3D / Real-Time</div>
-            <div>
-              <div class="tool-item"><span class="tool-dot"></span>Unreal Engine 5</div>
-              <div class="tool-item"><span class="tool-dot"></span>Blender</div>
-              <div class="tool-item"><span class="tool-dot"></span>Substance 3D Painter</div>
-              <div class="tool-item"><span class="tool-dot"></span>Character Creator 4</div>
-              <div class="tool-item"><span class="tool-dot"></span>Marvelous Designer</div>
-            </div>
-          </div>
-          <div class="tools-category">
-            <div class="tc-header">Compositing / Motion</div>
-            <div>
-              <div class="tool-item"><span class="tool-dot"></span>After Effects</div>
-              <div class="tool-item"><span class="tool-dot"></span>DaVinci Resolve</div>
-              <div class="tool-item"><span class="tool-dot"></span>Premiere Pro</div>
-              <div class="tool-item"><span class="tool-dot"></span>Audition</div>
-            </div>
-          </div>
-          <div class="tools-category">
-            <div class="tc-header">Design</div>
-            <div>
-              <div class="tool-item"><span class="tool-dot"></span>Photoshop</div>
-              <div class="tool-item"><span class="tool-dot"></span>Illustrator</div>
-              <div class="tool-item"><span class="tool-dot"></span>Lightroom</div>
-              <div class="tool-item"><span class="tool-dot"></span>Corel Draw</div>
-            </div>
-          </div>
-          <div class="tools-category">
-            <div class="tc-header">Generative / AI</div>
-            <div>
-              <div class="tool-item"><span class="tool-dot"></span>ComfyUI</div>
-              <div class="tool-item"><span class="tool-dot"></span>Image Workflows</div>
-              <div class="tool-item"><span class="tool-dot"></span>Video Workflows</div>
-            </div>
-          </div>
+        <div class="cap-tools-line reveal">
+          <strong>3D / Real-Time —</strong> Unreal Engine 5 · Blender · Substance 3D Painter · Character Creator 4 · Marvelous Designer<br>
+          <strong>Motion / Post —</strong> After Effects · DaVinci Resolve · Premiere Pro · Audition<br>
+          <strong>Design —</strong> Photoshop · Illustrator · Lightroom · Corel Draw
         </div>
       </div>
     </div>
@@ -823,77 +847,109 @@ function switchWorld(idx) {
   }, 260);
 }
 
-// ── WORLD FRAME ANIMATION ───────────────────────────────
-// Verified frame inventories — never request missing frames
+// ── WORLD FRAME PLAYER ──────────────────────────────────
+// Authoritative frame inventories — excludes known missing frames
 const FRAME_MANIFESTS = [
-  // World 01 — Ashfall: frames 1–111
   Array.from({length:111}, (_,i) => i+1),
-  // World 02 — Luminara: frames 1–165
   Array.from({length:165}, (_,i) => i+1),
-  // World 03 — Verdant: frames 1–124, excluding 110
-  Array.from({length:124}, (_,i) => i+1).filter(n => n !== 110),
-  // World 04 — Helios: frames 1–179, excluding 38
-  Array.from({length:179}, (_,i) => i+1).filter(n => n !== 38),
-  // World 05 — Aurum: frames 1–375, excluding 91, 143, 191
-  Array.from({length:375}, (_,i) => i+1).filter(n => n !== 91 && n !== 143 && n !== 191),
+  Array.from({length:123}, (_,i) => i+1).filter(n => n !== 110),
+  Array.from({length:178}, (_,i) => i+1).filter(n => n !== 38),
+  Array.from({length:372}, (_,i) => i+1).filter(n => n !== 91 && n !== 143 && n !== 191),
 ];
 
-// Sparse playback — 8 evenly-distributed frames per world for smooth looping
-// without loading hundreds of full-res images
-const ANIM_FRAMES = FRAME_MANIFESTS.map(manifest => {
-  const count = 8;
-  const step = Math.floor(manifest.length / count);
-  return Array.from({length:count}, (_,i) => manifest[i * step]);
-});
+const PLAYER_FRAMES = 30; // sample 30 evenly-spaced frames per world
+const PLAYER_FPS    = 10; // 10fps = proper animation, not a slideshow
 
-const ANIM_INTERVAL = 220; // ms per frame — slow cinematic cycle
-const worldFrameCache = WORLDS.map(() => []); // preloaded Image objects per world
-let animTimer = null;
-let animIdx = 0; // current frame position within the active world's cycle
+function padFrame(n) { return 'frame_' + String(n).padStart(4,'0') + '.webp'; }
 
-function padFrame(n) {
-  return 'frame_' + String(n).padStart(4,'0') + '.webp';
-}
+class FramePlayer {
+  constructor(worldIdx, canvas) {
+    this.wi       = worldIdx;
+    this.canvas   = canvas;
+    this.ctx      = canvas.getContext('2d');
+    this.bitmaps  = new Array(PLAYER_FRAMES).fill(null);
+    this.loaded   = 0;
+    this.playing  = false;
+    this.frameIdx = 0;
+    this.lastTs   = 0;
+    this.interval = 1000 / PLAYER_FPS;
+    this.raf      = null;
+    this._loading = false;
+    const manifest = FRAME_MANIFESTS[worldIdx];
+    const step = manifest.length / PLAYER_FRAMES;
+    this.frameNums = Array.from({length: PLAYER_FRAMES}, (_,i) => manifest[Math.floor(i * step)]);
+    this._tick = this._tick.bind(this);
+  }
 
-function preloadWorldFrames(wi) {
-  const frames = ANIM_FRAMES[wi];
-  if (worldFrameCache[wi].length === frames.length) return; // already done
-  frames.forEach((fNum, i) => {
-    if (worldFrameCache[wi][i]) return;
-    const img = new Image();
-    img.src = `${CDN}/${WORLDS[wi].slug}/${padFrame(fNum)}`;
-    worldFrameCache[wi][i] = img;
-  });
-}
+  preload() {
+    if (this._loading) return;
+    this._loading = true;
+    this.frameNums.forEach((fNum, i) => {
+      if (this.bitmaps[i]) return;
+      fetch(`${CDN}/${WORLDS[this.wi].slug}/${padFrame(fNum)}`)
+        .then(r => r.ok ? r.blob() : Promise.reject())
+        .then(b => createImageBitmap(b))
+        .then(bmp => { this.bitmaps[i] = bmp; this.loaded++; })
+        .catch(() => {});
+    });
+  }
 
-function startWorldAnim(wi) {
-  stopWorldAnim();
-  preloadWorldFrames(wi);
-  animIdx = 0;
-  const frames = ANIM_FRAMES[wi];
-  const bgEl = bgImgs[wi];
-  animTimer = setInterval(() => {
-    animIdx = (animIdx + 1) % frames.length;
-    const cached = worldFrameCache[wi][animIdx];
-    if (cached && cached.complete && cached.naturalWidth > 0) {
-      bgEl.src = cached.src;
+  start() {
+    if (this.playing) return;
+    this.preload();
+    this.playing = true;
+    this.frameIdx = 0;
+    this.lastTs   = 0;
+    this.raf = requestAnimationFrame(this._tick);
+  }
+
+  _tick(ts) {
+    if (!this.playing) return;
+    this.raf = requestAnimationFrame(this._tick);
+    if (ts - this.lastTs < this.interval) return;
+    this.lastTs = ts;
+    if (this.loaded < 3) return; // wait for minimum frames
+    // Find next available frame
+    let f = this.frameIdx, tries = 0;
+    while (!this.bitmaps[f] && tries++ < PLAYER_FRAMES) f = (f+1) % PLAYER_FRAMES;
+    const bmp = this.bitmaps[f];
+    if (!bmp) return;
+    // Resize canvas to display size on first draw
+    const cw = this.canvas.offsetWidth, ch = this.canvas.offsetHeight;
+    if (this.canvas.width !== cw || this.canvas.height !== ch) {
+      this.canvas.width = cw; this.canvas.height = ch;
     }
-  }, ANIM_INTERVAL);
+    if (!this.canvas.classList.contains('playing')) this.canvas.classList.add('playing');
+    // Cover-fit draw
+    const scale = Math.max(cw / bmp.width, ch / bmp.height);
+    const sw = bmp.width * scale, sh = bmp.height * scale;
+    this.ctx.drawImage(bmp, (cw-sw)/2, (ch-sh)/2, sw, sh);
+    this.frameIdx = (f+1) % PLAYER_FRAMES;
+  }
+
+  stop() {
+    this.playing = false;
+    if (this.raf) { cancelAnimationFrame(this.raf); this.raf = null; }
+    this.canvas.classList.remove('playing');
+  }
 }
 
-function stopWorldAnim() {
-  if (animTimer !== null) { clearInterval(animTimer); animTimer = null; }
-}
-
-// Only animate while worlds section is in viewport
+const worldCanvas = document.getElementById('world-anim-canvas');
+const players = WORLDS.map((_, i) => new FramePlayer(i, worldCanvas));
 let worldsVisible = false;
 
-// Replace button handlers with animation-aware version
+function startWorldAnim(wi) {
+  players.forEach((p, i) => { if (i !== wi) p.stop(); });
+  players[wi].start();
+}
+function stopWorldAnim() { players.forEach(p => p.stop()); }
+
+// Update button handlers
 indexBtns.forEach((el,i) => {
   el.onclick = () => {
     switchWorld(i);
     if (worldsVisible) startWorldAnim(i);
-    [i-1, i+1].forEach(adj => { if (adj >= 0 && adj < WORLDS.length) preloadWorldFrames(adj); });
+    [i-1, i+1].forEach(adj => { if (adj >= 0 && adj < WORLDS.length) players[adj]?.preload(); });
   };
 });
 
@@ -996,12 +1052,141 @@ if (commGrid) {
   const charVid  = document.getElementById('char-video');
   if (charWrap && charVid) {
     charWrap.addEventListener('click', () => VM.toggle(charWrap, charVid));
-    // Preload metadata when approaching viewport
     new IntersectionObserver(([e]) => {
       if (!e.isIntersecting) return;
       charVid.preload='metadata'; charVid.load();
     }, { rootMargin:'600px' }).observe(charWrap);
   }
+}
+
+// ── 3D MODEL VIEWER ─────────────────────────────────────
+{
+  const mdlSection = document.getElementById('model-viewer');
+  if (mdlSection) {
+    let viewerInit = false;
+    new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting || viewerInit) return;
+      viewerInit = true;
+      initModelViewer().catch(() => {
+        const fb = document.getElementById('mdl-fallback');
+        const ld = document.getElementById('mdl-loading');
+        if (fb) fb.style.display = 'flex';
+        if (ld) ld.style.display = 'none';
+      });
+    }, { rootMargin:'400px' }).observe(mdlSection);
+  }
+}
+
+async function initModelViewer() {
+  const [THREE_NS, { OrbitControls }, { GLTFLoader }] = await Promise.all([
+    import('three'),
+    import('three/addons/controls/OrbitControls.js'),
+    import('three/addons/loaders/GLTFLoader.js'),
+  ]);
+  const { WebGLRenderer, Scene, PerspectiveCamera, AmbientLight, DirectionalLight,
+          AnimationMixer, Box3, Vector3, Clock } = THREE_NS;
+
+  const canvas    = document.getElementById('mdl-canvas');
+  const loadingEl = document.getElementById('mdl-loading');
+  const loadFill  = document.getElementById('mdl-load-fill');
+  const btns      = document.querySelectorAll('.mdl-btn');
+
+  const renderer = new WebGLRenderer({ canvas, antialias:true, alpha:true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.outputColorSpace = 'srgb';
+
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  renderer.setSize(w, h);
+
+  const scene  = new Scene();
+  const camera = new PerspectiveCamera(40, w / h, 0.1, 100);
+  camera.position.set(0, 1.6, 3.8);
+
+  const amb = new AmbientLight(0xffffff, 0.9);
+  scene.add(amb);
+  const key = new DirectionalLight(0xfff0e0, 1.4);
+  key.position.set(2, 5, 3);
+  scene.add(key);
+  const fill = new DirectionalLight(0xe0f0ff, 0.4);
+  fill.position.set(-3, 2, -2);
+  scene.add(fill);
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping  = true;
+  controls.dampingFactor  = 0.06;
+  controls.enableZoom     = false;
+  controls.enablePan      = false;
+  controls.autoRotate     = true;
+  controls.autoRotateSpeed = 1.0;
+  controls.target.set(0, 1.0, 0);
+  controls.minPolarAngle  = Math.PI * 0.15;
+  controls.maxPolarAngle  = Math.PI * 0.75;
+
+  // pause autoRotate while dragging
+  controls.addEventListener('start', () => { controls.autoRotate = false; });
+  controls.addEventListener('end',   () => { setTimeout(() => { controls.autoRotate = true; }, 2000); });
+
+  const loader = new GLTFLoader();
+  const MODELS = {
+    idle:  `${CDN}/models/JON%20Idel.glb`,
+    wave:  `${CDN}/models/JON%20wave.glb`,
+    stand: `${CDN}/models/JON%20stand.glb`,
+  };
+
+  let mixer = null, currentObj = null;
+  const clock = new Clock();
+
+  async function loadModel(key) {
+    if (loadFill)  loadFill.style.width = '0%';
+    if (loadingEl) loadingEl.classList.remove('done');
+    const gltf = await new Promise((res, rej) => {
+      loader.load(MODELS[key], res, p => {
+        if (loadFill && p.total) loadFill.style.width = (p.loaded / p.total * 100) + '%';
+      }, rej);
+    });
+    if (currentObj) { scene.remove(currentObj); }
+    currentObj = gltf.scene;
+    scene.add(currentObj);
+    // center and ground model
+    const box = new Box3().setFromObject(currentObj);
+    const ctr = box.getCenter(new Vector3());
+    currentObj.position.sub(ctr);
+    currentObj.position.y += (box.max.y - box.min.y) / 2;
+    // play first animation if present
+    if (gltf.animations?.length) {
+      mixer = new AnimationMixer(currentObj);
+      const action = mixer.clipAction(gltf.animations[0]);
+      action.play();
+    } else {
+      mixer = null;
+    }
+    if (loadingEl) loadingEl.classList.add('done');
+  }
+
+  await loadModel('idle');
+
+  btns.forEach(btn => {
+    btn.addEventListener('click', async () => {
+      btns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      await loadModel(btn.dataset.mdl).catch(() => {});
+    });
+  });
+
+  new ResizeObserver(() => {
+    const nw = canvas.clientWidth, nh = canvas.clientHeight;
+    renderer.setSize(nw, nh);
+    camera.aspect = nw / nh;
+    camera.updateProjectionMatrix();
+  }).observe(canvas);
+
+  (function renderLoop() {
+    requestAnimationFrame(renderLoop);
+    const dt = clock.getDelta();
+    if (mixer) mixer.update(dt);
+    controls.update();
+    renderer.render(scene, camera);
+  })();
 }
 
 // Preload commercial metadata when section approaches
