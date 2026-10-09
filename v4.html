@@ -1021,7 +1021,8 @@ async function startWorldAnim(wi) {
     currentVideoWorld = wi;
   }
   try {
-    worldVideo.playbackRate = 0.65; // original 24fps sequences are too brief at real-time speed\n    await worldVideo.play();
+    worldVideo.playbackRate = 0.4; // 24fps source: cinematic slow playback, approx 11–39 seconds per loop
+    await worldVideo.play();
     if (requestId !== worldRequestId || !worldsVisible || wi !== activeWorld) {
       worldVideo.pause();
       return;
