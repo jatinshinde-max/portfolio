@@ -542,6 +542,21 @@ body {
 .c-btn.secondary { border-color:rgba(255,255,255,0.18); color:var(--ink-dim); }
 .c-btn.secondary:hover { background:rgba(255,255,255,0.08); color:var(--ink); }
 
+/* Curated film gallery — no nine-tile catalog on the homepage */
+.commercial-section{padding:clamp(70px,9vw,135px) clamp(20px,6vw,96px);background:#09090b}
+.comm-header{display:grid;grid-template-columns:1.2fr .8fr;align-items:end;gap:60px;margin-bottom:48px}
+.comm-title{font-size:clamp(3.5rem,8vw,9rem);line-height:.88;letter-spacing:-.065em}
+.comm-title em{font-weight:300;font-style:italic;color:#aaa1b3}
+.comm-intro{justify-self:end;max-width:34ch}
+.comm-intro p{font-size:clamp(14px,1.3vw,17px);line-height:1.7;color:#b9b5bd;margin:0 0 22px}
+.comm-intro a{color:white;font-size:12px;text-decoration:none;border-bottom:1px solid #8c8595;padding-bottom:9px}
+.comm-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:14px}
+.comm-card{min-height:310px;aspect-ratio:16/10;overflow:hidden}
+.comm-card:first-child{grid-row:span 2;aspect-ratio:auto}
+.comm-card:nth-child(4){grid-column:2}
+.comm-card-title{font-size:clamp(17px,2vw,28px);letter-spacing:-.03em}
+@media(max-width:800px){.comm-header{grid-template-columns:1fr;gap:22px}.comm-intro{justify-self:start}.comm-grid{grid-template-columns:1fr 1fr;gap:8px}.comm-card:first-child{grid-row:auto;aspect-ratio:16/10}.comm-card:nth-child(4){grid-column:auto}.comm-card{min-height:0;aspect-ratio:16/10}}
+@media(max-width:550px){.comm-grid{grid-template-columns:1fr}.comm-card{aspect-ratio:16/10}}
 /* V8 editorial art direction — compact, deliberate, and image-led */
 .accent-dot{color:var(--accent)}
 .sw-section{background:#0b0b0d;padding:clamp(64px,9vw,128px) clamp(20px,6vw,96px) clamp(28px,4vw,56px)}
@@ -713,9 +728,9 @@ footer {
     <div class="comm-header reveal">
       <div class="comm-left">
         <span class="comm-eyebrow">Commercial CGI</span>
-        <div class="comm-title">Product.<br>Advertising.<br>Motion.</div>
+        <div class="comm-title">Made to<br><em>move you.</em></div>
       </div>
-      <span class="comm-note">9 works · Click to play</span>
+      <div class="comm-intro"><p>Commercial CGI is where precision meets impact. A curated selection of product films — click to play.</p><a href="/archive#commercial">Explore all commercial work ↗</a></div>
     </div>
     <div class="comm-grid" id="comm-grid"></div>
   </section>
@@ -1109,15 +1124,10 @@ const VM = {
 
 // ── COMMERCIAL GRID — click to play ─────────────────────
 const ADS = [
-  { src:'gallery/ads/car-commercial.mp4',      title:'Automotive Concept',   meta:'Product · CGI' },
-  { src:'gallery/ads/pepsi.mp4',               title:'Pepsi Commercial',     meta:'Advertising · CGI' },
-  { src:'gallery/ads/smart-watch.mp4',         title:'Smart Watch',          meta:'Product · CGI' },
-  { src:'gallery/ads/car-commercial-2.mp4',    title:'Automotive Concept 2', meta:'Product · CGI' },
-  { src:'gallery/ads/chocolate-bar.mp4',       title:'Chocolate Bar',        meta:'Product · CGI' },
-  { src:'gallery/ads/earbuds.mp4',             title:'EarBuds',              meta:'Product · CGI' },
-  { src:'gallery/ads/facewash.mp4',            title:'Facewash',             meta:'Product · CGI' },
-  { src:'gallery/ads/shoe.mp4',                title:'Sneaker',              meta:'Product · CGI' },
-  { src:'gallery/ads/serum.mp4',               title:'Serum',                meta:'Product · CGI' },
+  { src:'gallery/ads/car-commercial.mp4', title:'Automotive', meta:'CGI / Motion' },
+  { src:'gallery/ads/facewash.mp4', title:'Skincare', meta:'Product / CGI' },
+  { src:'gallery/ads/smart-watch.mp4', title:'Timepiece', meta:'Product / CGI' },
+  { src:'gallery/ads/shoe.mp4', title:'Footwear', meta:'Product / CGI' },
 ];
 const commGrid = document.getElementById('comm-grid');
 if (commGrid) {
