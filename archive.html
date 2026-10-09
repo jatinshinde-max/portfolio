@@ -262,14 +262,14 @@ function renderGrid(cat) {
         mediaEl.src = item.src;
         mediaEl.alt = item.title;
         mediaEl.loading = 'lazy';
-        // Fallback chain — try alternate URLs before showing error
+        // Fallback chain — handles HTTP errors AND animated WebP blank-decode
+        // (naturalWidth === 0 after a successful load = browser rendered nothing)
         let fbIdx = 0;
         const fallbacks = item.fallbacks || [];
-        mediaEl.addEventListener('error', function onImgError() {
+        function nextFallback() {
           if (fbIdx < fallbacks.length) {
             mediaEl.src = fallbacks[fbIdx++];
           } else {
-            mediaEl.removeEventListener('error', onImgError);
             cell.style.background = 'rgba(80,20,20,0.4)';
             cell.style.border = '1px solid rgba(200,60,60,0.3)';
             const e = document.createElement('div');
@@ -277,6 +277,10 @@ function renderGrid(cat) {
             e.textContent = '⚠ Asset not found';
             cell.appendChild(e);
           }
+        }
+        mediaEl.addEventListener('error', nextFallback);
+        mediaEl.addEventListener('load', function() {
+          if (mediaEl.naturalWidth === 0) nextFallback();
         });
       }
 

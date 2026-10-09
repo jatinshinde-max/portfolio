@@ -803,7 +803,7 @@ const CDN = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev';
 // ── WORLD DATA ──────────────────────────────────────────
 const WORLDS = [
   { slug:'world-01', name:'Ashfall',  accent:'#c46428', posterCandidates:['frame_0001.webp','frame_0002.webp','frame_0003.webp'] },
-  { slug:'world-02', name:'Luminara', accent:'#7c5cc4', posterCandidates:['frame_0001.webp','frame_0002.webp','frame_0003.webp'] },
+  { slug:'world-02', name:'Luminara', accent:'#7c5cc4', posterCandidates:['frame_0002.webp','frame_0003.webp','frame_0004.webp'] },
   { slug:'world-03', name:'Verdant',  accent:'#3a8c52', posterCandidates:['frame_0061.webp','frame_0001.webp','frame_0000.webp'] },
   { slug:'world-04', name:'Helios',   accent:'#2872c4', posterCandidates:['frame_0004.webp','frame_0005.webp','frame_0001.webp'] },
   { slug:'world-05', name:'Aurum',    accent:'#c4a028', posterCandidates:['frame_0001.webp','frame_0002.webp','frame_0003.webp'] },
@@ -833,12 +833,17 @@ if (!isMob) {
 }
 
 // ── POSTER LOADING ──────────────────────────────────────
+// naturalWidth === 0 after load means the image decoded as empty (e.g. animated WebP
+// where the browser renders no static frame). Treat it the same as a network error.
 function tryPoster(idx, ci) {
   const w = WORLDS[idx]; const img = bgImgs[idx];
   if (ci >= w.posterCandidates.length) { img.classList.remove('loading'); return; }
   const url = `${CDN}/${w.slug}/${w.posterCandidates[ci]}`;
   img.onerror = () => tryPoster(idx, ci+1);
-  img.onload  = () => img.classList.remove('loading');
+  img.onload  = () => {
+    if (img.naturalWidth === 0) { tryPoster(idx, ci+1); return; }
+    img.classList.remove('loading');
+  };
   img.src = url;
 }
 WORLDS.forEach((_,i) => tryPoster(i, 0));
@@ -1027,12 +1032,10 @@ indexBtns.forEach((el,i) => {
   el.onclick = () => {
     switchWorld(i);
     if (worldsVisible) startWorldAnim(i);
-    // Preload adjacent canvas fallback frames and probe adjacent video availability
+    // Preload adjacent canvas fallback frames (no-op if already loading)
+    // Video availability is probed lazily inside startWorldAnim — no eager HEAD requests
     [i-1, i+1].forEach(adj => {
-      if (adj >= 0 && adj < WORLDS.length) {
-        players[adj].preload();
-        probeVideo(adj);
-      }
+      if (adj >= 0 && adj < WORLDS.length) players[adj].preload();
     });
   };
 });
