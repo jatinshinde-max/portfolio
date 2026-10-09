@@ -351,10 +351,31 @@ body {
 .reveal-delay-2 { transition-delay:0.2s; }
 .reveal-delay-3 { transition-delay:0.3s; }
 
+/* ─── SELECTED WORK ────────────────────────────────────── */
+.sw-section { padding:0; background:var(--bg-1); overflow:hidden; }
+.sw-header { padding:clamp(60px,9vh,120px) clamp(28px,7vw,100px) 0; display:flex; align-items:baseline; justify-content:space-between; margin-bottom:36px; }
+.sw-label { font-family:var(--f-mono); font-size:8px; letter-spacing:0.38em; text-transform:uppercase; color:var(--ink-mute); }
+.sw-count { font-family:var(--f-display); font-size:clamp(3.5rem,9vw,8rem); font-weight:200; letter-spacing:-0.04em; line-height:1; color:rgba(255,255,255,0.055); }
+.sw-title { font-family:var(--f-display); font-size:clamp(2.8rem,7.5vw,8rem); font-weight:300; letter-spacing:-0.03em; line-height:0.94; color:var(--ink); padding:0 clamp(28px,7vw,100px) 48px; }
+.sw-hero { position:relative; overflow:hidden; width:100%; aspect-ratio:21/9; background:var(--bg-2); }
+.sw-hero img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 1.2s var(--ease-out); }
+.sw-hero:hover img { transform:scale(1.02); }
+.sw-hero-label { position:absolute; bottom:16px; right:20px; font-family:var(--f-mono); font-size:7px; letter-spacing:0.3em; text-transform:uppercase; color:rgba(255,255,255,0.45); }
+.sw-trio { display:grid; grid-template-columns:1fr 2fr 1fr; gap:4px; margin-top:4px; }
+.sw-trio-item { position:relative; overflow:hidden; background:var(--bg-2); aspect-ratio:4/3; }
+.sw-trio-item:nth-child(2) { aspect-ratio:16/9; }
+.sw-trio-item img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.8s var(--ease-out); }
+.sw-trio-item:hover img { transform:scale(1.04); }
+.sw-trio-label { position:absolute; bottom:10px; left:12px; font-family:var(--f-mono); font-size:7px; letter-spacing:0.24em; text-transform:uppercase; color:rgba(255,255,255,0.4); }
+.sw-footer { padding:20px clamp(28px,7vw,100px) clamp(60px,9vh,100px); border-top:1px solid var(--ink-ghost); margin-top:40px; }
+.sw-footer a { font-family:var(--f-mono); font-size:8px; letter-spacing:0.28em; text-transform:uppercase; color:var(--ink-dim); text-decoration:none; border-bottom:1px solid var(--ink-ghost); padding-bottom:2px; transition:color 0.3s; }
+.sw-footer a:hover { color:var(--ink); }
+@media (max-width:768px) { .sw-trio { grid-template-columns:1fr; } .sw-trio-item:nth-child(2) { aspect-ratio:4/3; } }
+
 /* ─── COMMERCIAL SECTION ──────────────────────────────── */
 .commercial-section {
   padding:clamp(80px,11vh,140px) clamp(28px,7vw,100px);
-  background:var(--bg-1); position:relative; overflow:hidden;
+  background:var(--bg); position:relative; overflow:hidden;
   scroll-margin-top:72px;
 }
 .commercial-section::before {
@@ -365,321 +386,99 @@ body {
   color:rgba(255,255,255,0.028); pointer-events:none; user-select:none;
   white-space:nowrap;
 }
-.comm-header { margin-bottom:48px; }
-.comm-eyebrow {
-  font-family:var(--f-mono); font-size:8px; letter-spacing:0.38em;
-  text-transform:uppercase; color:var(--ink-mute); display:block; margin-bottom:16px;
-}
-.comm-descriptor {
-  font-family:var(--f-display); font-size:clamp(1.6rem,3.5vw,3rem);
-  font-weight:300; letter-spacing:-0.02em; color:var(--ink);
-}
-/* portrait 9:16 card grid — 3 col desktop, 2 tablet, 1 mobile */
-.comm-grid {
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:8px;
-}
+.comm-header { margin-bottom:48px; display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:16px; }
+.comm-eyebrow { font-family:var(--f-mono); font-size:8px; letter-spacing:0.38em; text-transform:uppercase; color:var(--ink-mute); display:block; margin-bottom:12px; }
+.comm-title { font-family:var(--f-display); font-size:clamp(1.8rem,4vw,3.5rem); font-weight:300; letter-spacing:-0.025em; line-height:1; color:var(--ink); }
+.comm-note { font-family:var(--f-mono); font-size:8px; letter-spacing:0.24em; text-transform:uppercase; color:var(--ink-mute); }
+.comm-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
 @media (max-width:900px) { .comm-grid { grid-template-columns:repeat(2,1fr); } }
 @media (max-width:500px) { .comm-grid { grid-template-columns:1fr; } }
-.comm-card {
-  position:relative; overflow:hidden; background:var(--bg-2);
-  border:1px solid var(--ink-ghost); aspect-ratio:9/16;
-}
-/* .comm-card.hidden reserved — error state shown inline instead */
-.comm-card video {
-  width:100%; height:100%; object-fit:cover; display:block;
-  transition:transform 0.6s var(--ease-out);
-}
-.comm-card:hover video { transform:scale(1.03); }
-.comm-card-info {
-  position:absolute; bottom:0; left:0; right:0;
-  padding:16px 18px;
-  background:linear-gradient(transparent,rgba(6,5,12,0.85));
-}
-.comm-card-meta {
-  font-family:var(--f-mono); font-size:8px; letter-spacing:0.24em;
-  text-transform:uppercase; color:var(--ink-mute); margin-bottom:4px;
-}
-.comm-card-title {
-  font-family:var(--f-display); font-size:1rem; font-weight:400;
-  letter-spacing:-0.01em; color:var(--ink);
-}
+.comm-card { position:relative; overflow:hidden; background:var(--bg-2); aspect-ratio:9/16; cursor:pointer; }
+.comm-card video { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.6s var(--ease-out); }
+.comm-card.playing video { transform:scale(1.02); }
+.comm-card-overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(6,5,12,0.32); transition:background 0.3s, opacity 0.35s; }
+.comm-card.playing .comm-card-overlay { opacity:0; pointer-events:none; }
+.comm-play-btn { width:50px; height:50px; border:1px solid rgba(255,255,255,0.55); border-radius:50%; display:flex; align-items:center; justify-content:center; transition:transform 0.3s var(--ease-out), border-color 0.3s; }
+.comm-card:hover .comm-play-btn { transform:scale(1.1); border-color:rgba(255,255,255,0.88); }
+.comm-play-icon { width:0; height:0; border-style:solid; border-width:7px 0 7px 14px; border-color:transparent transparent transparent rgba(255,255,255,0.88); margin-left:3px; }
+.comm-card-info { position:absolute; bottom:0; left:0; right:0; padding:16px 18px; background:linear-gradient(transparent,rgba(6,5,12,0.85)); }
+.comm-card-meta { font-family:var(--f-mono); font-size:8px; letter-spacing:0.24em; text-transform:uppercase; color:var(--ink-mute); margin-bottom:4px; }
+.comm-card-title { font-family:var(--f-display); font-size:1rem; font-weight:400; letter-spacing:-0.01em; color:var(--ink); }
 
-/* ─── TRANSFORMATIONS SECTION ─────────────────────────── */
-.transforms-section {
-  padding:clamp(80px,11vh,140px) clamp(28px,7vw,100px);
-  background:var(--bg); position:relative; overflow:hidden;
-  scroll-margin-top:72px;
-}
-.transforms-section::before {
-  content:'BEFORE / AFTER';
-  position:absolute; bottom:-0.1em; right:-0.04em;
-  font-family:var(--f-display); font-size:clamp(4rem,10vw,10rem);
-  font-weight:300; letter-spacing:-0.02em; line-height:1;
-  color:rgba(255,255,255,0.022); pointer-events:none; user-select:none;
-  white-space:nowrap;
-}
-.transforms-header { margin-bottom:48px; }
+/* ─── LOOK DEVELOPMENT ──────────────────────────────────── */
+.ld-section { padding:clamp(80px,11vh,140px) clamp(28px,7vw,100px); background:var(--bg-1); scroll-margin-top:72px; }
+.ld-header { margin-bottom:60px; }
+.ld-title { font-family:var(--f-display); font-size:clamp(2.5rem,7vw,7rem); font-weight:300; letter-spacing:-0.03em; line-height:0.96; color:var(--ink); margin:20px 0 24px; }
+.ld-subtitle { font-family:var(--f-body); font-size:0.95rem; font-weight:300; line-height:1.7; color:var(--ink-dim); max-width:52ch; }
+.ld-phase { margin-bottom:72px; }
+.ld-phase-label { font-family:var(--f-mono); font-size:7px; letter-spacing:0.4em; text-transform:uppercase; color:var(--ink-mute); padding-bottom:14px; margin-bottom:16px; border-bottom:1px solid var(--ink-ghost); }
+.ld-quad { display:grid; grid-template-columns:repeat(4,1fr); gap:4px; }
+@media (max-width:768px) { .ld-quad { grid-template-columns:repeat(2,1fr); } }
+.ld-pair { display:grid; grid-template-columns:3fr 2fr; gap:4px; margin-bottom:4px; }
+@media (max-width:600px) { .ld-pair { grid-template-columns:1fr; } }
+.ld-hero-frame { position:relative; overflow:hidden; background:var(--bg-2); aspect-ratio:21/9; margin-bottom:4px; }
+.ld-strip { display:grid; grid-template-columns:repeat(4,1fr); gap:4px; }
+@media (max-width:768px) { .ld-strip { grid-template-columns:repeat(2,1fr); } }
+.ld-frame { position:relative; overflow:hidden; background:var(--bg-2); aspect-ratio:4/3; }
+.ld-frame img, .ld-hero-frame img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.7s var(--ease-out); }
+.ld-frame:hover img, .ld-hero-frame:hover img { transform:scale(1.04); }
+.ld-footer { margin-top:32px; padding-top:20px; border-top:1px solid var(--ink-ghost); }
+.ld-footer a { font-family:var(--f-mono); font-size:8px; letter-spacing:0.28em; text-transform:uppercase; color:var(--ink-dim); text-decoration:none; border-bottom:1px solid var(--ink-ghost); padding-bottom:2px; transition:color 0.3s; }
+.ld-footer a:hover { color:var(--ink); }
 
-/* Side-by-side comparison pairs */
-.ba-pairs-grid { display:flex; flex-direction:column; gap:4px; }
-.ba-pair { display:grid; grid-template-columns:1fr 1fr; gap:4px; }
-@media (max-width:600px) { .ba-pair { grid-template-columns:1fr; } }
-.ba-side { position:relative; overflow:hidden; background:var(--bg-2); }
-.ba-side img {
-  width:100%; display:block; aspect-ratio:4/3; object-fit:cover;
-  transition:transform 0.7s var(--ease-out);
-}
-.ba-side:hover img { transform:scale(1.03); }
-.ba-side-label {
-  position:absolute; top:12px; left:12px;
-  font-family:var(--f-mono); font-size:8px; letter-spacing:0.24em;
-  text-transform:uppercase; color:var(--ink-dim);
-  background:rgba(6,5,12,0.65); padding:5px 10px;
-  pointer-events:none; z-index:2;
-}
-.ba-pair-caption {
-  display:flex; justify-content:flex-end; padding:8px 0;
-  font-family:var(--f-mono); font-size:8px; letter-spacing:0.18em;
-  text-transform:uppercase; color:var(--ink-mute);
-}
-.transforms-footer {
-  margin-top:40px; padding-top:20px; border-top:1px solid var(--ink-ghost);
-  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;
-}
-.transforms-footer-note {
-  font-family:var(--f-mono); font-size:8px; letter-spacing:0.22em;
-  color:var(--ink-mute); text-transform:uppercase;
-}
-.transforms-footer a {
-  font-family:var(--f-mono); font-size:8px; letter-spacing:0.22em;
-  text-transform:uppercase; color:var(--ink-dim); text-decoration:none;
-  border-bottom:1px solid var(--ink-ghost); padding-bottom:2px; transition:color 0.3s;
-}
-.transforms-footer a:hover { color:var(--ink); }
+/* ─── CHARACTER & MOTION ─────────────────────────────────── */
+.char-section { padding:clamp(80px,11vh,140px) clamp(28px,7vw,100px); background:var(--bg-2); scroll-margin-top:72px; }
+.char-inner { display:grid; grid-template-columns:3fr 2fr; gap:80px; align-items:center; }
+@media (max-width:900px) { .char-inner { grid-template-columns:1fr; gap:40px; } }
+.char-video-wrap { position:relative; overflow:hidden; background:var(--bg-1); aspect-ratio:16/9; cursor:pointer; }
+.char-video-wrap video { width:100%; height:100%; object-fit:cover; display:block; }
+.char-play-overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(6,5,12,0.28); transition:background 0.4s, opacity 0.4s; }
+.char-video-wrap.playing .char-play-overlay { opacity:0; pointer-events:none; }
+.char-play-circle { width:68px; height:68px; border:1px solid rgba(255,255,255,0.6); border-radius:50%; display:flex; align-items:center; justify-content:center; transition:transform 0.3s var(--ease-out), border-color 0.3s; }
+.char-video-wrap:hover .char-play-circle { transform:scale(1.1); border-color:rgba(255,255,255,0.9); }
+.char-play-tri { width:0; height:0; border-style:solid; border-width:10px 0 10px 20px; border-color:transparent transparent transparent rgba(255,255,255,0.9); margin-left:5px; }
+.char-eyebrow { font-family:var(--f-mono); font-size:8px; letter-spacing:0.38em; text-transform:uppercase; color:var(--ink-mute); margin-bottom:20px; display:block; }
+.char-title { font-family:var(--f-display); font-size:clamp(2.2rem,5vw,4.5rem); font-weight:300; letter-spacing:-0.025em; line-height:1.02; color:var(--ink); margin-bottom:28px; }
+.char-body { font-family:var(--f-body); font-size:0.95rem; font-weight:300; line-height:1.72; color:var(--ink-dim); max-width:44ch; margin-bottom:32px; }
+.char-pipeline { display:flex; flex-direction:column; gap:10px; }
+.char-step { font-family:var(--f-mono); font-size:9px; letter-spacing:0.18em; color:var(--ink-mute); display:flex; gap:12px; align-items:baseline; }
+.char-step span { color:var(--accent); font-size:8px; min-width:28px; letter-spacing:0.14em; }
 
-/* ─── SHOWREEL / CHARACTER ─────────────────────────────── */
-.showreel-section {
-  padding:clamp(80px,11vh,140px) clamp(28px,7vw,100px);
-  background:var(--bg-1); scroll-margin-top:72px;
-}
-.showreel-inner {
-  display:grid; grid-template-columns:1fr 1fr; gap:72px; align-items:center;
-}
-@media (max-width:900px) {
-  .showreel-inner { grid-template-columns:1fr; gap:40px; }
-  .showreel-section { padding-left:0; padding-right:0; }
-  .showreel-inner { padding-left:clamp(16px,5vw,36px); padding-right:clamp(16px,5vw,36px); }
-}
-.showreel-video {
-  position:relative; overflow:hidden; background:var(--bg-2);
-  aspect-ratio:16/9;
-}
-.showreel-video video { width:100%; height:100%; object-fit:cover; }
-.video-overlay {
-  position:absolute; inset:0;
-  background:linear-gradient(135deg,rgba(6,5,12,0.18),transparent);
-  pointer-events:none;
-}
-.sr-eyebrow {
-  font-family:var(--f-mono); font-size:8px; letter-spacing:0.38em;
-  text-transform:uppercase; color:var(--accent); margin-bottom:20px; display:block;
-}
-.sr-title {
-  font-family:var(--f-display); font-size:clamp(2.2rem,5vw,4.5rem);
-  font-weight:300; letter-spacing:-0.025em; line-height:1.02;
-  color:var(--ink); margin-bottom:28px;
-}
-.sr-body {
-  font-family:var(--f-body); font-size:0.95rem; font-weight:300; line-height:1.72;
-  color:var(--ink-dim); max-width:44ch; margin-bottom:32px;
-}
-.sr-meta { display:flex; flex-direction:column; gap:10px; }
-.sr-meta-item {
-  font-family:var(--f-mono); font-size:9px; letter-spacing:0.18em;
-  color:var(--ink-mute); display:flex; gap:12px; align-items:baseline;
-}
-.sr-meta-item span {
-  color:var(--accent); font-size:8px; min-width:28px; letter-spacing:0.14em;
-}
-
-/* ─── GALLERY ─────────────────────────────────────────── */
-.gallery-section {
-  padding:clamp(80px,12vh,140px) clamp(28px,7vw,100px);
-  background:var(--bg-2); scroll-margin-top:72px;
-}
-.gallery-head-row {
-  display:flex; justify-content:space-between; align-items:baseline;
-  margin-bottom:32px; flex-wrap:wrap; gap:12px;
-}
-.gallery-archive-label {
-  font-family:var(--f-display); font-size:clamp(2rem,5vw,4.5rem);
-  font-weight:300; letter-spacing:-0.025em; color:var(--ink);
-}
-.gallery-count {
-  font-family:var(--f-mono); font-size:8px; letter-spacing:0.28em;
-  text-transform:uppercase; color:var(--ink-mute);
-}
-.gallery-filters { display:flex; gap:0; margin-bottom:40px; border-bottom:1px solid var(--ink-ghost); }
-.g-filter {
-  padding:10px 20px; background:none; border:none; cursor:pointer;
-  font-family:var(--f-mono); font-size:8px; letter-spacing:0.28em;
-  text-transform:uppercase; color:var(--ink-mute);
-  border-bottom:1px solid transparent; margin-bottom:-1px;
-  transition:color 0.25s, border-color 0.25s;
-}
-.g-filter.active { color:var(--ink); border-bottom-color:var(--ink); }
-.g-filter:hover { color:var(--ink-dim); }
-.gallery-grid {
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:4px;
-}
-@media (max-width:900px) { .gallery-grid { grid-template-columns:repeat(2,1fr); } }
-@media (max-width:500px) { .gallery-grid { grid-template-columns:1fr; } }
-.g-cell {
-  position:relative; overflow:hidden; background:var(--bg-1);
-  aspect-ratio:4/3; cursor:pointer;
-  border:1px solid var(--ink-ghost);
-}
-.g-cell[data-size="tall"] { aspect-ratio:9/16; }
-.g-cell[data-size="wide"] { aspect-ratio:16/7; grid-column:span 2; }
-.g-cell img, .g-cell video {
-  width:100%; height:100%; object-fit:cover; display:block;
-  transition:transform 0.6s var(--ease-out);
-}
-.g-cell:hover img, .g-cell:hover video { transform:scale(1.04); }
-.g-cell-info {
-  position:absolute; bottom:0; left:0; right:0;
-  padding:14px 16px;
-  background:linear-gradient(transparent,rgba(6,5,12,0.75));
-  opacity:0; transition:opacity 0.3s;
-}
-.g-cell:hover .g-cell-info { opacity:1; }
-.g-cell-title { font-family:var(--f-display); font-size:0.9rem; font-weight:400; color:var(--ink); }
-.g-cell-tag { font-family:var(--f-mono); font-size:7px; letter-spacing:0.22em; color:var(--ink-mute); margin-top:3px; }
-.g-hidden { display:none !important; }
-
-/* ─── CAPABILITIES ────────────────────────────────────── */
-.tools-section {
-  padding:clamp(80px,11vh,140px) clamp(28px,7vw,100px);
-  background:var(--bg-1);
-  display:grid; grid-template-columns:1fr 1.4fr; gap:80px; align-items:start;
-}
-@media (max-width:900px) { .tools-section { grid-template-columns:1fr; gap:48px; } }
-.caps-disciplines { margin-top:28px; }
-.cap-disc {
-  font-family:var(--f-display); font-size:clamp(1rem,2vw,1.25rem);
-  font-weight:300; letter-spacing:-0.01em; color:var(--ink-dim);
-  padding:13px 0; border-bottom:1px solid var(--ink-ghost);
-  transition:color 0.3s var(--ease-out), padding-left 0.3s var(--ease-out);
-  cursor:default;
-}
-.cap-disc:first-child { border-top:1px solid var(--ink-ghost); }
-.cap-disc:hover { color:var(--ink); padding-left:8px; }
-.tools-categories { display:grid; grid-template-columns:repeat(2,1fr); gap:40px 32px; }
-@media (max-width:600px) { .tools-categories { grid-template-columns:1fr; } }
-.tc-header {
-  font-family:var(--f-mono); font-size:7px; letter-spacing:0.32em;
-  text-transform:uppercase; color:var(--ink-mute); margin-bottom:16px;
-  padding-bottom:10px; border-bottom:1px solid var(--ink-ghost);
-}
-.tool-item {
-  font-family:var(--f-body); font-size:0.85rem; font-weight:300;
-  color:var(--ink-dim); padding:6px 0;
-  display:flex; align-items:center; gap:10px;
-  border-bottom:1px solid rgba(255,255,255,0.03);
-}
+/* ─── CAPABILITIES & ABOUT ───────────────────────────────── */
+.cap-section { padding:clamp(80px,11vh,140px) clamp(28px,7vw,100px); background:var(--bg-1); scroll-margin-top:72px; }
+.cap-grid { display:grid; grid-template-columns:1fr 1.6fr; gap:96px; align-items:start; }
+@media (max-width:900px) { .cap-grid { grid-template-columns:1fr; gap:48px; } }
+.cap-left-head { margin-bottom:32px; }
+.cap-disciplines { border-top:1px solid var(--ink-ghost); margin-top:28px; }
+.cap-disc { font-family:var(--f-display); font-size:clamp(0.95rem,1.8vw,1.18rem); font-weight:300; letter-spacing:-0.01em; color:var(--ink-dim); padding:12px 0; border-bottom:1px solid var(--ink-ghost); transition:color 0.3s var(--ease-out), padding-left 0.3s var(--ease-out); cursor:default; }
+.cap-disc:hover { color:var(--ink); padding-left:10px; }
+.cap-tools { display:grid; grid-template-columns:repeat(2,1fr); gap:40px 32px; margin-top:24px; }
+@media (max-width:600px) { .cap-tools { grid-template-columns:1fr; } }
+.tc-header { font-family:var(--f-mono); font-size:7px; letter-spacing:0.32em; text-transform:uppercase; color:var(--ink-mute); margin-bottom:16px; padding-bottom:10px; border-bottom:1px solid var(--ink-ghost); }
+.tool-item { font-family:var(--f-body); font-size:0.85rem; font-weight:300; color:var(--ink-dim); padding:6px 0; display:flex; align-items:center; gap:10px; border-bottom:1px solid rgba(255,255,255,0.03); }
 .tool-dot { width:4px; height:4px; border-radius:50%; background:var(--accent); flex-shrink:0; }
-
-/* ─── ABOUT ───────────────────────────────────────────── */
-.about-section {
-  padding:clamp(80px,11vh,140px) clamp(28px,7vw,100px);
-  background:var(--bg-2);
-  display:grid; grid-template-columns:1fr 1.2fr; gap:80px; align-items:start;
-}
-@media (max-width:900px) { .about-section { grid-template-columns:1fr; gap:48px; } }
-.about-visual {
-  display:grid; grid-template-columns:1fr 1fr; grid-template-rows:auto auto;
-  gap:3px; background:var(--bg);
-}
-.about-frame {
-  position:relative; overflow:hidden; background:var(--bg-2);
-}
-.about-frame:first-child {
-  grid-column:1 / -1; aspect-ratio:16/9;
-}
-.about-frame:not(:first-child) { aspect-ratio:4/3; }
-.about-frame img {
-  width:100%; height:100%; object-fit:cover; display:block;
-  transition:transform 0.9s var(--ease-out);
-}
-.about-visual:hover .about-frame img { transform:scale(1.03); }
-.af-label {
-  position:absolute; bottom:10px; left:12px;
-  font-family:var(--f-mono); font-size:7px; letter-spacing:0.24em;
-  text-transform:uppercase; color:var(--ink-mute);
-  background:rgba(6,5,12,0.65); padding:4px 10px; pointer-events:none;
-}
-.a-eyebrow {
-  font-family:var(--f-mono); font-size:8px; letter-spacing:0.38em;
-  text-transform:uppercase; color:var(--ink-mute); margin-bottom:20px; display:block;
-}
-.a-headline {
-  font-family:var(--f-display); font-size:clamp(2.2rem,5.5vw,5rem);
-  font-weight:300; letter-spacing:-0.025em; line-height:1.02;
-  color:var(--ink); margin-bottom:32px;
-}
-.a-body {
-  font-family:var(--f-body); font-size:0.95rem; font-weight:300; line-height:1.72;
-  color:var(--ink-dim); max-width:46ch;
-}
+.cap-about-head { margin-bottom:20px; }
+.a-eyebrow { font-family:var(--f-mono); font-size:8px; letter-spacing:0.38em; text-transform:uppercase; color:var(--ink-mute); margin-bottom:20px; display:block; }
+.a-headline { font-family:var(--f-display); font-size:clamp(2.2rem,5.5vw,5rem); font-weight:300; letter-spacing:-0.025em; line-height:1.02; color:var(--ink); margin-bottom:32px; }
+.cap-bio { font-family:var(--f-body); font-size:0.95rem; font-weight:300; line-height:1.72; color:var(--ink-dim); max-width:46ch; margin-bottom:20px; }
 
 /* ─── CONTACT ─────────────────────────────────────────── */
 .contact-section {
-  padding:clamp(100px,14vh,180px) clamp(28px,7vw,100px);
+  padding:clamp(120px,16vh,200px) clamp(28px,7vw,100px);
   background:var(--bg); text-align:center; position:relative; overflow:hidden;
 }
 .contact-section::before {
-  content:'JATIN SHINDE';
-  position:absolute; bottom:-0.08em; left:50%; transform:translateX(-50%);
-  font-family:var(--f-display); font-size:clamp(3rem,12vw,11rem);
-  font-weight:200; letter-spacing:0.08em; line-height:1;
-  color:rgba(255,255,255,0.022); pointer-events:none; user-select:none;
-  white-space:nowrap;
+  content:'JS';
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  font-family:var(--f-display); font-size:clamp(14rem,46vw,44rem);
+  font-weight:200; letter-spacing:-0.06em; line-height:1;
+  color:rgba(255,255,255,0.018); pointer-events:none; user-select:none; white-space:nowrap;
 }
-.c-strip {
-  display:flex; gap:3px; margin:0 auto 64px;
-  width:min(700px,92vw); position:relative; z-index:1;
-}
-.c-strip-frame { flex:1; aspect-ratio:16/9; overflow:hidden; background:var(--bg-2); }
-.c-strip-frame img { width:100%; height:100%; object-fit:cover; display:block;
-  transition:transform 0.7s var(--ease-out); filter:saturate(0.6); }
-.c-strip:hover .c-strip-frame img { filter:saturate(1); }
-.c-strip-frame:hover img { transform:scale(1.08); }
-.c-eyebrow {
-  font-family:var(--f-mono); font-size:8px; letter-spacing:0.38em;
-  text-transform:uppercase; color:var(--ink-mute); margin-bottom:24px; display:block;
-}
-.c-headline {
-  font-family:var(--f-display); font-size:clamp(2.4rem,6.5vw,6rem);
-  font-weight:300; letter-spacing:-0.025em; line-height:1.02;
-  color:var(--ink); margin-bottom:40px;
-}
-.c-body {
-  font-family:var(--f-body); font-size:0.95rem; font-weight:300; line-height:1.7;
-  color:var(--ink-dim); max-width:44ch; margin:0 auto 40px; position:relative; z-index:1;
-}
-.c-btns {
-  display:flex; gap:16px; justify-content:center; flex-wrap:wrap;
-  position:relative; z-index:1;
-}
-.c-btn {
-  font-family:var(--f-mono); font-size:8px; letter-spacing:0.32em; text-transform:uppercase;
-  padding:14px 30px; border:1px solid var(--ink); color:var(--ink); text-decoration:none;
-  transition:background 0.3s, color 0.3s;
-}
+.c-eyebrow { font-family:var(--f-mono); font-size:8px; letter-spacing:0.38em; text-transform:uppercase; color:var(--ink-mute); margin-bottom:24px; display:block; position:relative; z-index:1; }
+.c-headline { font-family:var(--f-display); font-size:clamp(3rem,9vw,9rem); font-weight:200; letter-spacing:-0.03em; line-height:0.96; color:var(--ink); margin-bottom:32px; position:relative; z-index:1; }
+.c-body { font-family:var(--f-body); font-size:0.95rem; font-weight:300; line-height:1.7; color:var(--ink-dim); max-width:44ch; margin:0 auto 40px; position:relative; z-index:1; }
+.c-btns { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; position:relative; z-index:1; }
+.c-btn { font-family:var(--f-mono); font-size:8px; letter-spacing:0.32em; text-transform:uppercase; padding:14px 30px; border:1px solid var(--ink); color:var(--ink); text-decoration:none; transition:background 0.3s, color 0.3s; }
 .c-btn:hover { background:var(--ink); color:var(--bg); }
 .c-btn.secondary { border-color:rgba(255,255,255,0.18); color:var(--ink-dim); }
 .c-btn.secondary:hover { background:rgba(255,255,255,0.08); color:var(--ink); }
@@ -692,10 +491,7 @@ footer {
 }
 .f-left { font-family:var(--f-mono); font-size:8px; letter-spacing:0.22em; color:var(--ink-mute); }
 .f-right { display:flex; gap:24px; }
-.f-right a {
-  font-family:var(--f-mono); font-size:8px; letter-spacing:0.22em;
-  text-transform:uppercase; color:var(--ink-mute); text-decoration:none; transition:color 0.3s;
-}
+.f-right a { font-family:var(--f-mono); font-size:8px; letter-spacing:0.22em; text-transform:uppercase; color:var(--ink-mute); text-decoration:none; transition:color 0.3s; }
 .f-right a:hover { color:var(--ink); }
 @media (max-width:600px) { footer { flex-direction:column; align-items:center; text-align:center; } }
 </style>
@@ -794,234 +590,182 @@ footer {
 <!-- ══════════════════════════════════════════════════════════ -->
 <div id="content">
 
+  <!-- SELECTED WORK -->
+  <section class="sw-section" id="selected-work">
+    <div class="sw-header">
+      <span class="sw-label">Selected Work</span>
+      <span class="sw-count">—01</span>
+    </div>
+    <h2 class="sw-title reveal">Render &amp; Reality.</h2>
+    <div class="sw-hero reveal">
+      <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/09.webp" loading="lazy" alt="CGI render">
+      <span class="sw-hero-label">Look Development · Final Output</span>
+    </div>
+    <div class="sw-trio">
+      <div class="sw-trio-item"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/01.webp" loading="lazy" alt="Render 01"><span class="sw-trio-label">R-01</span></div>
+      <div class="sw-trio-item"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/05.webp" loading="lazy" alt="Render 05"><span class="sw-trio-label">R-05</span></div>
+      <div class="sw-trio-item"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/13.webp" loading="lazy" alt="Render 13"><span class="sw-trio-label">R-13</span></div>
+    </div>
+    <div class="sw-footer"><a href="/archive#transforms">View all 13 renders →</a></div>
+  </section>
+
   <!-- COMMERCIAL CGI -->
-  <div class="commercial-section" id="ads">
-    <div class="comm-header">
-      <span class="comm-eyebrow reveal">Commercial CGI</span>
-      <div class="comm-descriptor">Product · Advertising · Motion</div>
+  <section class="commercial-section" id="ads">
+    <div class="comm-header reveal">
+      <div class="comm-left">
+        <span class="comm-eyebrow">Commercial CGI</span>
+        <div class="comm-title">Product.<br>Advertising.<br>Motion.</div>
+      </div>
+      <span class="comm-note">9 works · Click to play</span>
     </div>
-    <div class="comm-grid" id="comm-grid">
-      <!-- Cards injected by JS; each hides itself on video error -->
-    </div>
-  </div>
+    <div class="comm-grid" id="comm-grid"></div>
+  </section>
 
-  <!-- TRANSFORMATIONS -->
-  <div class="transforms-section" id="transformations">
-    <div class="transforms-header">
+  <!-- LOOK DEVELOPMENT -->
+  <section class="ld-section" id="look-development">
+    <div class="ld-header">
       <span class="s-eyebrow reveal">Look Development</span>
-      <h2 class="s-title reveal reveal-delay-1">Before &amp;<br>After.</h2>
+      <h2 class="ld-title reveal reveal-delay-1">13 renders.<br>One pipeline.</h2>
+      <p class="ld-subtitle reveal reveal-delay-2">Full photoreal development — from early concept blocking through to final lighting and material passes.</p>
     </div>
-    <div class="ba-pairs-grid reveal reveal-delay-1">
-      <!-- Pair 1 -->
-      <div class="ba-pair">
-        <div class="ba-side">
-          <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/01.webp" loading="lazy" alt="Before — 01">
-          <span class="ba-side-label">Before</span>
-        </div>
-        <div class="ba-side">
-          <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/02.webp" loading="lazy" alt="After — 01">
-          <span class="ba-side-label">After</span>
-        </div>
-      </div>
-      <!-- Pair 2 -->
-      <div class="ba-pair">
-        <div class="ba-side">
-          <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/03.webp" loading="lazy" alt="Before — 02">
-          <span class="ba-side-label">Before</span>
-        </div>
-        <div class="ba-side">
-          <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/04.webp" loading="lazy" alt="After — 02">
-          <span class="ba-side-label">After</span>
-        </div>
-      </div>
-      <!-- Pair 3 -->
-      <div class="ba-pair">
-        <div class="ba-side">
-          <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/05.webp" loading="lazy" alt="Before — 03">
-          <span class="ba-side-label">Before</span>
-        </div>
-        <div class="ba-side">
-          <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/06.webp" loading="lazy" alt="After — 03">
-          <span class="ba-side-label">After</span>
-        </div>
-      </div>
-      <!-- Pair 4 -->
-      <div class="ba-pair">
-        <div class="ba-side">
-          <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/07.webp" loading="lazy" alt="Before — 04">
-          <span class="ba-side-label">Before</span>
-        </div>
-        <div class="ba-side">
-          <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/08.webp" loading="lazy" alt="After — 04">
-          <span class="ba-side-label">After</span>
-        </div>
-      </div>
-      <!-- Pair 5 -->
-      <div class="ba-pair">
-        <div class="ba-side">
-          <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/09.webp" loading="lazy" alt="Before — 05">
-          <span class="ba-side-label">Before</span>
-        </div>
-        <div class="ba-side">
-          <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/10.webp" loading="lazy" alt="After — 05">
-          <span class="ba-side-label">After</span>
-        </div>
-      </div>
-      <!-- Pair 6 -->
-      <div class="ba-pair">
-        <div class="ba-side">
-          <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/11.webp" loading="lazy" alt="Before — 06">
-          <span class="ba-side-label">Before</span>
-        </div>
-        <div class="ba-side">
-          <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/12.webp" loading="lazy" alt="After — 06">
-          <span class="ba-side-label">After</span>
-        </div>
+    <div class="ld-phase">
+      <div class="ld-phase-label">Phase 01 · Blocking &amp; Composition</div>
+      <div class="ld-quad">
+        <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/01.webp" loading="lazy" alt="Render 01"></div>
+        <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/02.webp" loading="lazy" alt="Render 02"></div>
+        <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/03.webp" loading="lazy" alt="Render 03"></div>
+        <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/04.webp" loading="lazy" alt="Render 04"></div>
       </div>
     </div>
-    <div class="transforms-footer">
-      <span class="transforms-footer-note">6 comparisons · Full look development pipeline</span>
-      <a href="/archive#transformations">Full Transforms Archive →</a>
+    <div class="ld-phase">
+      <div class="ld-phase-label">Phase 02 · Materials &amp; Lighting</div>
+      <div class="ld-pair">
+        <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/05.webp" loading="lazy" alt="Render 05"></div>
+        <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/06.webp" loading="lazy" alt="Render 06"></div>
+      </div>
+      <div class="ld-pair">
+        <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/07.webp" loading="lazy" alt="Render 07"></div>
+        <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/08.webp" loading="lazy" alt="Render 08"></div>
+      </div>
     </div>
-  </div>
+    <div class="ld-phase">
+      <div class="ld-phase-label">Phase 03 · Final Output</div>
+      <div class="ld-hero-frame">
+        <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/09.webp" loading="lazy" alt="Render 09">
+      </div>
+      <div class="ld-strip">
+        <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/10.webp" loading="lazy" alt="Render 10"></div>
+        <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/11.webp" loading="lazy" alt="Render 11"></div>
+        <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/12.webp" loading="lazy" alt="Render 12"></div>
+        <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/13.webp" loading="lazy" alt="Render 13"></div>
+      </div>
+    </div>
+    <div class="ld-footer"><a href="/archive#transforms">Full render archive →</a></div>
+  </section>
 
-  <!-- CHARACTER PIPELINE -->
-  <div class="showreel-section" id="showreel">
-    <div class="showreel-inner">
-      <div class="showreel-video reveal">
-        <video id="reel-video" loop muted playsinline preload="none">
+  <!-- CHARACTER & MOTION -->
+  <section class="char-section" id="showreel">
+    <div class="char-inner">
+      <div class="char-video-wrap reveal" id="char-wrap">
+        <video id="char-video" loop muted playsinline preload="none">
           <source src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/showreel/character-reel.mp4" type="video/mp4">
         </video>
-        <div class="video-overlay"></div>
+        <div class="char-play-overlay">
+          <div class="char-play-circle"><div class="char-play-tri"></div></div>
+        </div>
       </div>
-      <div class="showreel-text">
-        <span class="sr-eyebrow reveal">Character Work</span>
-        <h2 class="sr-title reveal reveal-delay-1">From Clay<br>to Camera.</h2>
-        <p class="sr-body reveal reveal-delay-2">Character creation, texturing, look development and final cinematic output. Full pipeline from Blender and Character Creator 4 through Substance 3D Painter, Marvelous Designer and Unreal Engine 5 lighting.</p>
-        <div class="sr-meta reveal reveal-delay-3">
-          <div class="sr-meta-item"><span>CC4</span>Character Creator 4</div>
-          <div class="sr-meta-item"><span>SP</span>Substance 3D Painter</div>
-          <div class="sr-meta-item"><span>MD</span>Marvelous Designer</div>
-          <div class="sr-meta-item"><span>UE5</span>Cinematic Render</div>
+      <div>
+        <span class="char-eyebrow reveal">Character Work</span>
+        <h2 class="char-title reveal reveal-delay-1">From Clay<br>to Camera.</h2>
+        <p class="char-body reveal reveal-delay-2">Character creation, texturing, look development and final cinematic output. Full pipeline from Blender and Character Creator 4 through Substance 3D Painter, Marvelous Designer and Unreal Engine 5.</p>
+        <div class="char-pipeline reveal reveal-delay-3">
+          <div class="char-step"><span>CC4</span>Character Creator 4</div>
+          <div class="char-step"><span>SP</span>Substance 3D Painter</div>
+          <div class="char-step"><span>MD</span>Marvelous Designer</div>
+          <div class="char-step"><span>UE5</span>Cinematic Render</div>
         </div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- GALLERY ARCHIVE -->
-  <div class="gallery-section" id="gallery">
-    <div class="gallery-head-row">
-      <span class="gallery-archive-label reveal">Archive</span>
-      <span class="gallery-count reveal">40+ Works · Environments · VFX &amp; Motion</span>
-    </div>
-    <div class="gallery-filters reveal">
-      <button class="g-filter active" data-filter="all">All</button>
-      <button class="g-filter" data-filter="environments">Environments</button>
-      <button class="g-filter" data-filter="concept-art">VFX &amp; Motion</button>
-    </div>
-    <div class="gallery-grid" id="g-grid"></div>
-    <div style="margin-top:40px;text-align:center">
-      <a href="/archive" style="font-family:var(--f-mono);font-size:8px;letter-spacing:0.32em;text-transform:uppercase;color:var(--ink-dim);text-decoration:none;border-bottom:1px solid var(--ink-ghost);padding-bottom:4px;transition:color 0.3s,border-color 0.3s" onmouseenter="this.style.color='var(--ink)';this.style.borderColor='var(--ink-mute)'" onmouseleave="this.style.color='var(--ink-dim)';this.style.borderColor='var(--ink-ghost)'">Full Archive →</a>
-    </div>
-  </div>
-
-  <!-- CAPABILITIES -->
-  <div class="tools-section" id="capabilities">
-    <div>
-      <span class="s-eyebrow reveal">Capabilities</span>
-      <h2 class="s-title reveal reveal-delay-1">Full-Stack<br>3D Pipeline.</h2>
-      <div class="caps-disciplines reveal reveal-delay-2">
-        <div class="cap-disc">Cinematic Environment Design</div>
-        <div class="cap-disc">3D Modelling &amp; Texturing</div>
-        <div class="cap-disc">Lighting, Rendering &amp; Look Development</div>
-        <div class="cap-disc">Character Creation</div>
-        <div class="cap-disc">CGI Advertising</div>
-        <div class="cap-disc">VFX &amp; Compositing</div>
-        <div class="cap-disc">Motion Design &amp; Post-Production</div>
-      </div>
-    </div>
-    <div class="tools-categories reveal">
-      <div class="tools-category">
-        <div class="tc-header">3D / Real-Time</div>
-        <div>
-          <div class="tool-item"><span class="tool-dot"></span>Unreal Engine 5</div>
-          <div class="tool-item"><span class="tool-dot"></span>Blender</div>
-          <div class="tool-item"><span class="tool-dot"></span>Substance 3D Painter</div>
-          <div class="tool-item"><span class="tool-dot"></span>Character Creator 4</div>
-          <div class="tool-item"><span class="tool-dot"></span>Marvelous Designer</div>
+  <!-- CAPABILITIES & ABOUT -->
+  <section class="cap-section" id="about">
+    <div class="cap-grid">
+      <div>
+        <div class="cap-left-head">
+          <span class="s-eyebrow reveal">Capabilities</span>
+          <h2 class="s-title reveal reveal-delay-1">Full-Stack<br>3D Pipeline.</h2>
+        </div>
+        <div class="cap-disciplines reveal reveal-delay-2">
+          <div class="cap-disc">Cinematic Environment Design</div>
+          <div class="cap-disc">3D Modelling &amp; Texturing</div>
+          <div class="cap-disc">Lighting, Rendering &amp; Look Development</div>
+          <div class="cap-disc">Character Creation</div>
+          <div class="cap-disc">CGI Advertising</div>
+          <div class="cap-disc">VFX &amp; Compositing</div>
+          <div class="cap-disc">Motion Design &amp; Post-Production</div>
         </div>
       </div>
-      <div class="tools-category">
-        <div class="tc-header">Compositing / Motion</div>
-        <div>
-          <div class="tool-item"><span class="tool-dot"></span>After Effects</div>
-          <div class="tool-item"><span class="tool-dot"></span>DaVinci Resolve</div>
-          <div class="tool-item"><span class="tool-dot"></span>Premiere Pro</div>
-          <div class="tool-item"><span class="tool-dot"></span>Audition</div>
+      <div>
+        <div class="cap-about-head">
+          <span class="a-eyebrow reveal">About</span>
+          <h2 class="a-headline reveal reveal-delay-1">7+ Years of<br>Creative Production.</h2>
         </div>
-      </div>
-      <div class="tools-category">
-        <div class="tc-header">Design</div>
-        <div>
-          <div class="tool-item"><span class="tool-dot"></span>Photoshop</div>
-          <div class="tool-item"><span class="tool-dot"></span>Illustrator</div>
-          <div class="tool-item"><span class="tool-dot"></span>Lightroom</div>
-          <div class="tool-item"><span class="tool-dot"></span>Corel Draw</div>
-        </div>
-      </div>
-      <div class="tools-category">
-        <div class="tc-header">Generative / AI</div>
-        <div>
-          <div class="tool-item"><span class="tool-dot"></span>ComfyUI</div>
-          <div class="tool-item"><span class="tool-dot"></span>Image Workflows</div>
-          <div class="tool-item"><span class="tool-dot"></span>Video Workflows</div>
+        <p class="cap-bio reveal reveal-delay-2">Seven years of hands-on creative production — cinematic environments, character work, product CGI, and VFX. Comfortable across the full 3D pipeline, from early concept through to final render and delivery.</p>
+        <p class="cap-bio reveal reveal-delay-3">Based in India. Available for international projects, studio collaborations, and relocation. Strong interest in game studios, VFX houses, and creative technology teams worldwide.</p>
+        <div class="cap-tools reveal">
+          <div class="tools-category">
+            <div class="tc-header">3D / Real-Time</div>
+            <div>
+              <div class="tool-item"><span class="tool-dot"></span>Unreal Engine 5</div>
+              <div class="tool-item"><span class="tool-dot"></span>Blender</div>
+              <div class="tool-item"><span class="tool-dot"></span>Substance 3D Painter</div>
+              <div class="tool-item"><span class="tool-dot"></span>Character Creator 4</div>
+              <div class="tool-item"><span class="tool-dot"></span>Marvelous Designer</div>
+            </div>
+          </div>
+          <div class="tools-category">
+            <div class="tc-header">Compositing / Motion</div>
+            <div>
+              <div class="tool-item"><span class="tool-dot"></span>After Effects</div>
+              <div class="tool-item"><span class="tool-dot"></span>DaVinci Resolve</div>
+              <div class="tool-item"><span class="tool-dot"></span>Premiere Pro</div>
+              <div class="tool-item"><span class="tool-dot"></span>Audition</div>
+            </div>
+          </div>
+          <div class="tools-category">
+            <div class="tc-header">Design</div>
+            <div>
+              <div class="tool-item"><span class="tool-dot"></span>Photoshop</div>
+              <div class="tool-item"><span class="tool-dot"></span>Illustrator</div>
+              <div class="tool-item"><span class="tool-dot"></span>Lightroom</div>
+              <div class="tool-item"><span class="tool-dot"></span>Corel Draw</div>
+            </div>
+          </div>
+          <div class="tools-category">
+            <div class="tc-header">Generative / AI</div>
+            <div>
+              <div class="tool-item"><span class="tool-dot"></span>ComfyUI</div>
+              <div class="tool-item"><span class="tool-dot"></span>Image Workflows</div>
+              <div class="tool-item"><span class="tool-dot"></span>Video Workflows</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-
-  <!-- ABOUT -->
-  <div class="about-section" id="about">
-    <div class="about-visual reveal">
-      <div class="about-frame">
-        <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-01/frame_0001.webp" loading="lazy" alt="Ashfall — World 01">
-        <span class="af-label">Ashfall · World 01</span>
-      </div>
-      <div class="about-frame">
-        <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-03/frame_0061.webp" loading="lazy" alt="Verdant — World 03">
-        <span class="af-label">Verdant · World 03</span>
-      </div>
-      <div class="about-frame">
-        <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-04/frame_0004.webp" loading="lazy" alt="Helios — World 04">
-        <span class="af-label">Helios · World 04</span>
-      </div>
-    </div>
-    <div class="about-text">
-      <span class="a-eyebrow reveal">About</span>
-      <h2 class="a-headline reveal reveal-delay-1">7+ Years of<br>Creative Production<br>Experience.</h2>
-      <p class="a-body reveal reveal-delay-2">Seven years of hands-on creative production — cinematic environments, character work, product CGI, and VFX. Comfortable across the full 3D pipeline, from early concept through to final render and delivery. Tools of choice: Unreal Engine 5, Blender, Substance 3D, After Effects, DaVinci Resolve.</p>
-      <p class="a-body reveal reveal-delay-3" style="margin-top:20px">Based in India. Available for international projects, studio collaborations, and relocation. Strong interest in game studios, VFX houses, and creative technology teams worldwide.</p>
-    </div>
-  </div>
+  </section>
 
   <!-- CONTACT -->
-  <div class="contact-section" id="contact">
+  <section class="contact-section" id="contact">
     <span class="c-eyebrow reveal">Contact</span>
-    <h2 class="c-headline reveal reveal-delay-1">Seven years<br>of craft.</h2>
-    <div class="c-strip reveal reveal-delay-1">
-      <div class="c-strip-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-01/frame_0001.webp" loading="lazy" alt="Ashfall"></div>
-      <div class="c-strip-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-02/frame_0001.webp" loading="lazy" alt="Luminara"></div>
-      <div class="c-strip-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-03/frame_0061.webp" loading="lazy" alt="Verdant"></div>
-      <div class="c-strip-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-04/frame_0004.webp" loading="lazy" alt="Helios"></div>
-      <div class="c-strip-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-05/frame_0001.webp" loading="lazy" alt="Aurum"></div>
-    </div>
+    <h2 class="c-headline reveal reveal-delay-1">Ready to<br>Collaborate.</h2>
     <p class="c-body reveal reveal-delay-2">Cinematic environments, product CGI, and character work. Available for international projects, studio partnerships, and relocation.</p>
     <div class="c-btns">
       <a href="mailto:jatinshinde118@gmail.com" class="c-btn reveal reveal-delay-2">Send Email →</a>
       <a href="https://www.linkedin.com/in/jatin-shinde-202b671a9" class="c-btn secondary reveal reveal-delay-3" target="_blank" rel="noopener">LinkedIn →</a>
       <a href="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/cv/jatin-shinde-cv.pdf" class="c-btn secondary reveal reveal-delay-3" target="_blank" rel="noopener">Download CV →</a>
     </div>
-  </div>
+  </section>
 
   <footer>
     <div class="f-left">© 2026 Jatin Shinde — CGI &amp; VFX Artist</div>
@@ -1133,126 +877,42 @@ new IntersectionObserver(entries => {
 
 setAccent(0);
 
-// ── GALLERY CELLS ───────────────────────────────────────
-const GALLERY_ITEMS = [
-  // Environments — world poster stills
-  { title:'Ashfall',  tag:'World 01 · UE5',  cat:'environments', src:`${CDN}/world-01/frame_0001.webp`, link:'/work/ashfall' },
-  { title:'Luminara', tag:'World 02 · UE5',  cat:'environments', src:`${CDN}/world-02/frame_0000.webp`, link:'/work/luminara' },
-  { title:'Verdant',  tag:'World 03 · UE5',  cat:'environments', src:`${CDN}/world-03/frame_0061.webp`, link:'/work/verdant' },
-  { title:'Helios',   tag:'World 04 · UE5',  cat:'environments', src:`${CDN}/world-04/frame_0004.webp`, link:'/work/helios' },
-  { title:'Aurum',    tag:'World 05 · UE5',  cat:'environments', src:`${CDN}/world-05/frame_0001.webp`, link:'/work/aurum' },
-  // VFX & Motion — concept art videos (44 verified files; H13/H17/H28/V3 absent)
-  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H1.mp4`  },
-  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H2.mp4`  },
-  { cat:'concept-art', size:'tall',   video:`${CDN}/gallery/concept%20art/V1.mp4`  },
-  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H3.mp4`  },
-  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H4.mp4`  },
-  { cat:'concept-art', size:'tall',   video:`${CDN}/gallery/concept%20art/V2.mp4`  },
-  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H5.mp4`  },
-  { cat:'concept-art', size:'wide',   video:`${CDN}/gallery/concept%20art/H6.mp4`  },
-  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H7.mp4`  },
-  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H8.mp4`  },
-  { cat:'concept-art', size:'tall',   video:`${CDN}/gallery/concept%20art/V4.mp4`  },
-  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H9.mp4`  },
-  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H10.mp4` },
-  { cat:'concept-art', size:'tall',   video:`${CDN}/gallery/concept%20art/V5.mp4`  },
-  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H11.mp4` },
-  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H12.mp4` },
-  { cat:'concept-art', size:'tall',   video:`${CDN}/gallery/concept%20art/V6.mp4`  },
-  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H14.mp4` },
-  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H15.mp4` },
-  { cat:'concept-art', size:'tall',   video:`${CDN}/gallery/concept%20art/V7.mp4`  },
-  { cat:'concept-art', size:'wide',   video:`${CDN}/gallery/concept%20art/H16.mp4` },
-  { cat:'concept-art', size:'tall',   video:`${CDN}/gallery/concept%20art/V8.mp4`  },
-  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H18.mp4` },
-  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H19.mp4` },
-  { cat:'concept-art', size:'tall',   video:`${CDN}/gallery/concept%20art/V9.mp4`  },
-  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H20.mp4` },
-  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H21.mp4` },
-  { cat:'concept-art', size:'tall',   video:`${CDN}/gallery/concept%20art/V10.mp4` },
-  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H22.mp4` },
-  { cat:'concept-art', size:'wide',   video:`${CDN}/gallery/concept%20art/H23.mp4` },
-  { cat:'concept-art', size:'tall',   video:`${CDN}/gallery/concept%20art/V11.mp4` },
-  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H24.mp4` },
-  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H25.mp4` },
-  { cat:'concept-art', size:'tall',   video:`${CDN}/gallery/concept%20art/V12.mp4` },
-  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H26.mp4` },
-  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H27.mp4` },
-  { cat:'concept-art', size:'tall',   video:`${CDN}/gallery/concept%20art/V13.mp4` },
-  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H29.mp4` },
-  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H30.mp4` },
-  { cat:'concept-art', size:'tall',   video:`${CDN}/gallery/concept%20art/V14.mp4` },
-  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H31.mp4` },
-  { cat:'concept-art', size:'wide',   video:`${CDN}/gallery/concept%20art/H32.mp4` },
-  { cat:'concept-art', size:'tall',   video:`${CDN}/gallery/concept%20art/V15.mp4` },
-  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H33.mp4` },
-];
-const gGrid = document.getElementById('g-grid');
-GALLERY_ITEMS.forEach(item => {
-  const cell = document.createElement('div');
-  cell.className = 'g-cell'; cell.dataset.category = item.cat;
-  if (item.size) cell.dataset.size = item.size;
-  if (item.src) {
-    const img = document.createElement('img');
-    img.src = item.src; img.alt = item.title||''; img.loading = 'lazy';
-    cell.appendChild(img);
-  } else if (item.video) {
-    const vid = document.createElement('video');
-    vid.muted=true; vid.loop=true; vid.playsInline=true; vid.preload='none';
-    const s = document.createElement('source'); s.src=item.video; s.type='video/mp4';
-    vid.appendChild(s); cell.appendChild(vid);
+// ── VIDEO MANAGER — singleton, max 1 playing at a time ──
+const VM = {
+  current: null,
+  play(wrap, vid) {
+    if (this.current && this.current.vid !== vid) {
+      this.current.vid.pause();
+      this.current.vid.currentTime = 0;
+      this.current.wrap.classList.remove('playing');
+    }
+    this.current = { wrap, vid };
+    wrap.classList.add('playing');
+    vid.muted = false;
+    vid.play().catch(() => { vid.muted = true; vid.play().catch(()=>{}); });
+  },
+  toggle(wrap, vid) {
+    if (wrap.classList.contains('playing')) {
+      vid.pause();
+      wrap.classList.remove('playing');
+      if (this.current && this.current.vid === vid) this.current = null;
+    } else {
+      this.play(wrap, vid);
+    }
   }
-  if (item.title) {
-    const info = document.createElement('div'); info.className='g-cell-info';
-    info.innerHTML=`<div class="g-cell-title">${item.title}</div><div class="g-cell-tag">${item.tag||''}</div>`;
-    cell.appendChild(info);
-  }
-  if (item.link) {
-    cell.style.cursor = 'pointer';
-    cell.addEventListener('click', () => { window.location.href = item.link; });
-  }
-  gGrid.appendChild(cell);
-});
+};
 
-document.querySelectorAll('.g-filter').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const f = btn.dataset.filter;
-    document.querySelectorAll('.g-filter').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const cells = [...gGrid.querySelectorAll('.g-cell')];
-    cells.forEach(c => { c.style.opacity='0'; c.style.transition='opacity 0.2s'; });
-    setTimeout(() => {
-      cells.forEach(c => {
-        const show = f==='all' || c.dataset.category===f;
-        c.style.display = show ? '' : 'none'; c.style.transition=''; c.style.opacity='';
-      });
-    }, 220);
-  });
-});
-
-// ── VIDEO OBSERVERS ─────────────────────────────────────
-const vidObs = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) e.target.play().catch(()=>{});
-    else e.target.pause();
-  });
-}, { threshold:0.25 });
-
-document.querySelectorAll('.g-cell video').forEach(v => vidObs.observe(v));
-const srVid = document.getElementById('reel-video');
-if (srVid) vidObs.observe(srVid);
-
-// ── COMMERCIAL GRID ─────────────────────────────────────
+// ── COMMERCIAL GRID — click to play ─────────────────────
 const ADS = [
-  { src:'gallery/ads/car-commercial.mp4',      title:'Automotive Concept',  meta:'Product · CGI' },
-  { src:'gallery/ads/pepsi.mp4',               title:'Pepsi Commercial',    meta:'Advertising · CGI' },
-  { src:'gallery/ads/smart-watch.mp4',         title:'Smart Watch',         meta:'Product · CGI' },
-  { src:'gallery/ads/car-commercial-2.mp4',    title:'Automotive Concept 2',meta:'Product · CGI' },
-  { src:'gallery/ads/chocolate-bar.mp4',       title:'Chocolate Bar',       meta:'Product · CGI' },
-  { src:'gallery/ads/earbuds.mp4',             title:'EarBuds',             meta:'Product · CGI' },
-  { src:'gallery/ads/facewash.mp4',            title:'Facewash',            meta:'Product · CGI' },
-  { src:'gallery/ads/shoe.mp4',                title:'Sneaker',             meta:'Product · CGI' },
-  { src:'gallery/ads/serum.mp4',               title:'Serum',               meta:'Product · CGI' },
+  { src:'gallery/ads/car-commercial.mp4',      title:'Automotive Concept',   meta:'Product · CGI' },
+  { src:'gallery/ads/pepsi.mp4',               title:'Pepsi Commercial',     meta:'Advertising · CGI' },
+  { src:'gallery/ads/smart-watch.mp4',         title:'Smart Watch',          meta:'Product · CGI' },
+  { src:'gallery/ads/car-commercial-2.mp4',    title:'Automotive Concept 2', meta:'Product · CGI' },
+  { src:'gallery/ads/chocolate-bar.mp4',       title:'Chocolate Bar',        meta:'Product · CGI' },
+  { src:'gallery/ads/earbuds.mp4',             title:'EarBuds',              meta:'Product · CGI' },
+  { src:'gallery/ads/facewash.mp4',            title:'Facewash',             meta:'Product · CGI' },
+  { src:'gallery/ads/shoe.mp4',                title:'Sneaker',              meta:'Product · CGI' },
+  { src:'gallery/ads/serum.mp4',               title:'Serum',                meta:'Product · CGI' },
 ];
 const commGrid = document.getElementById('comm-grid');
 if (commGrid) {
@@ -1262,32 +922,32 @@ if (commGrid) {
     vid.muted=true; vid.loop=true; vid.playsInline=true; vid.preload='none';
     const src = document.createElement('source'); src.src=`${CDN}/${ad.src}`; src.type='video/mp4';
     vid.appendChild(src); card.appendChild(vid);
+    const overlay = document.createElement('div'); overlay.className='comm-card-overlay';
+    overlay.innerHTML='<div class="comm-play-btn"><div class="comm-play-icon"></div></div>';
+    card.appendChild(overlay);
     const info = document.createElement('div'); info.className='comm-card-info';
     info.innerHTML=`<div class="comm-card-meta">${ad.meta}</div><div class="comm-card-title">${ad.title}</div>`;
     card.appendChild(info);
-    vid.addEventListener('error', () => {
-      card.style.background = 'rgba(180,40,40,0.18)';
-      card.style.border = '1px solid rgba(200,60,60,0.5)';
-      const err = document.createElement('div');
-      err.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;pointer-events:none';
-      err.innerHTML = `<span style="font-family:var(--f-mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,100,100,0.8)">⚠ Asset not found</span><span style="font-family:var(--f-mono);font-size:8px;color:rgba(255,255,255,0.3);word-break:break-all;text-align:center">${ad.src}</span>`;
-      card.appendChild(err);
-    });
+    card.addEventListener('click', () => VM.toggle(card, vid));
     commGrid.appendChild(card);
-    vidObs.observe(vid);
   });
 }
 
-
-// Preload showreel metadata
+// ── CHARACTER VIDEO — click to play ─────────────────────
 {
-  const srSec = document.getElementById('showreel');
-  if (srSec) new IntersectionObserver(([e]) => {
-    if (!e.isIntersecting) return;
-    const v = document.getElementById('reel-video');
-    if (v) { v.preload='metadata'; v.load(); }
-  }, { rootMargin:'500px' }).observe(srSec);
+  const charWrap = document.getElementById('char-wrap');
+  const charVid  = document.getElementById('char-video');
+  if (charWrap && charVid) {
+    charWrap.addEventListener('click', () => VM.toggle(charWrap, charVid));
+    // Preload metadata when approaching viewport
+    new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      charVid.preload='metadata'; charVid.load();
+    }, { rootMargin:'600px' }).observe(charWrap);
+  }
 }
+
+// Preload commercial metadata when section approaches
 {
   const commSec = document.getElementById('ads');
   if (commSec) new IntersectionObserver(([e]) => {
@@ -1448,20 +1108,26 @@ if (!isMob) {
 }
 </script>
 
-<!-- GSAP scroll animations + Three.js character — deferred -->
+<!-- GSAP scroll animations — deferred -->
 <script type="module">
-const CDN = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev';
-const WORLDS_ACCENTS = { 'worlds-section':'#c46428', 'ads':'#7c5cc4', 'gallery':'#3a8c52', 'capabilities':'#2872c4', 'about':'#c4a028', 'contact':'#e8d5b0' };
 const root = document.documentElement;
+const SECTION_ACCENTS = {
+  'worlds-section':   '#c46428',
+  'selected-work':    '#c46428',
+  'ads':              '#7c5cc4',
+  'look-development': '#3a8c52',
+  'showreel':         '#2872c4',
+  'about':            '#c4a028',
+  'contact':          '#e8d5b0',
+};
 
-// ── GSAP SCROLL ANIMATIONS ──────────────────────────────
 if (typeof gsap!=='undefined' && typeof ScrollTrigger!=='undefined') {
   gsap.registerPlugin(ScrollTrigger);
   const EASE = 'cubic-bezier(0.23,1,0.32,1)';
   const isMob = matchMedia('(max-width:768px)').matches;
 
-  // Headline clip reveals
-  document.querySelectorAll('.s-title,.sr-title,.a-headline,.c-headline').forEach(el => {
+  // Headline clip reveals — all large display headings
+  document.querySelectorAll('.s-title,.ld-title,.char-title,.a-headline,.c-headline,.sw-title').forEach(el => {
     el.style.opacity='1';
     el.innerHTML = el.innerHTML.split(/<br\s*\/?>/i).map(l =>
       `<span style="display:block;overflow:hidden;line-height:1.08"><span class="tl" style="display:block;will-change:transform">${l}</span></span>`
@@ -1472,16 +1138,7 @@ if (typeof gsap!=='undefined' && typeof ScrollTrigger!=='undefined') {
     );
   });
 
-  // Gallery stagger reveal
-  const gCells = [...document.querySelectorAll('.g-cell')];
-  ScrollTrigger.create({ trigger:'#g-grid', start:'top 78%', once:true,
-    onEnter:() => gsap.fromTo(gCells,
-      {opacity:0,y:20,scale:0.97},
-      {opacity:1,y:0,scale:1,duration:0.8,stagger:0.04,ease:EASE,clearProps:'scale'}
-    )
-  });
-
-  // Commercial cards (injected dynamically — observe after a tick)
+  // Commercial cards stagger (injected dynamically)
   setTimeout(() => {
     const commCards = [...document.querySelectorAll('#comm-grid .comm-card')];
     if (commCards.length) {
@@ -1492,24 +1149,29 @@ if (typeof gsap!=='undefined' && typeof ScrollTrigger!=='undefined') {
     }
   }, 100);
 
-  // Showreel parallax (desktop)
+  // Look development frames stagger
+  const ldFrames = [...document.querySelectorAll('.ld-frame,.ld-hero-frame')];
+  if (ldFrames.length) {
+    gsap.set(ldFrames, {opacity:0,y:12});
+    ScrollTrigger.create({ trigger:'#look-development', start:'top 80%', once:true,
+      onEnter:() => gsap.to(ldFrames, {opacity:1,y:0,duration:0.7,stagger:0.05,ease:EASE})
+    });
+  }
+
+  // Character section parallax (desktop)
   if (!isMob) {
-    const srV = document.querySelector('.showreel-video');
-    const srT = document.querySelector('.showreel-text');
-    const cfg = {trigger:'.showreel-section',start:'top bottom',end:'bottom top',scrub:1.0};
-    if (srV) gsap.to(srV, {y:'-8%',ease:'none',scrollTrigger:cfg});
-    if (srT) gsap.to(srT, {y:'-3%',ease:'none',scrollTrigger:{...cfg}});
+    const charV = document.querySelector('.char-video-wrap');
+    if (charV) gsap.to(charV, {y:'-6%',ease:'none',scrollTrigger:{trigger:'.char-section',start:'top bottom',end:'bottom top',scrub:1.0}});
   }
 
   // Accent per section
-  Object.entries(WORLDS_ACCENTS).forEach(([id,color]) => {
+  Object.entries(SECTION_ACCENTS).forEach(([id,color]) => {
     const el = document.getElementById(id);
     if (!el) return;
     const set = () => root.style.setProperty('--accent', color);
     ScrollTrigger.create({trigger:el, start:'top 55%', onEnter:set, onEnterBack:set});
   });
 }
-
 </script>
 
 </body>
