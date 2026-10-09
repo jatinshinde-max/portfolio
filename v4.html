@@ -601,19 +601,26 @@ body {
 }
 @media (max-width:900px) { .about-section { grid-template-columns:1fr; gap:48px; } }
 .about-visual {
-  position:relative; aspect-ratio:3/4; background:var(--bg-1);
-  overflow:hidden; border:1px solid var(--ink-ghost);
+  display:grid; grid-template-columns:1fr 1fr; grid-template-rows:auto auto;
+  gap:3px; background:var(--bg);
 }
-.about-still {
+.about-frame {
+  position:relative; overflow:hidden; background:var(--bg-2);
+}
+.about-frame:first-child {
+  grid-column:1 / -1; aspect-ratio:16/9;
+}
+.about-frame:not(:first-child) { aspect-ratio:4/3; }
+.about-frame img {
   width:100%; height:100%; object-fit:cover; display:block;
-  transition:transform 0.8s var(--ease-out);
+  transition:transform 0.9s var(--ease-out);
 }
-.about-visual:hover .about-still { transform:scale(1.03); }
-.av-label {
-  position:absolute; bottom:16px; left:50%; transform:translateX(-50%);
-  font-family:var(--f-mono); font-size:7px; letter-spacing:0.28em;
-  text-transform:uppercase; color:var(--ink-mute); white-space:nowrap;
-  background:rgba(6,5,12,0.55); padding:5px 12px;
+.about-visual:hover .about-frame img { transform:scale(1.03); }
+.af-label {
+  position:absolute; bottom:10px; left:12px;
+  font-family:var(--f-mono); font-size:7px; letter-spacing:0.24em;
+  text-transform:uppercase; color:var(--ink-mute);
+  background:rgba(6,5,12,0.65); padding:4px 10px; pointer-events:none;
 }
 .a-eyebrow {
   font-family:var(--f-mono); font-size:8px; letter-spacing:0.38em;
@@ -635,13 +642,22 @@ body {
   background:var(--bg); text-align:center; position:relative; overflow:hidden;
 }
 .contact-section::before {
-  content:'HELLO';
+  content:'JATIN SHINDE';
   position:absolute; bottom:-0.08em; left:50%; transform:translateX(-50%);
-  font-family:var(--f-display); font-size:clamp(6rem,22vw,20rem);
-  font-weight:300; letter-spacing:-0.03em; line-height:1;
-  color:rgba(255,255,255,0.025); pointer-events:none; user-select:none;
+  font-family:var(--f-display); font-size:clamp(3rem,12vw,11rem);
+  font-weight:200; letter-spacing:0.08em; line-height:1;
+  color:rgba(255,255,255,0.022); pointer-events:none; user-select:none;
   white-space:nowrap;
 }
+.c-strip {
+  display:flex; gap:3px; margin:0 auto 64px;
+  width:min(700px,92vw); position:relative; z-index:1;
+}
+.c-strip-frame { flex:1; aspect-ratio:16/9; overflow:hidden; background:var(--bg-2); }
+.c-strip-frame img { width:100%; height:100%; object-fit:cover; display:block;
+  transition:transform 0.7s var(--ease-out); filter:saturate(0.6); }
+.c-strip:hover .c-strip-frame img { filter:saturate(1); }
+.c-strip-frame:hover img { transform:scale(1.08); }
 .c-eyebrow {
   font-family:var(--f-mono); font-size:8px; letter-spacing:0.38em;
   text-transform:uppercase; color:var(--ink-mute); margin-bottom:24px; display:block;
@@ -862,20 +878,9 @@ footer {
           <span class="ba-side-label">After</span>
         </div>
       </div>
-      <!-- Pair 7 -->
-      <div class="ba-pair">
-        <div class="ba-side">
-          <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/13.webp" loading="lazy" alt="Before — 07">
-          <span class="ba-side-label">Before</span>
-        </div>
-        <div class="ba-side">
-          <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/14.webp" loading="lazy" alt="After — 07">
-          <span class="ba-side-label">After</span>
-        </div>
-      </div>
     </div>
     <div class="transforms-footer">
-      <span class="transforms-footer-note">7 comparisons · Full look development pipeline</span>
+      <span class="transforms-footer-note">6 comparisons · Full look development pipeline</span>
       <a href="/archive#transformations">Full Transforms Archive →</a>
     </div>
   </div>
@@ -978,8 +983,18 @@ footer {
   <!-- ABOUT -->
   <div class="about-section" id="about">
     <div class="about-visual reveal">
-      <img class="about-still" src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-01/frame_0001.webp" loading="lazy" alt="Ashfall — Unreal Engine 5 cinematic environment">
-      <div class="av-label">CGI &amp; VFX Artist · India</div>
+      <div class="about-frame">
+        <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-01/frame_0001.webp" loading="lazy" alt="Ashfall — World 01">
+        <span class="af-label">Ashfall · World 01</span>
+      </div>
+      <div class="about-frame">
+        <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-03/frame_0061.webp" loading="lazy" alt="Verdant — World 03">
+        <span class="af-label">Verdant · World 03</span>
+      </div>
+      <div class="about-frame">
+        <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-04/frame_0004.webp" loading="lazy" alt="Helios — World 04">
+        <span class="af-label">Helios · World 04</span>
+      </div>
     </div>
     <div class="about-text">
       <span class="a-eyebrow reveal">About</span>
@@ -992,7 +1007,14 @@ footer {
   <!-- CONTACT -->
   <div class="contact-section" id="contact">
     <span class="c-eyebrow reveal">Contact</span>
-    <h2 class="c-headline reveal reveal-delay-1">Let's Build<br>Something Memorable.</h2>
+    <h2 class="c-headline reveal reveal-delay-1">Seven years<br>of craft.</h2>
+    <div class="c-strip reveal reveal-delay-1">
+      <div class="c-strip-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-01/frame_0001.webp" loading="lazy" alt="Ashfall"></div>
+      <div class="c-strip-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-02/frame_0001.webp" loading="lazy" alt="Luminara"></div>
+      <div class="c-strip-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-03/frame_0061.webp" loading="lazy" alt="Verdant"></div>
+      <div class="c-strip-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-04/frame_0004.webp" loading="lazy" alt="Helios"></div>
+      <div class="c-strip-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/world-05/frame_0001.webp" loading="lazy" alt="Aurum"></div>
+    </div>
     <p class="c-body reveal reveal-delay-2">Cinematic environments, product CGI, and character work. Available for international projects, studio partnerships, and relocation.</p>
     <div class="c-btns">
       <a href="mailto:jatinshinde118@gmail.com" class="c-btn reveal reveal-delay-2">Send Email →</a>
@@ -1118,8 +1140,8 @@ const GALLERY_ITEMS = [
   { title:'Luminara', tag:'World 02 · UE5',  cat:'environments', src:`${CDN}/world-02/frame_0000.webp`, link:'/work/luminara' },
   { title:'Verdant',  tag:'World 03 · UE5',  cat:'environments', src:`${CDN}/world-03/frame_0061.webp`, link:'/work/verdant' },
   { title:'Helios',   tag:'World 04 · UE5',  cat:'environments', src:`${CDN}/world-04/frame_0004.webp`, link:'/work/helios' },
-  { title:'Aurum',    tag:'World 05 · UE5',  cat:'environments', src:`${CDN}/world-05/frame_0000.webp`, link:'/work/aurum' },
-  // VFX & Motion — concept art videos
+  { title:'Aurum',    tag:'World 05 · UE5',  cat:'environments', src:`${CDN}/world-05/frame_0001.webp`, link:'/work/aurum' },
+  // VFX & Motion — concept art videos (44 verified files; H13/H17/H28/V3 absent)
   { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H1.mp4`  },
   { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H2.mp4`  },
   { cat:'concept-art', size:'tall',   video:`${CDN}/gallery/concept%20art/V1.mp4`  },
@@ -1128,10 +1150,42 @@ const GALLERY_ITEMS = [
   { cat:'concept-art', size:'tall',   video:`${CDN}/gallery/concept%20art/V2.mp4`  },
   { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H5.mp4`  },
   { cat:'concept-art', size:'wide',   video:`${CDN}/gallery/concept%20art/H6.mp4`  },
-  { cat:'concept-art', size:'tall',   video:`${CDN}/gallery/concept%20art/V3.mp4`  },
   { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H7.mp4`  },
   { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H8.mp4`  },
   { cat:'concept-art', size:'tall',   video:`${CDN}/gallery/concept%20art/V4.mp4`  },
+  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H9.mp4`  },
+  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H10.mp4` },
+  { cat:'concept-art', size:'tall',   video:`${CDN}/gallery/concept%20art/V5.mp4`  },
+  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H11.mp4` },
+  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H12.mp4` },
+  { cat:'concept-art', size:'tall',   video:`${CDN}/gallery/concept%20art/V6.mp4`  },
+  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H14.mp4` },
+  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H15.mp4` },
+  { cat:'concept-art', size:'tall',   video:`${CDN}/gallery/concept%20art/V7.mp4`  },
+  { cat:'concept-art', size:'wide',   video:`${CDN}/gallery/concept%20art/H16.mp4` },
+  { cat:'concept-art', size:'tall',   video:`${CDN}/gallery/concept%20art/V8.mp4`  },
+  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H18.mp4` },
+  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H19.mp4` },
+  { cat:'concept-art', size:'tall',   video:`${CDN}/gallery/concept%20art/V9.mp4`  },
+  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H20.mp4` },
+  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H21.mp4` },
+  { cat:'concept-art', size:'tall',   video:`${CDN}/gallery/concept%20art/V10.mp4` },
+  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H22.mp4` },
+  { cat:'concept-art', size:'wide',   video:`${CDN}/gallery/concept%20art/H23.mp4` },
+  { cat:'concept-art', size:'tall',   video:`${CDN}/gallery/concept%20art/V11.mp4` },
+  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H24.mp4` },
+  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H25.mp4` },
+  { cat:'concept-art', size:'tall',   video:`${CDN}/gallery/concept%20art/V12.mp4` },
+  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H26.mp4` },
+  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H27.mp4` },
+  { cat:'concept-art', size:'tall',   video:`${CDN}/gallery/concept%20art/V13.mp4` },
+  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H29.mp4` },
+  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H30.mp4` },
+  { cat:'concept-art', size:'tall',   video:`${CDN}/gallery/concept%20art/V14.mp4` },
+  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H31.mp4` },
+  { cat:'concept-art', size:'wide',   video:`${CDN}/gallery/concept%20art/H32.mp4` },
+  { cat:'concept-art', size:'tall',   video:`${CDN}/gallery/concept%20art/V15.mp4` },
+  { cat:'concept-art', size:'medium', video:`${CDN}/gallery/concept%20art/H33.mp4` },
 ];
 const gGrid = document.getElementById('g-grid');
 GALLERY_ITEMS.forEach(item => {
@@ -1193,11 +1247,11 @@ const ADS = [
   { src:'gallery/ads/car-commercial.mp4',      title:'Automotive Concept',  meta:'Product · CGI' },
   { src:'gallery/ads/pepsi.mp4',               title:'Pepsi Commercial',    meta:'Advertising · CGI' },
   { src:'gallery/ads/smart-watch.mp4',         title:'Smart Watch',         meta:'Product · CGI' },
-  { src:'gallery/ads/automotive-interior.mp4', title:'Automotive Interior', meta:'Product · CGI' },
+  { src:'gallery/ads/car-commercial-2.mp4',    title:'Automotive Concept 2',meta:'Product · CGI' },
   { src:'gallery/ads/chocolate-bar.mp4',       title:'Chocolate Bar',       meta:'Product · CGI' },
   { src:'gallery/ads/earbuds.mp4',             title:'EarBuds',             meta:'Product · CGI' },
   { src:'gallery/ads/facewash.mp4',            title:'Facewash',            meta:'Product · CGI' },
-  { src:'gallery/ads/sneaker-render.mp4',      title:'Sneaker Render',      meta:'Product · CGI' },
+  { src:'gallery/ads/shoe.mp4',                title:'Sneaker',             meta:'Product · CGI' },
   { src:'gallery/ads/serum.mp4',               title:'Serum',               meta:'Product · CGI' },
 ];
 const commGrid = document.getElementById('comm-grid');
