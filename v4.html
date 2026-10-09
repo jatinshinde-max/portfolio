@@ -624,7 +624,7 @@ footer {
     <a href="#worlds-section">Worlds</a>
     <a href="#ads">Commercial</a>
     <a href="#showreel">Character</a>
-    <a href="#look-development">Renders</a>
+    <a href="#selected-work">Renders</a>
     <a href="/archive">Full Archive</a>
     <a href="#contact">Contact</a>
   </nav>
@@ -719,6 +719,13 @@ footer {
     </div>
     <div class="comm-grid" id="comm-grid"></div>
   </section>
+
+  <!-- Selected render lightbox -->
+  <div id="render-lb" role="dialog" aria-modal="true" aria-label="Render preview">
+    <button id="render-lb-close" aria-label="Close">&times;</button>
+    <img id="render-lb-img" src="" alt="">
+    <span id="render-lb-label"></span>
+  </div>
 
   <!-- CHARACTER & MOTION -->
   <section class="char-section" id="showreel">
@@ -1494,7 +1501,7 @@ const SECTION_ACCENTS = {
   'worlds-section':   '#c46428',
   'selected-work':    '#c46428',
   'ads':              '#7c5cc4',
-  'look-development': '#3a8c52',
+  
   'showreel':         '#2872c4',
   'about':            '#c4a028',
   'contact':          '#e8d5b0',
@@ -1529,10 +1536,10 @@ if (typeof gsap!=='undefined' && typeof ScrollTrigger!=='undefined') {
   }, 100);
 
   // Look development frames stagger
-  const ldFrames = [...document.querySelectorAll('.ld-cell,.ld-hero-frame')];
+  const ldFrames = [...document.querySelectorAll('.sw-editorial-feature,.sw-editorial-strip figure')];
   if (ldFrames.length) {
     gsap.set(ldFrames, {opacity:0,y:16,scale:0.98});
-    ScrollTrigger.create({ trigger:'#look-development', start:'top 78%', once:true,
+    ScrollTrigger.create({ trigger:'#selected-work', start:'top 78%', once:true,
       onEnter:() => gsap.to(ldFrames, {opacity:1,y:0,scale:1,duration:0.8,stagger:0.07,ease:EASE})
     });
   }
@@ -1556,11 +1563,11 @@ if (typeof gsap!=='undefined' && typeof ScrollTrigger!=='undefined') {
   renderLbClose.addEventListener('click', closeRenderLb);
   renderLb.addEventListener('click', e => { if (e.target === renderLb) closeRenderLb(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && renderLb.classList.contains('open')) closeRenderLb(); });
-  document.querySelectorAll('.ld-cell').forEach(cell => {
+  document.querySelectorAll('.sw-editorial-feature,.sw-editorial-strip figure').forEach(cell => {
     cell.addEventListener('click', () => {
       const img = cell.querySelector('img');
       if (!img) return;
-      openRenderLb(img.src, cell.dataset.caption || img.alt);
+      openRenderLb(img.src, img.alt);
     });
   });
 
