@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Five Worlds — Redesign Preview</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,200;0,300;0,400;1,200&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+/* ── Tokens (match v4) ── */
+:root {
+  --bg:        #06050c;
+  --ink:       rgba(255,255,255,0.92);
+  --ink-dim:   rgba(255,255,255,0.45);
+  --ink-mute:  rgba(255,255,255,0.20);
+  --ink-ghost: rgba(255,255,255,0.06);
+  --accent:    #c46428;
+  --ease-out:  cubic-bezier(0.23,1,0.32,1);
+  --ease-cin:  cubic-bezier(0.16,1,0.3,1);
+  --ease-in:   cubic-bezier(0.76,0,0.24,1);
+}
+
+/* ── Reset ── */
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+html,body { width:100%; height:100%; overflow:hidden; background:var(--bg); }
+body { cursor:none; -webkit-font-smoothing:antialiased; }
+@media (hover:none),(pointer:coarse) { body { cursor:auto; } }
+
+/* ── Cursor ── */
+#c-dot,#c-ring {
+  position:fixed; top:0; left:0; pointer-events:none; z-index:9999;
+  transform:translate(-50%,-50%); will-change:transform;
+}
+#c-dot { width:5px; height:5px; background:var(--ink); border-radius:50%; mix-blend-mode:difference; }
+#c-ring {
+  width:28px; height:28px;
+  border:1px solid rgba(255,255,255,0.4); border-radius:50%;
+  transition:width .22s var(--ease-out),height .22s var(--ease-out),border-color .22s;
+}
+#c-ring.expand { width:48px; height:48px; border-color:var(--accent); }
+@media (hover:none),(pointer:coarse) { #c-dot,#c-ring { display:none; } }
+
+/* ── Main stage ── */
+#stage {
+  position:fixed; inset:0;
+  background:var(--bg);
+}
+
+/* ── Background layers: poster + video + canvas ── */
+.world-bg {
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit:cover; object-position:center;
+  opacity:0;
+  will-change:opacity; z-index:1;
+  background:var(--bg);
+}
+/* Default transition for crossfade */
+.world-bg.xfade { transition:opacity 600ms var(--ease-out); }
+.world-bg.active { opacity:1; }
+
+/* Loading pulse on active poster */
+.world-bg.loading.active { animation:w-pulse 2s ease-in-out infinite; }
+@keyframes w-pulse { 0%,100%{opacity:0} 50%{opacity:.06} }
+
+/* Canvas fallback — always visible when playing */
+#world-canvas {
+  position:absolute; inset:0; z-index:2;
+  width:100%; height:100%;
+  opacity:0; pointer-events:none;
+  transition:opacity 0.4s var(--ease-out);
+}
+#world-canvas.playing { opacity:1; }
+
+/* Video layer — on top */
+#world-video {
+  position:absolute; inset:0; z-index:3;
+  width:100%; height:100%;
+  object-fit:cover; opacity:0; pointer-events:none;
+  transition:opacity 0.6s var(--ease-out);
+}
+#world-video.playing { opacity:1; }
+
+/* ── Transition flash overlay ── */
+#flash {
+  position:absolute; inset:0; z-index:20;
+  background:var(--bg); opacity:0; pointer-events:none;
+}
+
+/* ── Vignette ── */
+#vignette {
+  position:absolute; inset:0; z-index:8; pointer-events:none;
+  background:
+    radial-gradient(ellipse 80% 80% at 50% 50%, transparent 30%, rgba(6,5,12,.55) 100%),
+    linear-gradient(180deg, rgba(6,5,12,.45) 0%, transparent 20%, transparent 55%, rgba(6,5,12,.95) 100%);
+}
+
+/* ── Film grain ── */
+#grain {
+  position:absolute; inset:0; z-index:9; pointer-events:none; opacity:.025;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:200px; animation:grain .5s steps(1) infinite;
+}
+@keyframes grain { 0%{background-position:0 0} 20%{background-position:-24px 17px} 40%{background-position:12px -31px} 60%{background-position:-8px 22px} 80%{background-position:18px -14px} 100%{background-position:0 0} }
+@media (prefers-reduced-motion:reduce) { #grain { animation:none; } }
+
+/* ── Cinematic top bar ── */
+#top-bar {
+  position:absolute; top:0; left:0; right:0; z-index:15;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:28px 40px;
+}
+.tb-site {
+  font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.35em;
+  text-transform:uppercase; color:var(--ink-mute);
+  text-decoration:none; pointer-events:auto;
+}
+.tb-site:hover { color:var(--ink); }
+.tb-site:focus-visible { outline:1px solid var(--accent); outline-offset:4px; }
+.tb-section {
+  font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.35em;
+  text-transform:uppercase; color:var(--ink-mute);
+}
+@media (max-width:600px) { #top-bar { padding:20px 20px; } }
+
+/* ── World identity (large cinematic) ── */
+#world-id {
+  position:absolute; bottom:140px; left:44px; z-index:15;
+  transition:transform .52s var(--ease-out), opacity .52s var(--ease-out);
+}
+#world-id.switching { transform:translateY(16px); opacity:0; }
+#world-id.arriving  { transform:translateY(-20px); opacity:0; transition:none; }
+
+.wid-num {
+  display:flex; align-items:center; gap:10px; margin-bottom:16px;
+}
+.wid-n {
+  font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.32em;
+  color:var(--accent); transition:color .6s;
+}
+.wid-sep { width:22px; height:1px; background:var(--accent); opacity:.5; transition:background .6s; }
+.wid-total { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.32em; color:var(--ink-mute); }
+
+.wid-name {
+  font-family:'Inter Tight',sans-serif;
+  font-size:clamp(3rem,5.5vw,6.5rem);
+  font-weight:200; letter-spacing:-.03em; line-height:.95;
+  color:var(--ink); position:relative;
+  margin-bottom:16px;
+}
+.wid-name::before {
+  content:''; position:absolute; left:-18px; top:6%; bottom:6%;
+  width:2px; background:var(--accent); border-radius:1px;
+  transition:background .65s var(--ease-out);
+}
+
+/* Accent bar under name */
+.wid-underline {
+  width:40px; height:1px; background:var(--accent); opacity:.4;
+  margin-bottom:14px; transition:width .5s var(--ease-out), background .65s;
+}
+
+.wid-tag {
+  font-family:'DM Mono',monospace; font-size:9px; font-weight:300;
+  letter-spacing:.28em; text-transform:uppercase; color:var(--ink-mute);
+}
+
+@media (max-width:768px) {
+  #world-id { left:20px; bottom:120px; }
+  .wid-name { font-size:clamp(2rem,7vw,4rem); }
+}
+
+/* ── Ghost world name (decorative large text) ── */
+#world-ghost {
+  position:absolute; right:-20px; bottom:60px; z-index:7;
+  pointer-events:none; user-select:none;
+  font-family:'Inter Tight',sans-serif;
+  font-size:clamp(8rem,18vw,22rem);
+  font-weight:200; letter-spacing:-.06em; line-height:1;
+  color:rgba(255,255,255,.04);
+  transition:opacity .4s, transform .6s var(--ease-out), color .8s;
+  white-space:nowrap;
+}
+@media (max-width:768px) { #world-ghost { display:none; } }
+@media (prefers-reduced-motion:reduce) { #world-ghost { transition:color .4s; } }
+
+/* ── World navigation ── */
+#world-nav {
+  position:absolute; bottom:0; left:0; right:0; z-index:15;
+  display:flex; align-items:stretch;
+  background:linear-gradient(transparent, rgba(6,5,12,.7) 40%);
+  padding-bottom:env(safe-area-inset-bottom, 0px);
+}
+
+.wn-btn {
+  flex:1; position:relative;
+  display:flex; flex-direction:column; align-items:flex-start;
+  padding:16px 16px 20px;
+  cursor:pointer; background:transparent; border:none;
+  color:inherit; user-select:none;
+  transition:background .2s;
+  -webkit-tap-highlight-color:transparent;
+  outline:none;
+}
+.wn-btn:focus-visible { background:rgba(255,255,255,.04); }
+
+/* Accent top indicator */
+.wn-btn::before {
+  content:''; position:absolute;
+  top:0; left:12px; right:12px; height:1px;
+  background:var(--ink-ghost);
+  transition:background .45s var(--ease-out), transform .25s;
+}
+.wn-btn.active::before  { background:var(--accent); transform:scaleX(1); transition:background .65s; }
+.wn-btn:hover:not(.active)::before { background:rgba(255,255,255,.18); }
+
+/* Progress fill on active button */
+.wn-btn.active::after {
+  content:''; position:absolute;
+  top:0; left:12px; height:1px;
+  background:var(--accent); opacity:.3;
+  width:var(--prog, 0%);
+  transition:background .65s;
+}
+
+.wn-num {
+  font-family:'DM Mono',monospace; font-size:8px; font-weight:300;
+  letter-spacing:.22em; color:var(--ink-mute);
+  margin-bottom:6px;
+  transition:color .35s;
+}
+.wn-btn.active .wn-num { color:var(--accent); }
+
+.wn-name {
+  font-family:'Inter Tight',sans-serif; font-size:clamp(9px,1.3vw,12px);
+  font-weight:300; letter-spacing:.05em; text-transform:uppercase;
+  color:rgba(255,255,255,.2);
+  transition:color .35s;
+  white-space:nowrap;
+}
+.wn-btn.active .wn-name { color:rgba(255,255,255,.8); }
+.wn-btn:hover:not(.active) .wn-name { color:rgba(255,255,255,.4); }
+
+/* Thumbnail on hover (desktop only) */
+.wn-thumb {
+  position:absolute; bottom:calc(100% + 8px); left:50%;
+  transform:translateX(-50%) translateY(8px) scale(.96);
+  width:90px; height:calc(90px * 9/16);
+  object-fit:cover; opacity:0;
+  border:1px solid rgba(255,255,255,.08);
+  transition:opacity .2s, transform .2s var(--ease-out);
+  pointer-events:none;
+}
+@media (hover:hover) {
+  .wn-btn:hover .wn-thumb { opacity:.8; transform:translateX(-50%) translateY(0) scale(1); }
+}
+@media (max-width:600px) { .wn-thumb { display:none; } .wn-name { font-size:8px; } }
+
+/* ── Keyboard hint ── */
+#kb-hint {
+  position:absolute; top:50%; right:32px; z-index:15;
+  transform:translateY(-50%);
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+  opacity:0; pointer-events:none;
+  transition:opacity .4s;
+}
+#kb-hint.show { opacity:1; }
+.kb-key {
+  font-family:'DM Mono',monospace; font-size:8px; letter-spacing:.15em;
+  color:var(--ink-mute);
+  border:1px solid var(--ink-ghost); padding:4px 8px;
+}
+@media (hover:none),(pointer:coarse),(max-width:768px) { #kb-hint { display:none; } }
+
+/* ── Loading overlay ── */
+#loading-overlay {
+  position:absolute; inset:0; z-index:30;
+  background:var(--bg);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:24px;
+  transition:opacity .6s var(--ease-in);
+}
+#loading-overlay.out { opacity:0; pointer-events:none; }
+.lo-num {
+  font-family:'Inter Tight',sans-serif;
+  font-size:clamp(5rem,14vw,12rem); font-weight:200;
+  letter-spacing:-.05em; color:var(--ink);
+  font-variant-numeric:tabular-nums;
+}
+.lo-bar { width:min(400px,55vw); height:1px; background:var(--ink-ghost); }
+.lo-fill { height:100%; width:0%; background:var(--ink); transition:width .12s linear; }
+.lo-label {
+  font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.35em;
+  text-transform:uppercase; color:var(--ink-mute);
+}
+
+/* ── Prototype label ── */
+#proto-label {
+  position:fixed; top:0; left:50%; transform:translateX(-50%);
+  z-index:9998;
+  font-family:'DM Mono',monospace; font-size:8px; letter-spacing:.25em;
+  text-transform:uppercase; color:rgba(232,213,176,.35);
+  background:rgba(6,5,12,.6); padding:6px 16px;
+  pointer-events:none;
+  border-bottom:1px solid rgba(196,100,40,.15);
+}
+
+/* ── Reduced motion: skip all transitions ── */
+@media (prefers-reduced-motion:reduce) {
+  .world-bg, #world-canvas, #world-video, #world-id, .wid-name::before,
+  .wid-underline, .wn-btn, .wn-btn::before, .wn-name, .wn-num {
+    transition:none !important;
+    animation:none !important;
+  }
+  #flash { display:none; }
+}
+</style>
+</head>
+<body>
+
+<div id="proto-label">Five Worlds — Redesign Preview · Prototype</div>
+
+<div id="c-dot"></div>
+<div id="c-ring"></div>
+
+<!-- Stage -->
+<div id="stage">
+
+  <!-- Loading screen -->
+  <div id="loading-overlay">
+    <div class="lo-num" id="lo-num">0</div>
+    <div class="lo-bar"><div class="lo-fill" id="lo-fill"></div></div>
+    <div class="lo-label">Preparing environments</div>
+  </div>
+
+  <!-- Poster frames (bg layers) -->
+  <img class="world-bg" id="bg-0" alt="" draggable="false">
+  <img class="world-bg" id="bg-1" alt="" draggable="false">
+  <img class="world-bg" id="bg-2" alt="" draggable="false">
+  <img class="world-bg" id="bg-3" alt="" draggable="false">
+  <img class="world-bg" id="bg-4" alt="" draggable="false">
+
+  <!-- Canvas fallback -->
+  <canvas id="world-canvas" aria-hidden="true"></canvas>
+
+  <!-- Video layer -->
+  <video id="world-video" aria-hidden="true" playsinline muted loop preload="none"></video>
+
+  <!-- Overlays -->
+  <div id="vignette"></div>
+  <div id="grain"></div>
+  <div id="flash" aria-hidden="true"></div>
+
+  <!-- Top bar -->
+  <div id="top-bar">
+    <a href="/v4" class="tb-site" aria-label="Return to portfolio">← Back to portfolio</a>
+    <span class="tb-section">Five Worlds · Unreal Engine 5</span>
+  </div>
+
+  <!-- Ghost name -->
+  <div id="world-ghost" aria-hidden="true">Ashfall</div>
+
+  <!-- World identity -->
+  <div id="world-id" role="region" aria-live="polite" aria-label="Active world">
+    <div class="wid-num">
+      <span class="wid-n" id="wid-n">01</span>
+      <span class="wid-sep"></span>
+      <span class="wid-total">05</span>
+    </div>
+    <div class="wid-name" id="wid-name">Ashfall</div>
+    <div class="wid-underline" id="wid-underline"></div>
+    <div class="wid-tag" id="wid-tag">Environment · Unreal Engine 5</div>
+  </div>
+
+  <!-- Keyboard hint -->
+  <div id="kb-hint" role="note">
+    <span class="kb-key">← →</span>
+    <span class="kb-key" style="font-size:7px;letter-spacing:.1em">Navigate</span>
+  </div>
+
+  <!-- World navigation -->
+  <nav id="world-nav" aria-label="Select world">
+    <!-- buttons injected by JS -->
+  </nav>
+
+</div><!-- end #stage -->
+
+<script>
+'use strict';
+
+const CDN = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev';
+
+const WORLDS = [
+  { slug:'world-01', name:'Ashfall',  accent:'#c46428', tag:'Scorched terrain · Ash &amp; ember', frames:[1,2,3,4,5] },
+  { slug:'world-02', name:'Luminara', accent:'#7c5cc4', tag:'Spectral light · Crystal formations', frames:[2,3,4,5,6] },
+  { slug:'world-03', name:'Verdant',  accent:'#3a8c52', tag:'Living overgrowth · Ancient forest', frames:[61,1,2,3,4] },
+  { slug:'world-04', name:'Helios',   accent:'#2872c4', tag:'Solar atmosphere · Radiant desert', frames:[4,5,6,1,2] },
+  { slug:'world-05', name:'Aurum',    accent:'#c4a028', tag:'Gilded light · Monumental architecture', frames:[1,2,3,4,5] },
+];
+
+// ── DOM ──────────────────────────────────────────────
+const bgImgs   = WORLDS.map((_,i) => document.getElementById(`bg-${i}`));
+const worldId  = document.getElementById('world-id');
+const widName  = document.getElementById('wid-name');
+const widN     = document.getElementById('wid-n');
+const widTag   = document.getElementById('wid-tag');
+const widUnder = document.getElementById('wid-underline');
+const ghost    = document.getElementById('world-ghost');
+const flash    = document.getElementById('flash');
+const worldNav = document.getElementById('world-nav');
+const canvas   = document.getElementById('world-canvas');
+const video    = document.getElementById('world-video');
+const overlay  = document.getElementById('loading-overlay');
+const loNum    = document.getElementById('lo-num');
+const loFill   = document.getElementById('lo-fill');
+const cDot     = document.getElementById('c-dot');
+const cRing    = document.getElementById('c-ring');
+const kbHint   = document.getElementById('kb-hint');
+
+const isMob = matchMedia('(hover:none),(pointer:coarse)').matches;
+const prefersReducedMotion = matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+let active = 0;
+let transitioning = false;
+let navBtns = [];
+
+// ── CSS accent ────────────────────────────────────────
+function setAccent(idx) {
+  document.documentElement.style.setProperty('--accent', WORLDS[idx].accent);
+}
+
+// ── Build nav buttons ─────────────────────────────────
+WORLDS.forEach((w, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'wn-btn' + (i === 0 ? ' active' : '');
+  btn.setAttribute('aria-label', `World ${String(i+1).padStart(2,'0')} — ${w.name}`);
+  btn.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
+  btn.dataset.i = i;
+  btn.innerHTML = `
+    <img class="wn-thumb" src="${CDN}/${w.slug}/frame_${String(w.frames[0]).padStart(4,'0')}.webp" alt="" loading="lazy" draggable="false">
+    <span class="wn-num">${String(i+1).padStart(2,'0')}</span>
+    <span class="wn-name">${w.name}</span>
+  `;
+  btn.addEventListener('click', () => { if (!transitioning) switchWorld(i, 'click'); });
+  btn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (!transitioning) switchWorld(i, 'key'); } });
+  worldNav.appendChild(btn);
+  navBtns.push(btn);
+});
+
+// ── Cursor ────────────────────────────────────────────
+let mx=0, my=0, rx=0, ry=0;
+if (!isMob) {
+  document.addEventListener('mousemove', e => {
+    mx=e.clientX; my=e.clientY;
+    cDot.style.left=mx+'px'; cDot.style.top=my+'px';
+  });
+  (function raf(){ rx+=(mx-rx)*.12; ry+=(my-ry)*.12; cRing.style.left=rx+'px'; cRing.style.top=ry+'px'; requestAnimationFrame(raf); })();
+  document.querySelectorAll('.wn-btn,a').forEach(el=>{
+    el.addEventListener('mouseenter',()=>cRing.classList.add('expand'));
+    el.addEventListener('mouseleave',()=>cRing.classList.remove('expand'));
+  });
+}
+
+// ── Keyboard navigation ───────────────────────────────
+document.addEventListener('keydown', e => {
+  if (transitioning) return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+    e.preventDefault(); switchWorld((active + 1) % WORLDS.length, 'key');
+  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    e.preventDefault(); switchWorld((active - 1 + WORLDS.length) % WORLDS.length, 'key');
+  }
+});
+// Show keyboard hint on first keydown
+document.addEventListener('keydown', () => {
+  kbHint.classList.add('show');
+  setTimeout(() => kbHint.classList.remove('show'), 2000);
+}, { once: false });
+
+// ── Mobile swipe ──────────────────────────────────────
+{
+  let tx0 = 0;
+  document.addEventListener('touchstart', e => { tx0 = e.touches[0].clientX; }, { passive:true });
+  document.addEventListener('touchend', e => {
+    if (transitioning) return;
+    const dx = e.changedTouches[0].clientX - tx0;
+    if (Math.abs(dx) < 40) return;
+    const next = (active + (dx < 0 ? 1 : -1) + WORLDS.length) % WORLDS.length;
+    switchWorld(next, 'swipe');
+  }, { passive:true });
+}
+
+// ── Poster loading ────────────────────────────────────
+let postersLoaded = 0;
+function tryPoster(idx, ci) {
+  const w = WORLDS[idx]; const img = bgImgs[idx];
+  if (ci >= w.frames.length) { img.classList.remove('loading'); return; }
+  const url = `${CDN}/${w.slug}/frame_${String(w.frames[ci]).padStart(4,'0')}.webp`;
+  img.onerror = () => tryPoster(idx, ci+1);
+  img.onload = () => {
+    if (img.naturalWidth === 0) { tryPoster(idx, ci+1); return; }
+    img.classList.remove('loading');
+    postersLoaded++;
+    onPosterLoad();
+  };
+  img.src = url;
+  img.classList.add('loading');
+}
+WORLDS.forEach((_,i) => tryPoster(i, 0));
+
+// ── Loader ────────────────────────────────────────────
+let loaderDone = false;
+function onPosterLoad() {
+  const pct = Math.round((postersLoaded / WORLDS.length) * 100);
+  loNum.textContent = pct;
+  loFill.style.width = pct + '%';
+  if (postersLoaded >= 1 && !loaderDone) {
+    // Reveal first world, dismiss loader after a brief pause
+    loaderDone = true;
+    bgImgs[0].classList.add('active');
+    setAccent(0);
+    setTimeout(() => {
+      overlay.classList.add('out');
+      // Show canvas animation for world 0
+      players[0].preload();
+      startWorldAnim(0);
+    }, prefersReducedMotion ? 0 : 420);
+  }
+}
+// Safety timeout — dismiss loader even if images fail
+setTimeout(() => { if (!loaderDone) { loaderDone=true; overlay.classList.add('out'); } }, 4000);
+
+// ── Frame player (canvas fallback) ───────────────────
+const FRAME_MANIFESTS = [
+  Array.from({length:111},(_,i)=>i+1),
+  Array.from({length:165},(_,i)=>i+1),
+  Array.from({length:123},(_,i)=>i+1).filter(n=>n!==110),
+  Array.from({length:178},(_,i)=>i+1).filter(n=>n!==38),
+  Array.from({length:372},(_,i)=>i+1).filter(n=>n!==91&&n!==143&&n!==191),
+];
+const PLAYER_FRAMES=30, PLAYER_FPS=10;
+function padFrame(n){ return 'frame_'+String(n).padStart(4,'0')+'.webp'; }
+
+class FramePlayer {
+  constructor(wi,cvs){ this.wi=wi; this.cvs=cvs; this.ctx=cvs.getContext('2d'); this.bitmaps=new Array(PLAYER_FRAMES).fill(null); this.loaded=0; this.playing=false; this.fi=0; this.last=0; this.interval=1000/PLAYER_FPS; this.raf=null; this._loading=false; const m=FRAME_MANIFESTS[wi]; const step=m.length/PLAYER_FRAMES; this.frameNums=Array.from({length:PLAYER_FRAMES},(_,i)=>m[Math.floor(i*step)]); this._tick=this._tick.bind(this); }
+  preload(){ if(this._loading)return; this._loading=true; this.frameNums.forEach((fn,i)=>{ if(this.bitmaps[i])return; fetch(`${CDN}/${WORLDS[this.wi].slug}/${padFrame(fn)}`).then(r=>r.ok?r.blob():Promise.reject()).then(b=>createImageBitmap(b)).then(bmp=>{this.bitmaps[i]=bmp;this.loaded++;}).catch(()=>{}); }); }
+  start(){ if(this.playing)return; this.preload(); this.playing=true; this.fi=0; this.last=0; this.raf=requestAnimationFrame(this._tick); }
+  stop(){ this.playing=false; if(this.raf){cancelAnimationFrame(this.raf);this.raf=null;} this.cvs.classList.remove('playing'); }
+  _tick(ts){ if(!this.playing)return; this.raf=requestAnimationFrame(this._tick); if(ts-this.last<this.interval)return; this.last=ts; if(this.loaded<3)return; let f=this.fi,t=0; while(!this.bitmaps[f]&&t++<PLAYER_FRAMES)f=(f+1)%PLAYER_FRAMES; const bmp=this.bitmaps[f]; if(!bmp)return; const cw=this.cvs.offsetWidth,ch=this.cvs.offsetHeight; if(this.cvs.width!==cw||this.cvs.height!==ch){this.cvs.width=cw;this.cvs.height=ch;} if(!this.cvs.classList.contains('playing'))this.cvs.classList.add('playing'); const sc=Math.max(cw/bmp.width,ch/bmp.height); const sw=bmp.width*sc,sh=bmp.height*sc; this.ctx.drawImage(bmp,(cw-sw)/2,(ch-sh)/2,sw,sh); this.fi=(f+1)%PLAYER_FRAMES; }
+}
+const players = WORLDS.map((_,i) => new FramePlayer(i, canvas));
+
+// ── Video system ──────────────────────────────────────
+// Per-world: null=unknown, true=available, false=not available
+const videoAvailable = new Array(WORLDS.length).fill(null);
+let currentVideoWorld = -1;
+
+function worldVideoSrc(wi) {
+  return `${CDN}/world-previews/world-0${wi+1}-preview.mp4`;
+}
+
+function probeVideo(wi) {
+  if (videoAvailable[wi] !== null) return Promise.resolve(videoAvailable[wi]);
+  return fetch(worldVideoSrc(wi), { method:'HEAD' })
+    .then(r => { videoAvailable[wi] = r.ok; return r.ok; })
+    .catch(() => { videoAvailable[wi] = false; return false; });
+}
+
+async function startWorldAnim(wi) {
+  players.forEach((p,i) => { if (i !== wi) p.stop(); });
+  if (currentVideoWorld !== wi) {
+    video.pause();
+    video.classList.remove('playing');
+  }
+
+  const hasVideo = await probeVideo(wi);
+  if (hasVideo) {
+    const src = worldVideoSrc(wi);
+    if (currentVideoWorld !== wi || video.src !== src) {
+      // FIX: do not call load() — set src and call play() directly.
+      // play() triggers the resource load; calling load() then play() immediately
+      // causes AbortError ("play() interrupted by load()").
+      video.src = src;
+      currentVideoWorld = wi;
+    }
+    video.classList.add('playing');
+    video.play().catch(err => {
+      if (err && err.name === 'AbortError') {
+        // Brief retry — still loading, give it 200ms
+        setTimeout(() => {
+          video.play().catch(() => {
+            videoAvailable[wi] = false;
+            video.classList.remove('playing');
+            players[wi].start();
+          });
+        }, 200);
+      } else {
+        // NotAllowedError (autoplay policy) or other — use canvas fallback
+        videoAvailable[wi] = false;
+        video.classList.remove('playing');
+        players[wi].start();
+      }
+    });
+    players[wi].stop();
+  } else {
+    video.pause();
+    video.classList.remove('playing');
+    players[wi].start();
+  }
+}
+
+function stopAllAnim() {
+  video.pause(); video.classList.remove('playing');
+  players.forEach(p => p.stop());
+  canvas.classList.remove('playing');
+}
+
+// ── World switch ──────────────────────────────────────
+function switchWorld(idx, source) {
+  if (idx === active || transitioning) return;
+  transitioning = true;
+  const prev = active;
+  active = idx;
+
+  // Flash transition
+  const doFlash = !prefersReducedMotion;
+  const flashDur = 140;
+
+  if (doFlash) {
+    flash.style.transition = `opacity ${flashDur}ms var(--ease-in)`;
+    flash.style.opacity = '1';
+  }
+
+  setTimeout(() => {
+    // Swap poster
+    bgImgs[prev].classList.add('xfade');
+    bgImgs[idx].classList.add('xfade');
+    bgImgs[prev].classList.remove('active');
+    bgImgs[idx].classList.add('active');
+    setTimeout(() => { bgImgs[prev].classList.remove('xfade'); bgImgs[idx].classList.remove('xfade'); }, 700);
+
+    // Set accent
+    setAccent(idx);
+
+    // Update nav buttons
+    navBtns.forEach((btn, i) => {
+      btn.classList.toggle('active', i === idx);
+      btn.setAttribute('aria-pressed', i === idx ? 'true' : 'false');
+    });
+
+    // Update identity text
+    worldId.classList.add('switching');
+    setTimeout(() => {
+      widName.textContent   = WORLDS[idx].name;
+      widN.textContent      = String(idx+1).padStart(2,'0');
+      widTag.innerHTML      = WORLDS[idx].tag;
+      ghost.textContent     = WORLDS[idx].name;
+      worldId.classList.remove('switching');
+      worldId.classList.add('arriving');
+      requestAnimationFrame(() => requestAnimationFrame(() => worldId.classList.remove('arriving')));
+    }, prefersReducedMotion ? 0 : 240);
+
+    // Start animation for new world
+    players[prev].stop();
+    startWorldAnim(idx);
+
+    // Preload adjacent canvas frames
+    [idx-1, idx+1].forEach(adj => {
+      if (adj >= 0 && adj < WORLDS.length) players[adj].preload();
+    });
+
+    // Fade out flash
+    if (doFlash) {
+      flash.style.transition = `opacity ${flashDur*2}ms var(--ease-out)`;
+      flash.style.opacity = '0';
+    }
+
+    transitioning = false;
+  }, doFlash ? flashDur : 0);
+}
+
+// ── Page visibility: pause when hidden ───────────────
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) stopAllAnim();
+  else startWorldAnim(active);
+});
+
+// ── Initial accent bar ────────────────────────────────
+setAccent(0);
+</script>
+</body>
+</html>
