@@ -817,7 +817,7 @@ const CDN = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev';
 
 // ── WORLD DATA ──────────────────────────────────────────
 const WORLDS = [
-  { slug:'world-01', name:'Ashfall',  accent:'#c46428', posterCandidates:['frame_0001.webp','frame_0002.webp','frame_0003.webp'] },
+  { slug:'world-01', name:'Ashfall',  accent:'#c46428', posterCandidates:['frame_0002.webp','frame_0003.webp'] },
   { slug:'world-02', name:'Luminara', accent:'#7c5cc4', posterCandidates:['frame_0002.webp','frame_0003.webp','frame_0004.webp'] },
   { slug:'world-03', name:'Verdant',  accent:'#3a8c52', posterCandidates:['frame_0061.webp','frame_0001.webp','frame_0000.webp'] },
   { slug:'world-04', name:'Helios',   accent:'#2872c4', posterCandidates:['frame_0004.webp','frame_0005.webp','frame_0001.webp'] },
@@ -997,44 +997,48 @@ class FramePlayer {
 
 const players = WORLDS.map((_, i) => new FramePlayer(i, worldCanvas));
 let worldsVisible = false;
+let worldRequestId = 0; // invalidate async media work after rapid switches / leaving viewport
 let currentVideoWorld = -1; // which world the <video> element is currently set to
 
 // Stop the video element and FramePlayer for all worlds
 function stopAllWorldAnim() {
+  worldRequestId++;
   worldVideo.pause();
   worldVideo.classList.remove('playing');
   players.forEach(p => p.stop());
 }
 
-// Start animation for world wi — video if available, canvas fallback otherwise
+// Play only the selected world. Stale network responses cannot restart an old world.
 async function startWorldAnim(wi) {
-  // Stop everything first (prevents overlap)
-  players.forEach((p, i) => { if (i !== wi) p.stop(); });
-  if (currentVideoWorld !== wi) {
-    worldVideo.pause();
-    worldVideo.classList.remove('playing');
-  }
+  const requestId = ++worldRequestId;
+  if (!worldsVisible || wi !== activeWorld) return;
+  players.forEach(p => p.stop());
+  worldVideo.pause();
+  worldVideo.classList.remove('playing');
 
   const hasVideo = await probeVideo(wi);
-  if (hasVideo) {
-    // Switch video source only if needed
-    const src = worldVideoSrc(wi);
-    if (currentVideoWorld !== wi || worldVideo.src !== src) {
-      worldVideo.src = src;
-      worldVideo.load();
-      currentVideoWorld = wi;
+  if (requestId !== worldRequestId || !worldsVisible || wi !== activeWorld) return;
+  if (!hasVideo) {
+    players[wi].start();
+    return;
+  }
+
+  const src = worldVideoSrc(wi);
+  if (currentVideoWorld !== wi || worldVideo.src !== src) {
+    worldVideo.src = src;
+    worldVideo.load();
+    currentVideoWorld = wi;
+  }
+  try {
+    await worldVideo.play();
+    if (requestId !== worldRequestId || !worldsVisible || wi !== activeWorld) {
+      worldVideo.pause();
+      return;
     }
+    // Reveal the video only after playback begins; the poster remains visible meanwhile.
     worldVideo.classList.add('playing');
-    worldVideo.play().catch(() => {
-      // Autoplay blocked — fall through to canvas player
-      videoAvailable[wi] = false;
-      worldVideo.classList.remove('playing');
-      players[wi].start();
-    });
-    players[wi].stop(); // ensure canvas player off
-  } else {
-    // No MP4 — use FramePlayer
-    worldVideo.pause();
+  } catch (err) {
+    if (requestId !== worldRequestId || !worldsVisible || wi !== activeWorld) return;
     worldVideo.classList.remove('playing');
     players[wi].start();
   }
@@ -1047,11 +1051,6 @@ indexBtns.forEach((el,i) => {
   el.onclick = () => {
     switchWorld(i);
     if (worldsVisible) startWorldAnim(i);
-    // Preload adjacent canvas fallback frames (no-op if already loading)
-    // Video availability is probed lazily inside startWorldAnim — no eager HEAD requests
-    [i-1, i+1].forEach(adj => {
-      if (adj >= 0 && adj < WORLDS.length) players[adj].preload();
-    });
   };
 });
 
@@ -1081,8 +1080,7 @@ new IntersectionObserver(entries => {
           requestAnimationFrame(() => requestAnimationFrame(() => worldInfo.classList.remove('arriving')));
         }, 280);
       }
-      // Start animating the active world; preload canvas fallback frames
-      players[activeWorld].preload();
+      // MP4 is preferred. Only fetch fallback frames if the video is unavailable.
       startWorldAnim(activeWorld);
     } else {
       stopWorldAnim();
