@@ -1114,8 +1114,8 @@ const VM = {
     }
     this.current = { wrap, vid };
     wrap.classList.add('playing');
-    vid.muted = false;
-    vid.play().catch(() => { vid.muted = true; vid.play().catch(()=>{}); });
+    vid.muted = true;
+    vid.play().catch(() => { wrap.classList.remove('playing'); if (this.current?.vid === vid) this.current = null; });
   },
   toggle(wrap, vid) {
     if (wrap.classList.contains('playing')) {
@@ -1155,7 +1155,7 @@ if (commGrid) {
     info.innerHTML=`<div class="comm-card-meta">${ad.meta}</div><div class="comm-card-title">${ad.title}</div>`;
     card.appendChild(info);
     card.addEventListener('mouseenter', () => { if (matchMedia('(hover:hover)').matches) VM.play(card, vid); });
-    card.addEventListener('mouseleave', () => { if (matchMedia('(hover:hover)').matches && VM.current?.vid === vid) VM.stop(); });
+    card.addEventListener('mouseleave', () => { if (matchMedia('(hover:hover)').matches && VM.current?.vid === vid) { vid.pause(); vid.currentTime = 0; card.classList.remove('playing'); VM.current = null; } });
     card.addEventListener('click', () => VM.toggle(card, vid));
     commGrid.appendChild(card);
   });
