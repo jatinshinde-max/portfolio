@@ -8,3 +8,4 @@ serve.log
 serve.err
 
 .vercel
+__pycache__/
