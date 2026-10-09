@@ -405,23 +405,16 @@ body {
 .comm-card-meta { font-family:var(--f-mono); font-size:8px; letter-spacing:0.24em; text-transform:uppercase; color:var(--ink-mute); margin-bottom:4px; }
 .comm-card-title { font-family:var(--f-display); font-size:1rem; font-weight:400; letter-spacing:-0.01em; color:var(--ink); }
 
-/* ─── LOOK DEVELOPMENT ──────────────────────────────────── */
+/* ─── SELECTED RENDERS ──────────────────────────────────── */
 .ld-section { padding:clamp(80px,11vh,140px) clamp(28px,7vw,100px); background:var(--bg-1); scroll-margin-top:72px; }
-.ld-header { margin-bottom:60px; }
-.ld-title { font-family:var(--f-display); font-size:clamp(2.5rem,7vw,7rem); font-weight:300; letter-spacing:-0.03em; line-height:0.96; color:var(--ink); margin:20px 0 24px; }
-.ld-subtitle { font-family:var(--f-body); font-size:0.95rem; font-weight:300; line-height:1.7; color:var(--ink-dim); max-width:52ch; }
-.ld-phase { margin-bottom:72px; }
-.ld-phase-label { font-family:var(--f-mono); font-size:7px; letter-spacing:0.4em; text-transform:uppercase; color:var(--ink-mute); padding-bottom:14px; margin-bottom:16px; border-bottom:1px solid var(--ink-ghost); }
-.ld-quad { display:grid; grid-template-columns:repeat(4,1fr); gap:4px; }
-@media (max-width:768px) { .ld-quad { grid-template-columns:repeat(2,1fr); } }
-.ld-pair { display:grid; grid-template-columns:3fr 2fr; gap:4px; margin-bottom:4px; }
-@media (max-width:600px) { .ld-pair { grid-template-columns:1fr; } }
-.ld-hero-frame { position:relative; overflow:hidden; background:var(--bg-2); aspect-ratio:21/9; margin-bottom:4px; }
-.ld-strip { display:grid; grid-template-columns:repeat(4,1fr); gap:4px; }
-@media (max-width:768px) { .ld-strip { grid-template-columns:repeat(2,1fr); } }
+.ld-header { margin-bottom:48px; }
+.ld-title { font-family:var(--f-display); font-size:clamp(2.5rem,7vw,7rem); font-weight:300; letter-spacing:-0.03em; line-height:0.96; color:var(--ink); margin:20px 0 0; }
+.ld-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:4px; }
+@media (max-width:900px) { .ld-grid { grid-template-columns:repeat(3,1fr); } }
+@media (max-width:600px) { .ld-grid { grid-template-columns:repeat(2,1fr); } }
 .ld-frame { position:relative; overflow:hidden; background:var(--bg-2); aspect-ratio:4/3; }
-.ld-frame img, .ld-hero-frame img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.7s var(--ease-out); }
-.ld-frame:hover img, .ld-hero-frame:hover img { transform:scale(1.04); }
+.ld-frame img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.7s var(--ease-out); }
+.ld-frame:hover img { transform:scale(1.04); }
 .ld-footer { margin-top:32px; padding-top:20px; border-top:1px solid var(--ink-ghost); }
 .ld-footer a { font-family:var(--f-mono); font-size:8px; letter-spacing:0.28em; text-transform:uppercase; color:var(--ink-dim); text-decoration:none; border-bottom:1px solid var(--ink-ghost); padding-bottom:2px; transition:color 0.3s; }
 .ld-footer a:hover { color:var(--ink); }
@@ -621,44 +614,26 @@ footer {
     <div class="comm-grid" id="comm-grid"></div>
   </section>
 
-  <!-- LOOK DEVELOPMENT -->
+  <!-- SELECTED RENDERS -->
   <section class="ld-section" id="look-development">
     <div class="ld-header">
-      <span class="s-eyebrow reveal">Look Development</span>
-      <h2 class="ld-title reveal reveal-delay-1">13 renders.<br>One pipeline.</h2>
-      <p class="ld-subtitle reveal reveal-delay-2">Full photoreal development — from early concept blocking through to final lighting and material passes.</p>
+      <span class="s-eyebrow reveal">Selected Renders</span>
+      <h2 class="ld-title reveal reveal-delay-1">13 renders.<br>CGI &amp; Photoreal.</h2>
     </div>
-    <div class="ld-phase">
-      <div class="ld-phase-label">Phase 01 · Blocking &amp; Composition</div>
-      <div class="ld-quad">
-        <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/01.webp" loading="lazy" alt="Render 01"></div>
-        <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/02.webp" loading="lazy" alt="Render 02"></div>
-        <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/03.webp" loading="lazy" alt="Render 03"></div>
-        <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/04.webp" loading="lazy" alt="Render 04"></div>
-      </div>
-    </div>
-    <div class="ld-phase">
-      <div class="ld-phase-label">Phase 02 · Materials &amp; Lighting</div>
-      <div class="ld-pair">
-        <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/05.webp" loading="lazy" alt="Render 05"></div>
-        <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/06.webp" loading="lazy" alt="Render 06"></div>
-      </div>
-      <div class="ld-pair">
-        <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/07.webp" loading="lazy" alt="Render 07"></div>
-        <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/08.webp" loading="lazy" alt="Render 08"></div>
-      </div>
-    </div>
-    <div class="ld-phase">
-      <div class="ld-phase-label">Phase 03 · Final Output</div>
-      <div class="ld-hero-frame">
-        <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/09.webp" loading="lazy" alt="Render 09">
-      </div>
-      <div class="ld-strip">
-        <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/10.webp" loading="lazy" alt="Render 10"></div>
-        <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/11.webp" loading="lazy" alt="Render 11"></div>
-        <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/12.webp" loading="lazy" alt="Render 12"></div>
-        <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/13.webp" loading="lazy" alt="Render 13"></div>
-      </div>
+    <div class="ld-grid">
+      <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/01.webp" loading="lazy" alt="Render 01"></div>
+      <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/02.webp" loading="lazy" alt="Render 02"></div>
+      <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/03.webp" loading="lazy" alt="Render 03"></div>
+      <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/04.webp" loading="lazy" alt="Render 04"></div>
+      <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/05.webp" loading="lazy" alt="Render 05"></div>
+      <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/06.webp" loading="lazy" alt="Render 06"></div>
+      <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/07.webp" loading="lazy" alt="Render 07"></div>
+      <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/08.webp" loading="lazy" alt="Render 08"></div>
+      <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/09.webp" loading="lazy" alt="Render 09"></div>
+      <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/10.webp" loading="lazy" alt="Render 10"></div>
+      <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/11.webp" loading="lazy" alt="Render 11"></div>
+      <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/12.webp" loading="lazy" alt="Render 12"></div>
+      <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/13.webp" loading="lazy" alt="Render 13"></div>
     </div>
     <div class="ld-footer"><a href="/archive#transforms">Full render archive →</a></div>
   </section>
@@ -848,7 +823,79 @@ function switchWorld(idx) {
   }, 260);
 }
 
-indexBtns.forEach((el,i) => el.addEventListener('click', () => switchWorld(i)));
+// ── WORLD FRAME ANIMATION ───────────────────────────────
+// Verified frame inventories — never request missing frames
+const FRAME_MANIFESTS = [
+  // World 01 — Ashfall: frames 1–111
+  Array.from({length:111}, (_,i) => i+1),
+  // World 02 — Luminara: frames 1–165
+  Array.from({length:165}, (_,i) => i+1),
+  // World 03 — Verdant: frames 1–124, excluding 110
+  Array.from({length:124}, (_,i) => i+1).filter(n => n !== 110),
+  // World 04 — Helios: frames 1–179, excluding 38
+  Array.from({length:179}, (_,i) => i+1).filter(n => n !== 38),
+  // World 05 — Aurum: frames 1–375, excluding 91, 143, 191
+  Array.from({length:375}, (_,i) => i+1).filter(n => n !== 91 && n !== 143 && n !== 191),
+];
+
+// Sparse playback — 8 evenly-distributed frames per world for smooth looping
+// without loading hundreds of full-res images
+const ANIM_FRAMES = FRAME_MANIFESTS.map(manifest => {
+  const count = 8;
+  const step = Math.floor(manifest.length / count);
+  return Array.from({length:count}, (_,i) => manifest[i * step]);
+});
+
+const ANIM_INTERVAL = 220; // ms per frame — slow cinematic cycle
+const worldFrameCache = WORLDS.map(() => []); // preloaded Image objects per world
+let animTimer = null;
+let animIdx = 0; // current frame position within the active world's cycle
+
+function padFrame(n) {
+  return 'frame_' + String(n).padStart(4,'0') + '.webp';
+}
+
+function preloadWorldFrames(wi) {
+  const frames = ANIM_FRAMES[wi];
+  if (worldFrameCache[wi].length === frames.length) return; // already done
+  frames.forEach((fNum, i) => {
+    if (worldFrameCache[wi][i]) return;
+    const img = new Image();
+    img.src = `${CDN}/${WORLDS[wi].slug}/${padFrame(fNum)}`;
+    worldFrameCache[wi][i] = img;
+  });
+}
+
+function startWorldAnim(wi) {
+  stopWorldAnim();
+  preloadWorldFrames(wi);
+  animIdx = 0;
+  const frames = ANIM_FRAMES[wi];
+  const bgEl = bgImgs[wi];
+  animTimer = setInterval(() => {
+    animIdx = (animIdx + 1) % frames.length;
+    const cached = worldFrameCache[wi][animIdx];
+    if (cached && cached.complete && cached.naturalWidth > 0) {
+      bgEl.src = cached.src;
+    }
+  }, ANIM_INTERVAL);
+}
+
+function stopWorldAnim() {
+  if (animTimer !== null) { clearInterval(animTimer); animTimer = null; }
+}
+
+// Only animate while worlds section is in viewport
+let worldsVisible = false;
+
+// Replace button handlers with animation-aware version
+indexBtns.forEach((el,i) => {
+  el.onclick = () => {
+    switchWorld(i);
+    if (worldsVisible) startWorldAnim(i);
+    [i-1, i+1].forEach(adj => { if (adj >= 0 && adj < WORLDS.length) preloadWorldFrames(adj); });
+  };
+});
 
 // Mobile swipe on world index
 {
@@ -858,19 +905,29 @@ indexBtns.forEach((el,i) => el.addEventListener('click', () => switchWorld(i)));
   wi.addEventListener('touchend', e => {
     const dx=e.changedTouches[0].clientX-tx0;
     if (Math.abs(dx)<36) return;
-    switchWorld(Math.max(0,Math.min(WORLDS.length-1, activeWorld+(dx<0?1:-1))));
+    const next = Math.max(0,Math.min(WORLDS.length-1, activeWorld+(dx<0?1:-1)));
+    switchWorld(next);
+    if (worldsVisible) startWorldAnim(next);
   }, {passive:true});
 }
 
-// ── WORLDS REVEAL ───────────────────────────────────────
+// ── WORLDS REVEAL + ANIMATION GATE ──────────────────────
 new IntersectionObserver(entries => {
   entries.forEach(e => {
-    if (e.isIntersecting && !worldsSection.classList.contains('is-revealed')) {
-      worldsSection.classList.add('is-revealed');
-      setTimeout(() => {
-        worldInfo.classList.add('arriving');
-        requestAnimationFrame(() => requestAnimationFrame(() => worldInfo.classList.remove('arriving')));
-      }, 280);
+    worldsVisible = e.isIntersecting;
+    if (e.isIntersecting) {
+      if (!worldsSection.classList.contains('is-revealed')) {
+        worldsSection.classList.add('is-revealed');
+        setTimeout(() => {
+          worldInfo.classList.add('arriving');
+          requestAnimationFrame(() => requestAnimationFrame(() => worldInfo.classList.remove('arriving')));
+        }, 280);
+      }
+      // Start animating the active world; preload first
+      preloadWorldFrames(activeWorld);
+      startWorldAnim(activeWorld);
+    } else {
+      stopWorldAnim();
     }
   });
 }, { threshold: 0.1 }).observe(worldsSection);
