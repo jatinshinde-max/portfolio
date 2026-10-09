@@ -415,18 +415,30 @@ body {
 .comm-card-title { font-family:var(--f-display); font-size:1rem; font-weight:400; letter-spacing:-0.01em; color:var(--ink); }
 
 /* ─── SELECTED RENDERS ──────────────────────────────────── */
-.ld-section { padding:clamp(80px,11vh,140px) clamp(28px,7vw,100px); background:var(--bg-1); scroll-margin-top:72px; }
-.ld-header { margin-bottom:48px; }
-.ld-title { font-family:var(--f-display); font-size:clamp(2.5rem,7vw,7rem); font-weight:300; letter-spacing:-0.03em; line-height:0.96; color:var(--ink); margin:20px 0 0; }
-.ld-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:4px; }
-@media (max-width:900px) { .ld-grid { grid-template-columns:repeat(3,1fr); } }
-@media (max-width:600px) { .ld-grid { grid-template-columns:repeat(2,1fr); } }
-.ld-frame { position:relative; overflow:hidden; background:var(--bg-2); aspect-ratio:4/3; }
-.ld-frame img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.7s var(--ease-out); }
-.ld-frame:hover img { transform:scale(1.04); }
-.ld-footer { margin-top:32px; padding-top:20px; border-top:1px solid var(--ink-ghost); }
+.ld-section { padding:clamp(60px,9vh,120px) clamp(28px,7vw,100px); background:var(--bg-1); scroll-margin-top:72px; }
+.ld-header { margin-bottom:40px; display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:20px; }
+.ld-title { font-family:var(--f-display); font-size:clamp(2rem,5vw,5rem); font-weight:300; letter-spacing:-0.03em; line-height:0.96; color:var(--ink); margin:16px 0 0; }
+/* Asymmetric mosaic: 2 large + 4 small in an intentional layout */
+.ld-mosaic { display:grid; grid-template-columns:5fr 3fr 4fr; grid-template-rows:auto auto; gap:3px; }
+.ld-cell { position:relative; overflow:hidden; background:var(--bg-2); cursor:zoom-in; }
+.ld-cell img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.8s var(--ease-out), opacity 0.4s; }
+.ld-cell:hover img { transform:scale(1.05); }
+.ld-cell.span-tall  { grid-row:span 2; aspect-ratio:3/4; }
+.ld-cell.short      { aspect-ratio:4/3; }
+.ld-cell.wide       { grid-column:span 2; aspect-ratio:16/7; }
+@media (max-width:768px) {
+  .ld-mosaic { grid-template-columns:1fr 1fr; grid-template-rows:auto; }
+  .ld-cell.span-tall  { grid-row:span 1; aspect-ratio:4/3; }
+  .ld-cell.wide       { grid-column:span 2; aspect-ratio:16/7; }
+}
+@media (max-width:480px) {
+  .ld-mosaic { grid-template-columns:1fr; }
+  .ld-cell.wide       { grid-column:span 1; aspect-ratio:4/3; }
+}
+.ld-footer { margin-top:24px; padding-top:18px; border-top:1px solid var(--ink-ghost); }
 .ld-footer a { font-family:var(--f-mono); font-size:8px; letter-spacing:0.28em; text-transform:uppercase; color:var(--ink-dim); text-decoration:none; border-bottom:1px solid var(--ink-ghost); padding-bottom:2px; transition:color 0.3s; }
 .ld-footer a:hover { color:var(--ink); }
+.ld-archive-count { font-family:var(--f-mono); font-size:8px; letter-spacing:0.2em; color:var(--ink-mute); }
 
 /* ─── CHARACTER & MOTION ─────────────────────────────────── */
 .char-section { padding:clamp(80px,11vh,140px) clamp(28px,7vw,100px); background:var(--bg-2); scroll-margin-top:72px; }
@@ -655,25 +667,22 @@ footer {
   <!-- SELECTED RENDERS -->
   <section class="ld-section" id="look-development">
     <div class="ld-header">
-      <span class="s-eyebrow reveal">Selected Renders</span>
-      <h2 class="ld-title reveal reveal-delay-1">13 renders.<br>CGI &amp; Photoreal.</h2>
+      <div>
+        <span class="s-eyebrow reveal">Selected Renders</span>
+        <h2 class="ld-title reveal reveal-delay-1">CGI &amp;<br>Photoreal.</h2>
+      </div>
+      <span class="ld-archive-count reveal">13 renders in archive</span>
     </div>
-    <div class="ld-grid">
-      <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/01.webp" loading="lazy" alt="Render 01"></div>
-      <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/02.webp" loading="lazy" alt="Render 02"></div>
-      <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/03.webp" loading="lazy" alt="Render 03"></div>
-      <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/04.webp" loading="lazy" alt="Render 04"></div>
-      <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/05.webp" loading="lazy" alt="Render 05"></div>
-      <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/06.webp" loading="lazy" alt="Render 06"></div>
-      <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/07.webp" loading="lazy" alt="Render 07"></div>
-      <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/08.webp" loading="lazy" alt="Render 08"></div>
-      <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/09.webp" loading="lazy" alt="Render 09"></div>
-      <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/10.webp" loading="lazy" alt="Render 10"></div>
-      <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/11.webp" loading="lazy" alt="Render 11"></div>
-      <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/12.webp" loading="lazy" alt="Render 12"></div>
-      <div class="ld-frame"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/13.webp" loading="lazy" alt="Render 13"></div>
+    <!-- 6 curated renders in an asymmetric mosaic — all 13 accessible in Archive -->
+    <div class="ld-mosaic">
+      <div class="ld-cell span-tall"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/01.webp" loading="lazy" alt="Render 01"></div>
+      <div class="ld-cell short"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/03.webp" loading="lazy" alt="Render 03"></div>
+      <div class="ld-cell short"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/05.webp" loading="lazy" alt="Render 05"></div>
+      <div class="ld-cell wide"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/07.webp" loading="lazy" alt="Render 07"></div>
+      <div class="ld-cell short"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/09.webp" loading="lazy" alt="Render 09"></div>
+      <div class="ld-cell short"><img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/11.webp" loading="lazy" alt="Render 11"></div>
     </div>
-    <div class="ld-footer"><a href="/archive#transforms">Full render archive →</a></div>
+    <div class="ld-footer"><a href="/archive#renders">View all 13 renders in archive →</a></div>
   </section>
 
   <!-- CHARACTER & MOTION -->
@@ -1084,7 +1093,7 @@ async function initModelViewer() {
     import('three/addons/loaders/GLTFLoader.js'),
   ]);
   const { WebGLRenderer, Scene, PerspectiveCamera, AmbientLight, DirectionalLight,
-          AnimationMixer, Box3, Vector3, Clock } = THREE_NS;
+          HemisphereLight, AnimationMixer, Box3, Vector3, Sphere, Clock } = THREE_NS;
 
   const canvas    = document.getElementById('mdl-canvas');
   const loadingEl = document.getElementById('mdl-loading');
@@ -1094,37 +1103,40 @@ async function initModelViewer() {
   const renderer = new WebGLRenderer({ canvas, antialias:true, alpha:true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.outputColorSpace = 'srgb';
+  renderer.shadowMap.enabled = false;
 
-  const w = canvas.clientWidth, h = canvas.clientHeight;
-  renderer.setSize(w, h);
+  // Canvas may not be laid out yet — use parent dimensions as fallback
+  function getDims() {
+    return [canvas.clientWidth || canvas.parentElement.clientWidth || 960,
+            canvas.clientHeight || canvas.parentElement.clientHeight || 540];
+  }
+  const [w0, h0] = getDims();
+  renderer.setSize(w0, h0);
 
   const scene  = new Scene();
-  const camera = new PerspectiveCamera(40, w / h, 0.1, 100);
-  camera.position.set(0, 1.6, 3.8);
+  const camera = new PerspectiveCamera(38, w0 / h0, 0.01, 1000);
 
-  const amb = new AmbientLight(0xffffff, 0.9);
-  scene.add(amb);
-  const key = new DirectionalLight(0xfff0e0, 1.4);
-  key.position.set(2, 5, 3);
+  // Lighting: hemisphere (sky/ground) + warm key + cool rim
+  const hemi = new HemisphereLight(0xfff4e8, 0x1a1428, 0.7);
+  scene.add(hemi);
+  const key = new DirectionalLight(0xfff0d8, 2.2);
+  key.position.set(1.5, 3, 2);
   scene.add(key);
-  const fill = new DirectionalLight(0xe0f0ff, 0.4);
-  fill.position.set(-3, 2, -2);
-  scene.add(fill);
+  const rim = new DirectionalLight(0xc8d8ff, 0.6);
+  rim.position.set(-2, 1.5, -3);
+  scene.add(rim);
 
   const controls = new OrbitControls(camera, renderer.domElement);
-  controls.enableDamping  = true;
-  controls.dampingFactor  = 0.06;
-  controls.enableZoom     = false;
-  controls.enablePan      = false;
-  controls.autoRotate     = true;
-  controls.autoRotateSpeed = 1.0;
-  controls.target.set(0, 1.0, 0);
-  controls.minPolarAngle  = Math.PI * 0.15;
-  controls.maxPolarAngle  = Math.PI * 0.75;
-
-  // pause autoRotate while dragging
+  controls.enableDamping   = true;
+  controls.dampingFactor   = 0.07;
+  controls.enableZoom      = false;
+  controls.enablePan       = false;
+  controls.autoRotate      = true;
+  controls.autoRotateSpeed = 0.8;
+  controls.minPolarAngle   = Math.PI * 0.1;
+  controls.maxPolarAngle   = Math.PI * 0.72;
   controls.addEventListener('start', () => { controls.autoRotate = false; });
-  controls.addEventListener('end',   () => { setTimeout(() => { controls.autoRotate = true; }, 2000); });
+  controls.addEventListener('end',   () => { setTimeout(() => { controls.autoRotate = true; }, 2200); });
 
   const loader = new GLTFLoader();
   const MODELS = {
@@ -1135,32 +1147,65 @@ async function initModelViewer() {
 
   let mixer = null, currentObj = null;
   const clock = new Clock();
+  // Target normalized height in Three.js units (1 unit = reasonable scene scale)
+  const TARGET_HEIGHT = 2.0;
 
-  async function loadModel(key) {
+  function fitCameraToModel(obj) {
+    const box = new Box3().setFromObject(obj);
+    const size   = box.getSize(new Vector3());
+    const center = box.getCenter(new Vector3());
+    const height = size.y || 1;
+
+    // Normalize scale: CC4 exports in cm (175 units) or other arbitrary scales
+    const scaleFactor = TARGET_HEIGHT / height;
+    obj.scale.setScalar(scaleFactor);
+
+    // Recompute after scaling
+    box.setFromObject(obj);
+    const center2 = box.getCenter(new Vector3());
+    const size2   = box.getSize(new Vector3());
+    // Ground the model: shift so feet sit at y=0
+    obj.position.y -= box.min.y;
+    box.setFromObject(obj);
+    const finalCenter = box.getCenter(new Vector3());
+
+    // Place camera at 3× bounding sphere radius, aimed at mid-torso
+    const sphere = box.getBoundingSphere(new Sphere());
+    const dist   = sphere.radius * 3.2;
+    const midY   = finalCenter.y;   // roughly mid-torso for a grounded character
+    camera.position.set(0, midY, dist);
+    controls.target.set(0, midY * 0.9, 0);
+    camera.near = dist * 0.01;
+    camera.far  = dist * 20;
+    camera.updateProjectionMatrix();
+    controls.update();
+  }
+
+  async function loadModel(modelKey) {
     if (loadFill)  loadFill.style.width = '0%';
     if (loadingEl) loadingEl.classList.remove('done');
+
+    // Stop and dispose previous mixer
+    if (mixer) { mixer.stopAllAction(); mixer = null; }
+    if (currentObj) { scene.remove(currentObj); currentObj = null; }
+
     const gltf = await new Promise((res, rej) => {
-      loader.load(MODELS[key], res, p => {
+      loader.load(MODELS[modelKey], res, p => {
         if (loadFill && p.total) loadFill.style.width = (p.loaded / p.total * 100) + '%';
       }, rej);
     });
-    if (currentObj) { scene.remove(currentObj); }
+
     currentObj = gltf.scene;
     scene.add(currentObj);
-    // center and ground model
-    const box = new Box3().setFromObject(currentObj);
-    const ctr = box.getCenter(new Vector3());
-    currentObj.position.sub(ctr);
-    currentObj.position.y += (box.max.y - box.min.y) / 2;
-    // play first animation if present
+    fitCameraToModel(currentObj);
+
+    // Play all animations (GLB from CC4 may have one clip per file)
     if (gltf.animations?.length) {
       mixer = new AnimationMixer(currentObj);
-      const action = mixer.clipAction(gltf.animations[0]);
-      action.play();
-    } else {
-      mixer = null;
+      gltf.animations.forEach(clip => mixer.clipAction(clip).play());
     }
-    if (loadingEl) loadingEl.classList.add('done');
+
+    if (loadingEl) { loadFill && (loadFill.style.width = '100%'); loadingEl.classList.add('done'); }
   }
 
   await loadModel('idle');
@@ -1169,16 +1214,19 @@ async function initModelViewer() {
     btn.addEventListener('click', async () => {
       btns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      await loadModel(btn.dataset.mdl).catch(() => {});
+      await loadModel(btn.dataset.mdl).catch(err => {
+        console.warn('[3D viewer] model load failed:', err);
+      });
     });
   });
 
   new ResizeObserver(() => {
-    const nw = canvas.clientWidth, nh = canvas.clientHeight;
+    const [nw, nh] = getDims();
+    if (!nw || !nh) return;
     renderer.setSize(nw, nh);
     camera.aspect = nw / nh;
     camera.updateProjectionMatrix();
-  }).observe(canvas);
+  }).observe(canvas.parentElement);
 
   (function renderLoop() {
     requestAnimationFrame(renderLoop);
@@ -1392,11 +1440,11 @@ if (typeof gsap!=='undefined' && typeof ScrollTrigger!=='undefined') {
   }, 100);
 
   // Look development frames stagger
-  const ldFrames = [...document.querySelectorAll('.ld-frame,.ld-hero-frame')];
+  const ldFrames = [...document.querySelectorAll('.ld-cell,.ld-hero-frame')];
   if (ldFrames.length) {
-    gsap.set(ldFrames, {opacity:0,y:12});
-    ScrollTrigger.create({ trigger:'#look-development', start:'top 80%', once:true,
-      onEnter:() => gsap.to(ldFrames, {opacity:1,y:0,duration:0.7,stagger:0.05,ease:EASE})
+    gsap.set(ldFrames, {opacity:0,y:16,scale:0.98});
+    ScrollTrigger.create({ trigger:'#look-development', start:'top 78%', once:true,
+      onEnter:() => gsap.to(ldFrames, {opacity:1,y:0,scale:1,duration:0.8,stagger:0.07,ease:EASE})
     });
   }
 
