@@ -7,6 +7,7 @@
     { "source": "/type-c",         "destination": "/type-c.html" },
     { "source": "/worlds-test",    "destination": "/worlds-test.html" },
     { "source": "/worlds-preview", "destination": "/worlds-preview.html" },
+    { "source": "/v5",             "destination": "/v5.html" },
     { "source": "/v4",             "destination": "/v4.html" },
     { "source": "/archive",        "destination": "/archive.html" },
     { "source": "/work/ashfall",   "destination": "/work/ashfall.html" },
