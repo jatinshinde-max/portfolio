@@ -297,23 +297,63 @@ footer{padding:2rem clamp(1.5rem,5vw,4rem);background:var(--bg);display:flex;jus
 
 /* ── AI CREATIVE SYSTEMS ────────────────────── */
 #ai-systems{padding:clamp(5rem,10vh,8rem) clamp(1.5rem,5vw,4rem);background:var(--bg-2)}
-.ais-intro{display:grid;grid-template-columns:1fr;gap:2rem;margin-bottom:clamp(3rem,6vh,5rem)}
-@media(min-width:768px){.ais-intro{grid-template-columns:1fr 1fr;align-items:end}}
+.ais-header{display:grid;grid-template-columns:1fr;gap:2rem;margin-bottom:clamp(2.5rem,5vh,4rem)}
+@media(min-width:768px){.ais-header{grid-template-columns:1fr 1fr;align-items:end}}
 .ais-intro-text{font-size:clamp(.9rem,1.1vw,1rem);line-height:1.75;color:var(--ink-dim);max-width:48ch}
-.ais-cards{display:grid;grid-template-columns:1fr;gap:1px;background:var(--ink-ghost);border:1px solid var(--ink-ghost)}
-@media(min-width:768px){.ais-cards{grid-template-columns:repeat(3,1fr)}}
-.ais-card{background:var(--bg-1);padding:clamp(1.5rem,3vw,2.5rem);display:flex;flex-direction:column;gap:1rem;transition:background .3s}
-.ais-card:hover{background:var(--bg-2)}
-.ais-card-num{font-family:var(--f-mono);font-size:.6rem;letter-spacing:.3em;color:var(--ink-mute)}
-.ais-card-title{font-family:var(--f-display);font-weight:300;font-size:clamp(1.2rem,2vw,1.5rem);letter-spacing:-.01em;color:var(--ink);line-height:1.2}
-.ais-card-type{font-family:var(--f-mono);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-top:-.25rem}
-.ais-card-desc{font-family:var(--f-body);font-size:.88rem;line-height:1.65;color:var(--ink-dim)}
-.ais-card-caps{display:flex;flex-direction:column;gap:.3rem;margin-top:.5rem}
-.ais-cap{font-family:var(--f-mono);font-size:.62rem;letter-spacing:.1em;color:var(--ink-mute);display:flex;align-items:baseline;gap:.4rem}
-.ais-cap::before{content:'→';color:var(--ink-ghost);flex-shrink:0}
-.ais-demo{margin-top:1rem;padding:.875rem;background:var(--bg);border-left:2px solid var(--accent);opacity:.8}
-.ais-demo-label{font-family:var(--f-mono);font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:.4rem}
-.ais-demo-text{font-family:var(--f-body);font-size:.78rem;line-height:1.55;color:var(--ink-dim);font-style:italic}
+/* tab strip */
+.ais-tabs{display:flex;gap:0;border-bottom:1px solid var(--ink-ghost);margin-bottom:0;overflow-x:auto;scrollbar-width:none}
+.ais-tabs::-webkit-scrollbar{display:none}
+.ais-tab{font-family:var(--f-mono);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;padding:.75rem 1.25rem;color:var(--ink-mute);border-bottom:2px solid transparent;transition:color .25s,border-color .25s;cursor:none;white-space:nowrap;flex-shrink:0}
+.ais-tab.active{color:var(--ink);border-bottom-color:var(--accent)}
+.ais-tab:hover{color:var(--ink-dim)}
+/* panels */
+.ais-panel{display:none;padding:clamp(1.5rem,3vw,2.5rem);background:var(--bg-1);border:1px solid var(--ink-ghost);border-top:none}
+.ais-panel.active{display:grid;grid-template-columns:1fr;gap:2rem}
+@media(min-width:900px){.ais-panel.active{grid-template-columns:1fr 1.4fr;align-items:start}}
+.ais-panel-meta{display:flex;flex-direction:column;gap:1.25rem}
+.ais-pnum{font-family:var(--f-mono);font-size:.6rem;letter-spacing:.3em;color:var(--ink-mute)}
+.ais-ptitle{font-family:var(--f-display);font-weight:300;font-size:clamp(1.3rem,2.5vw,1.8rem);letter-spacing:-.02em;color:var(--ink);line-height:1.15}
+.ais-ptype{font-family:var(--f-mono);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
+.ais-pdesc{font-size:.9rem;line-height:1.7;color:var(--ink-dim);max-width:44ch}
+.ais-caps{display:flex;flex-direction:column;gap:.3rem}
+.ais-cap{font-family:var(--f-mono);font-size:.61rem;letter-spacing:.08em;color:var(--ink-mute);display:flex;align-items:baseline;gap:.4rem}
+.ais-cap::before{content:'→';color:var(--ink-ghost)}
+/* demo frame */
+.ais-demo-frame{background:var(--bg);border:1px solid var(--ink-ghost);overflow:hidden;position:relative}
+.ais-demo-badge{position:absolute;top:.75rem;right:.75rem;font-family:var(--f-mono);font-size:.55rem;letter-spacing:.2em;text-transform:uppercase;padding:.2rem .5rem;background:rgba(232,213,176,.1);color:var(--accent);border:1px solid rgba(232,213,176,.2);z-index:2}
+/* Post Studio demo */
+.ps-brief{padding:1rem 1.25rem;border-bottom:1px solid var(--ink-ghost)}
+.ps-brief-label{font-family:var(--f-mono);font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:.4rem}
+.ps-brief-text{font-size:.82rem;line-height:1.5;color:var(--ink-dim)}
+.ps-posts{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--ink-ghost)}
+.ps-post{background:var(--bg-1);padding:.875rem;display:flex;flex-direction:column;gap:.5rem}
+.ps-post-plat{font-family:var(--f-mono);font-size:.55rem;letter-spacing:.22em;text-transform:uppercase;padding:.15rem .4rem;border:1px solid var(--ink-ghost);color:var(--ink-mute);align-self:flex-start}
+.ps-post-copy{font-size:.78rem;line-height:1.5;color:var(--ink-dim)}
+.ps-post-tags{display:flex;flex-wrap:wrap;gap:.25rem;margin-top:.25rem}
+.ps-tag{font-family:var(--f-mono);font-size:.55rem;color:var(--ink-mute)}
+.ps-post-dir{margin-top:.4rem;padding:.4rem;background:var(--bg-2);border-left:2px solid var(--ink-ghost)}
+.ps-post-dir-label{font-family:var(--f-mono);font-size:.52rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:.2rem}
+.ps-post-dir-text{font-size:.72rem;color:var(--ink-mute);font-style:italic}
+/* Story pipeline demo */
+.sp-concepts{display:flex;flex-direction:column;gap:0}
+.sp-scene{padding:.875rem 1.25rem;border-bottom:1px solid var(--ink-ghost);display:grid;grid-template-columns:auto 1fr auto;gap:.75rem;align-items:start}
+.sp-scene:last-child{border-bottom:none}
+.sp-sc-num{font-family:var(--f-mono);font-size:.6rem;letter-spacing:.15em;color:var(--ink-mute);padding-top:.15rem}
+.sp-sc-body{}
+.sp-sc-title{font-family:var(--f-display);font-weight:300;font-size:.92rem;color:var(--ink);margin-bottom:.2rem}
+.sp-sc-desc{font-size:.78rem;line-height:1.45;color:var(--ink-dim)}
+.sp-sc-meta{display:flex;flex-direction:column;gap:.2rem;align-items:flex-end;font-family:var(--f-mono);font-size:.55rem;letter-spacing:.1em;color:var(--ink-mute);white-space:nowrap}
+.sp-treatment{padding:1rem 1.25rem;background:var(--bg-2);border-bottom:1px solid var(--ink-ghost)}
+.sp-treatment-label{font-family:var(--f-mono);font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:.4rem}
+.sp-treatment-text{font-size:.8rem;line-height:1.55;color:var(--ink-dim)}
+/* Storyboard demo */
+.sb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--ink-ghost)}
+@media(max-width:500px){.sb-grid{grid-template-columns:repeat(2,1fr)}}
+.sb-panel{background:var(--bg-1);aspect-ratio:16/10;position:relative;overflow:hidden}
+.sb-panel-art{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+.sb-panel-meta{position:absolute;bottom:0;left:0;right:0;padding:.4rem .5rem;background:linear-gradient(to top,rgba(6,5,12,.9),transparent);z-index:2}
+.sb-panel-shot{font-family:var(--f-mono);font-size:.52rem;letter-spacing:.15em;color:var(--accent)}
+.sb-panel-note{font-family:var(--f-mono);font-size:.5rem;letter-spacing:.08em;color:var(--ink-mute);margin-top:.1rem}
 </style>
 </head>
 <body>
@@ -455,7 +495,7 @@ footer{padding:2rem clamp(1.5rem,5vw,4rem);background:var(--bg);display:flex;jus
 <!-- E. COMFYUI WORKFLOWS -->
 <section id="genai" aria-label="ComfyUI Workflows">
   <div class="s-eyebrow">ComfyUI Workflows</div>
-  <h2 class="s-title reveal">Node graphs.<br>Real outputs.</h2>
+  <h2 class="s-title reveal">Node graphs.<br>Production workflows.</h2>
   <div class="genai-tags">
     <span class="genai-tag">ComfyUI</span>
     <span class="genai-tag">Wan 2.1</span>
@@ -467,7 +507,7 @@ footer{padding:2rem clamp(1.5rem,5vw,4rem);background:var(--bg);display:flex;jus
     <span class="genai-tag">InfiniteTalk</span>
   </div>
   <div class="genai-intro reveal">
-    <p>Three production workflows — a mix I've built and customized. Each represents a different output modality: animated talking-head video, image-to-3D mesh conversion, and long-form cinematic video generation.</p>
+    <p>Three ComfyUI workflows — a mix I've built and customized from the community. The architecture shown below represents the actual node structure of each graph. Rendered outputs will be added when finalized.</p>
   </div>
 
   <div class="wf-grid reveal">
@@ -545,67 +585,158 @@ footer{padding:2rem clamp(1.5rem,5vw,4rem);background:var(--bg);display:flex;jus
 <section id="ai-systems" aria-label="AI Creative Systems">
   <div class="s-eyebrow">AI Creative Systems</div>
   <h2 class="s-title reveal">Production tools<br>I built.</h2>
-  <div class="ais-intro">
-    <div class="genai-intro">
-      <p>Three custom systems built on top of GPT APIs and prompt engineering. Each automates a specific stage of creative production — from campaign content to cinematic preproduction. Demonstrated below with fictional brand content.</p>
-    </div>
+  <div class="ais-header reveal">
+    <p class="ais-intro-text">Three custom systems built on top of GPT APIs — each automating a distinct stage of creative production. From social campaign content to full cinematic preproduction. All demo content below is fictional and illustrative.</p>
   </div>
-  <div class="ais-cards reveal">
 
-    <!-- Tool 1: Post Studio -->
-    <div class="ais-card">
-      <div class="ais-card-num">01</div>
-      <div class="ais-card-title">AI Creative Production Studio</div>
-      <div class="ais-card-type">GPT-Powered · Content Automation</div>
-      <div class="ais-card-desc">A structured content generation system for social media and advertising campaigns. Takes a brief and outputs platform-ready copy, hashtag strategies, and visual direction notes across multiple formats simultaneously.</div>
-      <div class="ais-card-caps">
+  <!-- Tab strip -->
+  <div class="ais-tabs" role="tablist" aria-label="AI System demos">
+    <button class="ais-tab active" role="tab" aria-selected="true"  data-ais="1">01 — Post Studio</button>
+    <button class="ais-tab"        role="tab" aria-selected="false" data-ais="2">02 — Story Pipeline</button>
+    <button class="ais-tab"        role="tab" aria-selected="false" data-ais="3">03 — Storyboard</button>
+  </div>
+
+  <!-- Panel 1: AI Creative Production Studio -->
+  <div class="ais-panel active" id="ais-p1" role="tabpanel">
+    <div class="ais-panel-meta">
+      <div>
+        <div class="ais-pnum">01 / 03</div>
+        <div class="ais-ptitle">AI Creative Production Studio</div>
+        <div class="ais-ptype">GPT-Powered · Content Automation</div>
+      </div>
+      <p class="ais-pdesc">A structured content generation system for social media and advertising campaigns. Input a brief, receive platform-ready copy, hashtag strategies, and visual direction notes — across all formats simultaneously.</p>
+      <div class="ais-caps">
         <span class="ais-cap">Multi-platform batch output (IG / LinkedIn / TikTok / YouTube)</span>
-        <span class="ais-cap">Brand voice consistency across formats</span>
+        <span class="ais-cap">Brand voice and tone consistency across formats</span>
         <span class="ais-cap">Campaign concept → post-ready copy in one pass</span>
         <span class="ais-cap">Structured JSON output for downstream automation</span>
       </div>
-      <div class="ais-demo">
-        <div class="ais-demo-label">Demo brief — fictional brand</div>
-        <div class="ais-demo-text">Brief: "LUMEX skincare launch — hydration serum, 18–35 female audience, minimal aesthetic." Output: 12 platform posts, 3 campaign angles, visual direction notes for each format. All content below is fictional demo material.</div>
+    </div>
+    <!-- Demo frame: fictional LUMEX skincare campaign -->
+    <div class="ais-demo-frame">
+      <div class="ais-demo-badge">Fictional demo — LUMEX skincare</div>
+      <div class="ps-brief">
+        <div class="ps-brief-label">Input brief</div>
+        <div class="ps-brief-text">"LUMEX Hydration Serum launch — minimal aesthetic, 18–35 audience. Emphasise clinical results, clean ingredients. Tone: precise, calm, premium."</div>
+      </div>
+      <div class="ps-posts">
+        <div class="ps-post">
+          <span class="ps-post-plat">Instagram</span>
+          <div class="ps-post-copy">Your skin remembers everything.<br>Give it what it deserves.<br><br>LUMEX Hydration Serum. 30 days to measurably different skin.</div>
+          <div class="ps-post-tags"><span class="ps-tag">#LUMEXSkin</span><span class="ps-tag">#HydrationFirst</span><span class="ps-tag">#CleanBeauty</span></div>
+          <div class="ps-post-dir"><div class="ps-post-dir-label">Visual direction</div><div class="ps-post-dir-text">Macro serum drop on pale skin. Natural window light. Minimal props. Off-white background.</div></div>
+        </div>
+        <div class="ps-post">
+          <span class="ps-post-plat">LinkedIn</span>
+          <div class="ps-post-copy">We spent 18 months reformulating.<br><br>The result: a hydration serum with 94% improvement in moisture retention at day 30. No fragrance. No filler.<br><br>LUMEX. Formulated differently.</div>
+          <div class="ps-post-tags"><span class="ps-tag">#SkinScience</span><span class="ps-tag">#BeautyInnovation</span></div>
+          <div class="ps-post-dir"><div class="ps-post-dir-label">Visual direction</div><div class="ps-post-dir-text">Split-frame: ingredient close-up / clinical result graph. Clean, data-forward layout.</div></div>
+        </div>
+        <div class="ps-post">
+          <span class="ps-post-plat">TikTok</span>
+          <div class="ps-post-copy">I stopped using 6 products and started using one.<br><br>Here's what happened to my skin in 30 days ↓<br><br>[LUMEX serum — day 1 vs day 30]</div>
+          <div class="ps-post-tags"><span class="ps-tag">#SkincareRoutine</span><span class="ps-tag">#GlowUp</span><span class="ps-tag">#LUMEX</span></div>
+          <div class="ps-post-dir"><div class="ps-post-dir-label">Visual direction</div><div class="ps-post-dir-text">Before/after split screen. Face blurred — focus on skin texture. Natural morning light. 15s.</div></div>
+        </div>
+        <div class="ps-post">
+          <span class="ps-post-plat">YouTube Desc</span>
+          <div class="ps-post-copy">LUMEX Hydration Serum: 30-day skin transformation. We followed four volunteers through a controlled 30-day trial. No filters. No retouching. Real results from a single-step routine.</div>
+          <div class="ps-post-tags"><span class="ps-tag">#LongformReview</span><span class="ps-tag">#SkinTrial</span></div>
+          <div class="ps-post-dir"><div class="ps-post-dir-label">Visual direction</div><div class="ps-post-dir-text">Documentary tone. Neutral studio. Interview-style with clinical overlay text. 8–12 min.</div></div>
+        </div>
       </div>
     </div>
+  </div>
 
-    <!-- Tool 2: Story Pipeline -->
-    <div class="ais-card">
-      <div class="ais-card-num">02</div>
-      <div class="ais-card-title">AI Story &amp; Cinematic Preproduction Pipeline</div>
-      <div class="ais-card-type">GPT-Chained · Preproduction Automation</div>
-      <div class="ais-card-desc">A chained GPT pipeline that converts a concept or synopsis into a full preproduction package. Generates story treatment, scene-by-scene breakdown, and production shot list in structured format — ready for the director or storyboard artist.</div>
-      <div class="ais-card-caps">
-        <span class="ais-cap">Concept → treatment → scene breakdown in sequence</span>
-        <span class="ais-cap">Shot list with camera angle, lens, and movement notes</span>
-        <span class="ais-cap">Maintains story consistency across chained calls</span>
-        <span class="ais-cap">Outputs structured data for storyboard pipeline input</span>
+  <!-- Panel 2: Story & Cinematic Preproduction Pipeline -->
+  <div class="ais-panel" id="ais-p2" role="tabpanel">
+    <div class="ais-panel-meta">
+      <div>
+        <div class="ais-pnum">02 / 03</div>
+        <div class="ais-ptitle">AI Story &amp; Cinematic Preproduction Pipeline</div>
+        <div class="ais-ptype">GPT-Chained · Preproduction Automation</div>
       </div>
-      <div class="ais-demo">
-        <div class="ais-demo-label">Demo output — fictional project</div>
-        <div class="ais-demo-text">Input: "A solitary astronaut discovers a signal in deep space — 90-second atmospheric short." Output: 4-page treatment, 12 scene cards, 38 shots with angle/movement/duration. Fictional project — not a real production.</div>
+      <p class="ais-pdesc">A chained GPT pipeline that converts a concept into a full preproduction package — story treatment, scene breakdown, and shot list with camera specifications. Output feeds directly into the storyboard pipeline.</p>
+      <div class="ais-caps">
+        <span class="ais-cap">Concept → treatment → scene cards → shot list in sequence</span>
+        <span class="ais-cap">Shot list includes angle, lens, movement, and duration</span>
+        <span class="ais-cap">Maintains narrative consistency across all chained calls</span>
+        <span class="ais-cap">Structured data output ready for storyboard pipeline input</span>
       </div>
     </div>
-
-    <!-- Tool 3: Storyboard Pipeline -->
-    <div class="ais-card">
-      <div class="ais-card-num">03</div>
-      <div class="ais-card-title">AI Storyboard Production Pipeline</div>
-      <div class="ais-card-type">GPT + Image Gen · Batch Storyboarding</div>
-      <div class="ais-card-desc">A batch storyboard generation system. Takes the shot list output from the Story Pipeline and generates visual panel descriptions for each shot, then sends them to an image generation model in batch. Produces a complete storyboard document ready for production review.</div>
-      <div class="ais-card-caps">
-        <span class="ais-cap">Shot list → visual panel description → generated image</span>
-        <span class="ais-cap">Consistent character and environment across panels</span>
-        <span class="ais-cap">Batch processing — full storyboard in one run</span>
-        <span class="ais-cap">Exports as numbered sequence for editorial use</span>
+    <!-- Demo frame: fictional "Signal" short film preproduction -->
+    <div class="ais-demo-frame">
+      <div class="ais-demo-badge">Fictional demo — "Signal" short film</div>
+      <div class="sp-treatment">
+        <div class="sp-treatment-label">Treatment — 90s short</div>
+        <div class="sp-treatment-text">"A solitary maintenance technician aboard a deep-space relay station detects an anomalous signal. The signal is a pattern — mathematical, deliberate. She must decide whether to amplify it or destroy it before her shift ends."</div>
       </div>
-      <div class="ais-demo">
-        <div class="ais-demo-label">Demo output — fictional project</div>
-        <div class="ais-demo-text">From the 38-shot deep-space project above: 38 generated panels, consistent lighting and character design, numbered and exported as a production-ready PDF storyboard. All panels use synthetic models — no real people.</div>
+      <div class="sp-concepts">
+        <div class="sp-scene">
+          <div class="sp-sc-num">SC 01</div>
+          <div class="sp-sc-body">
+            <div class="sp-sc-title">Cold open — station exterior</div>
+            <div class="sp-sc-desc">Establishing. Station drifting against star field. Engine hum. No dialogue.</div>
+          </div>
+          <div class="sp-sc-meta"><span>00:00–00:08</span><span>Wide / 24mm</span><span>Locked</span></div>
+        </div>
+        <div class="sp-scene">
+          <div class="sp-sc-num">SC 02</div>
+          <div class="sp-sc-body">
+            <div class="sp-sc-title">Interior — console room</div>
+            <div class="sp-sc-desc">MARA (30s) runs diagnostic. Alert triggers — sector 7 anomaly. Her expression shifts.</div>
+          </div>
+          <div class="sp-sc-meta"><span>00:08–00:22</span><span>Med / 50mm</span><span>Slow push</span></div>
+        </div>
+        <div class="sp-scene">
+          <div class="sp-sc-num">SC 03</div>
+          <div class="sp-sc-body">
+            <div class="sp-sc-title">Signal visualisation</div>
+            <div class="sp-sc-desc">Pattern renders on screen — unmistakably geometric. Mara leans in. Insert: her hand on keyboard.</div>
+          </div>
+          <div class="sp-sc-meta"><span>00:22–00:38</span><span>Close / 85mm</span><span>Handheld</span></div>
+        </div>
+        <div class="sp-scene">
+          <div class="sp-sc-num">SC 04</div>
+          <div class="sp-sc-body">
+            <div class="sp-sc-title">The decision</div>
+            <div class="sp-sc-desc">Mara's face in monitor glow. She reaches for amplify switch. Holds. Cut to black.</div>
+          </div>
+          <div class="sp-sc-meta"><span>00:38–00:52</span><span>ECU / 135mm</span><span>Locked</span></div>
+        </div>
+        <div class="sp-scene">
+          <div class="sp-sc-num">SC 05</div>
+          <div class="sp-sc-body">
+            <div class="sp-sc-title">Aftermath / title card</div>
+            <div class="sp-sc-desc">Station exterior again. One antenna slowly rotates toward source. Title: SIGNAL.</div>
+          </div>
+          <div class="sp-sc-meta"><span>00:52–01:30</span><span>Wide / 24mm</span><span>Slow pull</span></div>
+        </div>
       </div>
     </div>
+  </div>
 
+  <!-- Panel 3: Storyboard Production Pipeline -->
+  <div class="ais-panel" id="ais-p3" role="tabpanel">
+    <div class="ais-panel-meta">
+      <div>
+        <div class="ais-pnum">03 / 03</div>
+        <div class="ais-ptitle">AI Storyboard Production Pipeline</div>
+        <div class="ais-ptype">GPT + Image Gen · Batch Storyboarding</div>
+      </div>
+      <p class="ais-pdesc">Takes the shot list output from the Story Pipeline and generates visual panel descriptions per shot, then sends each to an image generation model in batch. Produces a complete numbered storyboard ready for production review.</p>
+      <div class="ais-caps">
+        <span class="ais-cap">Shot list → visual description → generated panel in sequence</span>
+        <span class="ais-cap">Consistent character design and lighting across all panels</span>
+        <span class="ais-cap">Batch processing — full storyboard in one automated run</span>
+        <span class="ais-cap">Exports numbered sequence for editorial and director review</span>
+      </div>
+    </div>
+    <!-- Demo frame: illustrated panels using CSS art -->
+    <div class="ais-demo-frame">
+      <div class="ais-demo-badge">Illustrative layout — panels represent AI output structure</div>
+      <div class="sb-grid" id="sb-grid"></div>
+    </div>
   </div>
 </section>
 
@@ -995,7 +1126,7 @@ const ADS = [
   { src:'gallery/ads/chocolate-bar.mp4',    title:'Chocolate',    meta:'Product / CGI' },
   { src:'gallery/ads/earbuds.mp4',          title:'Earbuds',      meta:'Product / CGI' },
   { src:'gallery/ads/facewash.mp4',         title:'Facewash',     meta:'Product / CGI' },
-  { src:'gallery/ads/pepsi.mp4',            title:'Pepsi',        meta:'Advertising / CGI' },
+  { src:'gallery/ads/pepsi.mp4',            title:'Beverage',     meta:'Advertising / CGI' },
   { src:'gallery/ads/serum.mp4',            title:'Serum',        meta:'Product / CGI' },
   { src:'gallery/ads/shoe.mp4',             title:'Footwear',     meta:'Product / CGI' },
   { src:'gallery/ads/smart-watch.mp4',      title:'Smart Watch',  meta:'Product / CGI' },
@@ -1180,6 +1311,45 @@ async function initModelViewer() {
 // lazy-init 3D viewer when section approaches
 new IntersectionObserver(([e])=>{ if(e.isIntersecting){ initModelViewer(); } },{rootMargin:'200px'})
   .observe(document.getElementById('model-viewer'));
+
+// ── AI SYSTEMS TABS ──────────────────────────
+{ const tabs   = document.querySelectorAll('.ais-tab');
+  const panels = document.querySelectorAll('.ais-panel');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const idx = tab.dataset.ais;
+      tabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
+      panels.forEach(p => p.classList.remove('active'));
+      tab.classList.add('active'); tab.setAttribute('aria-selected','true');
+      const p = document.getElementById('ais-p'+idx);
+      if(p) p.classList.add('active');
+    });
+  }); }
+
+// ── STORYBOARD PANELS (CSS art) ───────────────
+{ const SB_DATA = [
+    { shot:'SH 01A', note:'Station exterior · wide · 24mm · locked', bg:'#0a0914', art:'exterior' },
+    { shot:'SH 02A', note:'Console room · medium · 50mm · slow push', bg:'#0c0f18', art:'console' },
+    { shot:'SH 03A', note:'Screen close · 50mm · insert', bg:'#060c10', art:'screen' },
+    { shot:'SH 03B', note:'Hand on keyboard · extreme close · 85mm', bg:'#080912', art:'hand' },
+    { shot:'SH 04A', note:'Mara face · ECU · 135mm · locked', bg:'#100a10', art:'face' },
+    { shot:'SH 05A', note:'Station antenna · wide · 24mm · slow pull', bg:'#0a0914', art:'antenna' },
+  ];
+  const SVGS = {
+    exterior: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg"><rect width="160" height="100" fill="#0a0914"/><circle cx="80" cy="50" r="18" fill="none" stroke="#1a1830" stroke-width="1.5"/><rect x="50" y="48" width="60" height="4" rx="1" fill="#1a1830"/><rect x="78" y="30" width="4" height="40" rx="1" fill="#1a1830"/><circle cx="120" cy="20" r="1.5" fill="rgba(255,255,255,.3)"/><circle cx="40" cy="15" r="1" fill="rgba(255,255,255,.25)"/><circle cx="140" cy="70" r="1" fill="rgba(255,255,255,.2)"/><circle cx="20" cy="75" r="1.5" fill="rgba(255,255,255,.3)"/><circle cx="55" cy="85" r="1" fill="rgba(255,255,255,.15)"/><circle cx="100" cy="10" r="1" fill="rgba(255,255,255,.2)"/><rect x="74" y="42" width="12" height="2" rx="1" fill="#2a2848" opacity=".8"/></svg>`,
+    console: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg"><rect width="160" height="100" fill="#0c0f18"/><rect x="20" y="20" width="120" height="60" rx="2" fill="#0f1220" stroke="#1e2240" stroke-width="1"/><rect x="25" y="25" width="110" height="42" rx="1" fill="#080c18"/><rect x="25" y="25" width="110" height="42" rx="1" fill="url(#cg)" opacity=".4"/><defs><linearGradient id="cg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2a6cff" stop-opacity=".15"/><stop offset="1" stop-color="#00a0ff" stop-opacity=".05"/></linearGradient></defs><rect x="30" y="30" width="40" height="2" rx="1" fill="#2a6cff" opacity=".5"/><rect x="30" y="35" width="28" height="1.5" rx="1" fill="#1e3060" opacity=".8"/><rect x="30" y="39" width="32" height="1.5" rx="1" fill="#1e3060" opacity=".8"/><circle cx="100" cy="38" r="6" fill="none" stroke="#2a6cff" stroke-width=".8" opacity=".6"/><rect x="76" y="70" width="8" height="3" rx="1" fill="#1e2240"/><rect x="68" y="73" width="24" height="5" rx="1" fill="#1a1e32"/></svg>`,
+    screen: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg"><rect width="160" height="100" fill="#060c10"/><rect x="15" y="15" width="130" height="70" rx="2" fill="#040810" stroke="#102030" stroke-width="1"/><rect x="20" y="20" width="120" height="60" rx="1" fill="#050a14"/><g opacity=".7" stroke="#00b4ff" stroke-width=".7" fill="none"><polygon points="80,30 95,55 65,55" /><circle cx="80" cy="43" r="18"/><line x1="80" y1="25" x2="80" y2="65"/><line x1="60" y1="43" x2="100" y2="43"/></g><circle cx="80" cy="43" r="4" fill="#00b4ff" opacity=".4"/><rect x="55" y="62" width="50" height="1" rx=".5" fill="#102030"/></svg>`,
+    hand: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg"><rect width="160" height="100" fill="#080912"/><rect x="0" y="50" width="160" height="50" rx="0" fill="#0d0c1a"/><rect x="20" y="52" width="120" height="30" rx="3" fill="#131228" stroke="#1e1c38" stroke-width=".8"/><rect x="30" y="58" width="20" height="6" rx="2" fill="#1e1c38"/><rect x="55" y="58" width="15" height="6" rx="2" fill="#1e1c38"/><rect x="75" y="58" width="20" height="6" rx="2" fill="#2a2848"/><rect x="100" y="58" width="25" height="6" rx="2" fill="#1e1c38"/><rect x="30" y="67" width="40" height="6" rx="2" fill="#1e1c38"/><rect x="75" y="67" width="50" height="6" rx="2" fill="#2a2848"/><ellipse cx="80" cy="42" rx="22" ry="14" fill="#1a0f28" opacity=".6"/><rect x="65" y="30" width="4" height="24" rx="2" fill="#2a1840" opacity=".8"/><rect x="72" y="26" width="4" height="28" rx="2" fill="#2a1840" opacity=".8"/><rect x="79" y="28" width="4" height="26" rx="2" fill="#2a1840" opacity=".8"/><rect x="86" y="30" width="4" height="22" rx="2" fill="#2a1840" opacity=".8"/></svg>`,
+    face: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg"><rect width="160" height="100" fill="#100a10"/><defs><radialGradient id="fg" cx="50%" cy="45%" r="45%"><stop offset="0" stop-color="#2a1440"/><stop offset="100" stop-color="#100a10"/></radialGradient></defs><rect width="160" height="100" fill="url(#fg)"/><ellipse cx="80" cy="46" rx="28" ry="34" fill="#1c1020" opacity=".7"/><ellipse cx="73" cy="42" rx="4" ry="2.5" fill="none" stroke="#00b4ff" stroke-width=".6" opacity=".5"/><ellipse cx="87" cy="42" rx="4" ry="2.5" fill="none" stroke="#00b4ff" stroke-width=".6" opacity=".5"/><rect x="40" y="0" width="80" height="100" fill="url(#fl)" opacity=".08"/><defs><linearGradient id="fl" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#00b4ff"/><stop offset="1" stop-color="#0050ff"/></linearGradient></defs></svg>`,
+    antenna: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg"><rect width="160" height="100" fill="#0a0914"/><circle cx="80" cy="50" r="22" fill="none" stroke="#1a1830" stroke-width="1.5"/><rect x="50" y="48" width="60" height="4" rx="1" fill="#1a1830"/><rect x="78" y="28" width="4" height="44" rx="1" fill="#1a1830"/><line x1="82" y1="28" x2="105" y2="18" stroke="#2a2848" stroke-width="1" opacity=".6"/><circle cx="105" cy="18" r="3" fill="#2a2848" opacity=".6"/><circle cx="107" cy="17" r="1.2" fill="#00b4ff" opacity=".7"/><circle cx="120" cy="20" r="1" fill="rgba(255,255,255,.3)"/><circle cx="40" cy="15" r="1.2" fill="rgba(255,255,255,.25)"/><circle cx="140" cy="70" r="1" fill="rgba(255,255,255,.2)"/><circle cx="20" cy="75" r="1.5" fill="rgba(255,255,255,.3)"/></svg>`,
+  };
+  const grid = document.getElementById('sb-grid');
+  if(grid) SB_DATA.forEach(d => {
+    const cell = document.createElement('div');
+    cell.className='sb-panel';
+    cell.innerHTML=`<div class="sb-panel-art">${SVGS[d.art]||''}</div><div class="sb-panel-meta"><div class="sb-panel-shot">${d.shot}</div><div class="sb-panel-note">${d.note}</div></div>`;
+    grid.appendChild(cell);
+  }); }
 
 // ── SCROLL REVEAL ────────────────────────────
 const revealObs = new IntersectionObserver(entries => {
