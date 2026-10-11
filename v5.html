@@ -197,9 +197,13 @@ body:has(a:hover) #c-ring,body:has(button:hover) #c-ring{width:48px;height:48px;
 .char-step{font-family:var(--f-mono);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;padding:.25rem .55rem;border:1px solid var(--ink-ghost);color:var(--ink-dim)}
 /* 3D viewer */
 .mdl-section{margin-top:clamp(4rem,8vh,6rem)}
-.mdl-eyebrow{font-family:var(--f-mono);font-size:.65rem;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
-.mdl-headline{font-family:var(--f-display);font-weight:200;font-size:clamp(1.8rem,4vw,3rem);letter-spacing:-.02em;margin-bottom:1.5rem}
-#model-viewer{position:relative;width:min(560px,100%);margin:0 auto;aspect-ratio:3/4;background:radial-gradient(ellipse at 50% 30%,#1a1630 0%,var(--bg) 100%);overflow:hidden}
+.mdl-split{display:grid;grid-template-columns:1fr;gap:clamp(2.5rem,5vw,4rem);align-items:center}
+@media(min-width:768px){.mdl-split{grid-template-columns:1fr 1fr;gap:clamp(3rem,6vw,5rem)}}
+.mdl-info{display:flex;flex-direction:column;gap:1.5rem}
+.mdl-eyebrow{font-family:var(--f-mono);font-size:.65rem;letter-spacing:.28em;text-transform:uppercase;color:var(--accent)}
+.mdl-headline{font-family:var(--f-display);font-weight:200;font-size:clamp(1.8rem,3.5vw,2.8rem);letter-spacing:-.02em;line-height:1.05}
+.mdl-desc{font-size:clamp(.9rem,1.05vw,1rem);line-height:1.75;color:var(--ink-dim);max-width:38ch}
+#model-viewer{position:relative;width:100%;aspect-ratio:3/4;background:radial-gradient(ellipse at 50% 30%,#1a1630 0%,var(--bg) 100%);overflow:hidden}
 #mdl-canvas{width:100%;height:100%;display:block}
 #mdl-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.75rem;pointer-events:none;transition:opacity .5s}
 #mdl-loading.done{opacity:0}
@@ -213,6 +217,10 @@ body:has(a:hover) #c-ring,body:has(button:hover) #c-ring{width:48px;height:48px;
 
 /* ── ABOUT ──────────────────────────────────── */
 #about{padding:clamp(6rem,12vh,10rem) clamp(1.5rem,5vw,4rem);background:var(--bg)}
+.about-renders{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;margin-bottom:clamp(4rem,8vh,6rem);overflow:hidden}
+.about-renders img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;transition:transform .7s var(--ease-out)}
+.about-renders img:hover{transform:scale(1.04)}
+@media(max-width:500px){.about-renders{grid-template-columns:1fr}}
 .cap-section{max-width:1200px;margin:0 auto}
 .a-statement{font-family:var(--f-display);font-weight:200;font-size:clamp(2.8rem,6vw,5.5rem);line-height:1.04;letter-spacing:-.025em;color:var(--ink);max-width:22ch;margin-bottom:clamp(5rem,10vh,8rem)}
 .a-statement em{font-style:italic;color:var(--ink-dim)}
@@ -531,7 +539,7 @@ footer{padding:2rem clamp(1.5rem,5vw,4rem);background:var(--bg);display:flex;jus
     <div class="ba-viewer reveal" id="ba-viewer">
       <div class="ba-before" id="ba-before">
         <img id="ba-img-before" src="" alt="Before — raw reference" loading="lazy">
-        <div class="ba-after-wrap" id="ba-after-wrap" style="width:50%">
+        <div class="ba-after-wrap" id="ba-after-wrap">
           <img id="ba-img-after" src="" alt="After — 3D render" loading="lazy">
         </div>
         <div class="ba-handle" id="ba-handle" style="left:50%" aria-hidden="true">
@@ -852,22 +860,27 @@ footer{padding:2rem clamp(1.5rem,5vw,4rem);background:var(--bg);display:flex;jus
         </div>
       </div>
     </div>
-    <!-- 3D Model Viewer -->
+    <!-- 3D Model Viewer — integrated two-column -->
     <div class="mdl-section reveal">
-      <div class="mdl-eyebrow">Interactive 3D</div>
-      <div class="mdl-headline">JON — real-time character</div>
-      <div id="model-viewer">
-        <canvas id="mdl-canvas"></canvas>
-        <div id="mdl-loading">
-          <span style="font-family:var(--f-mono);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-dim)">Loading model</span>
-          <div class="mdl-load-bar"><div id="mdl-load-fill"></div></div>
+      <div class="mdl-split">
+        <div id="model-viewer">
+          <canvas id="mdl-canvas"></canvas>
+          <div id="mdl-loading">
+            <span style="font-family:var(--f-mono);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-dim)">Loading model</span>
+            <div class="mdl-load-bar"><div id="mdl-load-fill"></div></div>
+          </div>
+          <div id="mdl-fallback"><span style="font-family:var(--f-mono);font-size:.7rem;letter-spacing:.15em;color:var(--ink-dim)">3D viewer unavailable</span></div>
         </div>
-        <div id="mdl-fallback"><span style="font-family:var(--f-mono);font-size:.7rem;letter-spacing:.15em;color:var(--ink-dim)">3D viewer unavailable</span></div>
-      </div>
-      <div class="mdl-controls">
-        <button class="mdl-btn active" data-mdl="idle">Idle</button>
-        <button class="mdl-btn" data-mdl="wave">Wave</button>
-        <button class="mdl-btn" data-mdl="stand">Stand</button>
+        <div class="mdl-info">
+          <div class="mdl-eyebrow">Interactive 3D</div>
+          <div class="mdl-headline">JON —<br>real-time character</div>
+          <p class="mdl-desc">Built in Character Creator 4, textured in Substance 3D Painter, rigged and animated for real-time. Drag to orbit the model — switch animations below.</p>
+          <div class="mdl-controls">
+            <button class="mdl-btn active" data-mdl="idle">Idle</button>
+            <button class="mdl-btn" data-mdl="wave">Wave</button>
+            <button class="mdl-btn" data-mdl="stand">Stand</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -877,6 +890,11 @@ footer{padding:2rem clamp(1.5rem,5vw,4rem);background:var(--bg);display:flex;jus
 <section id="about" aria-label="About Jatin Shinde">
   <div class="cap-section">
     <h2 class="a-statement reveal">I build worlds.<br><em>Then I light them,</em><br>render them,<br>and make them move.</h2>
+    <div class="about-renders">
+      <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/01.webp" alt="Environment render" loading="lazy">
+      <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/05.webp" alt="Environment render" loading="lazy">
+      <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/11.webp" alt="Environment render" loading="lazy">
+    </div>
     <div class="about-columns">
       <div>
         <span class="about-prose-label">About</span>
@@ -1018,7 +1036,12 @@ function loadWorldPoster(wi) {
   const url = `${CDN}/assets/frames-webp/${WORLDS[wi].slug}/${WORLDS[wi].poster}`;
   bg.src = url;
   bg.onload = () => { bg.classList.remove('loading'); posterLoaded.add(wi); };
-  bg.onerror= () => { bg.classList.remove('loading'); posterLoaded.add(wi); };
+  bg.onerror= () => {
+    // Suppress broken-image icon; dark bg + accent gradient remain visible
+    bg.style.opacity = '0';
+    bg.classList.remove('loading');
+    posterLoaded.add(wi);
+  };
 }
 
 function playWorldVideo(wi) {
@@ -1077,6 +1100,9 @@ function switchWorld(wi, animate=true) {
   wiBtns.forEach((b,i) => b.classList.toggle('active', i===wi));
   document.querySelectorAll('.wp-dot').forEach((d,i) => d.classList.toggle('active', i===wi));
   root.style.setProperty('--accent', WORLDS[wi].accent);
+  // Accent-tinted fallback visible when poster hasn't loaded / failed
+  document.getElementById('worlds-section').style.background =
+    `radial-gradient(ellipse at 40% 35%, ${WORLDS[wi].accent}20 0%, #06050c 65%)`;
 
   // Start video after brief delay (poster visible first)
   setTimeout(() => {
@@ -1111,6 +1137,8 @@ document.addEventListener('visibilitychange', () => {
 });
 
 // Init first world
+document.getElementById('worlds-section').style.background =
+  `radial-gradient(ellipse at 40% 35%, ${WORLDS[0].accent}20 0%, #06050c 65%)`;
 loadWorldPoster(0);
 loadWorldPoster(1);
 setTimeout(() => playWorldVideo(0), 400);
@@ -1170,11 +1198,10 @@ function cflowUpdate(animate=true) {
     el.dataset.center = i === cflowIdx ? '1' : '0';
     const v = el.querySelector('video');
     if (v) {
-      if (i === cflowIdx) {
-        v.preload='auto';
-        v.play().catch(()=>{});
-      } else {
+      if (i !== cflowIdx) {
         v.pause();
+      } else {
+        v.preload = 'metadata';
       }
     }
   });
