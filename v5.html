@@ -297,21 +297,24 @@ footer{padding:2rem clamp(1.5rem,5vw,4rem);background:var(--bg);display:flex;jus
 .ba-dot{width:4px;height:4px;border-radius:50%;background:var(--ink-ghost);transition:background .3s,transform .2s;flex-shrink:0}
 .ba-dot.active{background:var(--accent);transform:scale(1.5)}
 .ba-instruction{font-family:var(--f-mono);font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-mute);margin-top:.75rem;text-align:center}
-/* B/A pair strip */
-.ba-strip{display:grid;grid-template-columns:repeat(7,1fr);gap:.3rem;margin-bottom:1.25rem}
+/* B/A pair strip — split Before/After mini-previews */
+.ba-strip{display:grid;grid-template-columns:repeat(7,1fr);gap:.3rem;margin-bottom:1.5rem}
 @media(max-width:768px){.ba-strip{grid-template-columns:repeat(4,1fr)}}
-.ba-thumb{position:relative;aspect-ratio:3/2;overflow:hidden;cursor:none;border:1.5px solid transparent;transition:border-color .2s}
+@media(max-width:420px){.ba-strip{grid-template-columns:repeat(3,1fr)}}
+.ba-thumb{position:relative;aspect-ratio:3/2;overflow:hidden;cursor:none;border:1.5px solid transparent;transition:border-color .2s;background:var(--bg-1)}
 .ba-thumb.active{border-color:var(--accent)}
-.ba-thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s var(--ease-out)}
-.ba-thumb:hover img{transform:scale(1.05)}
-.ba-thumb-num{position:absolute;bottom:.3rem;left:.3rem;font-family:var(--f-mono);font-size:.5rem;letter-spacing:.1em;color:var(--ink-dim);background:rgba(6,5,12,.7);padding:.1rem .3rem;pointer-events:none}
+.ba-thumb-before{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.ba-thumb-after{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;clip-path:inset(0 0 0 50%)}
+.ba-thumb-divider{position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.5);z-index:3;pointer-events:none}
+.ba-thumb-num{position:absolute;bottom:.25rem;left:.3rem;font-family:var(--f-mono);font-size:.48rem;letter-spacing:.08em;color:rgba(255,255,255,.6);background:rgba(6,5,12,.7);padding:.1rem .25rem;pointer-events:none;z-index:4}
+.ba-thumb:hover .ba-thumb-after{clip-path:inset(0 0 0 35%);transition:clip-path .3s var(--ease-out)}
 
 /* ── COVERFLOW ───────────────────────────────── */
-#ads{padding:clamp(5rem,10vh,8rem) 0;background:var(--bg);overflow:hidden}
+#ads{padding:clamp(5rem,10vh,8rem) 0;background:var(--bg);overflow-x:clip}
 #ads .s-eyebrow,#ads .s-title{padding:0 clamp(1.5rem,5vw,4rem)}
 .cflow-stage{position:relative;width:100%}
-.cflow-track{position:relative;height:min(100vw,800px);perspective:800px;perspective-origin:50% 46%;cursor:none}
-@media(max-width:768px){.cflow-track{height:min(160vw,580px)}}
+.cflow-track{position:relative;height:min(90vw,720px);perspective:800px;perspective-origin:50% 46%;cursor:none}
+@media(max-width:768px){.cflow-track{height:min(130vw,520px)}}
 /* center card width drives everything — make it dominate the frame */
 .cflow-card{position:absolute;top:50%;left:50%;width:min(52vw,400px);aspect-ratio:9/16;transform-style:preserve-3d;transition:transform .52s var(--ease-out),opacity .52s,filter .52s;cursor:none;overflow:hidden;background:var(--bg-2);border:1px solid rgba(255,255,255,.07)}
 .cflow-card[data-center="1"]{border-color:rgba(255,255,255,.15);box-shadow:0 0 80px rgba(0,0,0,.8)}
@@ -928,7 +931,7 @@ footer{padding:2rem clamp(1.5rem,5vw,4rem);background:var(--bg);display:flex;jus
         </div>
         <div class="about-ctas">
           <a href="mailto:jatinshinde118@gmail.com" class="about-cta filled">Start a project</a>
-          <a href="https://www.linkedin.com/in/jatin-shinde" target="_blank" rel="noopener" class="about-cta">LinkedIn →</a>
+          <a href="https://www.linkedin.com/in/jatin-shinde-202b671a9" target="_blank" rel="noopener" class="about-cta">LinkedIn →</a>
         </div>
       </div>
       <!-- Col 2: numbered specialties -->
@@ -983,7 +986,7 @@ footer{padding:2rem clamp(1.5rem,5vw,4rem);background:var(--bg);display:flex;jus
   <p class="c-sub">Open to projects &amp; collaborations</p>
   <div class="c-btns">
     <a href="mailto:jatinshinde118@gmail.com" class="c-btn primary">jatinshinde118@gmail.com</a>
-    <a href="https://www.linkedin.com/in/jatin-shinde" target="_blank" rel="noopener" class="c-btn">LinkedIn</a>
+    <a href="https://www.linkedin.com/in/jatin-shinde-202b671a9" target="_blank" rel="noopener" class="c-btn">LinkedIn</a>
   </div>
 </section>
 
@@ -992,7 +995,7 @@ footer{padding:2rem clamp(1.5rem,5vw,4rem);background:var(--bg);display:flex;jus
   <div class="footer-socials">
     <a href="https://www.instagram.com/imaginators.studio" target="_blank" rel="noopener">Instagram</a>
     <a href="https://www.youtube.com/@imaginatorsstudio" target="_blank" rel="noopener">YouTube</a>
-    <a href="https://www.linkedin.com/in/jatin-shinde" target="_blank" rel="noopener">LinkedIn</a>
+    <a href="https://www.linkedin.com/in/jatin-shinde-202b671a9" target="_blank" rel="noopener">LinkedIn</a>
   </div>
 </footer>
 
@@ -1339,21 +1342,30 @@ new IntersectionObserver(([e])=>{ if(!e.isIntersecting) return;
   let baDragging = false;
   let baPos = 0.5; // 0–1 (left-to-right reveal of After)
 
-  // Build thumbnail strip
+  // Build thumbnail strip — each cell shows split Before (left) / After (right)
   const baStrip = document.getElementById('ba-strip');
   for (let i=0; i<BA_COUNT; i++) {
     const th = document.createElement('button');
     th.className = 'ba-thumb' + (i===0?' active':'');
-    th.setAttribute('aria-label', `Pair ${i+1}`);
+    th.setAttribute('aria-label', `Pair ${i+1} — Before and After`);
     th.dataset.idx = i;
-    const tImg = document.createElement('img');
-    tImg.loading = 'lazy';
-    tImg.src = BA_CDN + 'After%20' + (i+1) + '.webp';
-    tImg.alt = `After ${i+1}`;
+    const tBefore = document.createElement('img');
+    tBefore.className = 'ba-thumb-before';
+    tBefore.loading = 'lazy';
+    tBefore.src = BA_CDN + 'Before%20' + (i+1) + '.webp';
+    tBefore.alt = '';
+    const tAfter = document.createElement('img');
+    tAfter.className = 'ba-thumb-after';
+    tAfter.loading = 'lazy';
+    tAfter.src = BA_CDN + 'After%20' + (i+1) + '.webp';
+    tAfter.alt = '';
+    const tDiv = document.createElement('span');
+    tDiv.className = 'ba-thumb-divider';
     const tNum = document.createElement('span');
     tNum.className = 'ba-thumb-num';
     tNum.textContent = String(i+1).padStart(2,'0');
-    th.appendChild(tImg); th.appendChild(tNum);
+    th.appendChild(tBefore); th.appendChild(tAfter);
+    th.appendChild(tDiv);    th.appendChild(tNum);
     th.addEventListener('click', () => loadBAPair(i));
     baStrip.appendChild(th);
   }
@@ -1368,7 +1380,7 @@ new IntersectionObserver(([e])=>{ if(!e.isIntersecting) return;
   }
 
   function updateBASlider(pos) {
-    baPos = Math.max(0.02, Math.min(0.98, pos));
+    baPos = Math.max(0, Math.min(1, pos));
     const pct = (baPos * 100).toFixed(2);
     // clip-path keeps the after image at full ba-before dimensions — no geometry distortion
     baAfterWrap.style.clipPath = `inset(0 0 0 ${(100 - baPos * 100).toFixed(2)}%)`;
