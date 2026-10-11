@@ -199,7 +199,7 @@ body:has(a:hover) #c-ring,body:has(button:hover) #c-ring{width:48px;height:48px;
 .mdl-section{margin-top:clamp(4rem,8vh,6rem)}
 .mdl-eyebrow{font-family:var(--f-mono);font-size:.65rem;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
 .mdl-headline{font-family:var(--f-display);font-weight:200;font-size:clamp(1.8rem,4vw,3rem);letter-spacing:-.02em;margin-bottom:1.5rem}
-#model-viewer{position:relative;width:100%;aspect-ratio:16/9;background:radial-gradient(ellipse at 50% 30%,#13112a 0%,var(--bg) 100%);overflow:hidden}
+#model-viewer{position:relative;width:min(560px,100%);margin:0 auto;aspect-ratio:3/4;background:radial-gradient(ellipse at 50% 30%,#1a1630 0%,var(--bg) 100%);overflow:hidden}
 #mdl-canvas{width:100%;height:100%;display:block}
 #mdl-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.75rem;pointer-events:none;transition:opacity .5s}
 #mdl-loading.done{opacity:0}
@@ -261,7 +261,7 @@ footer{padding:2rem clamp(1.5rem,5vw,4rem);background:var(--bg);display:flex;jus
 .ba-viewer{position:relative;overflow:hidden;background:var(--bg-1);user-select:none;touch-action:pan-y}
 .ba-before{position:relative;width:100%;aspect-ratio:3/2;overflow:hidden}
 .ba-before img{display:block;width:100%;height:100%;object-fit:cover}
-.ba-after-wrap{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.ba-after-wrap{position:absolute;inset:0;pointer-events:none}
 .ba-after-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .ba-handle{position:absolute;top:0;bottom:0;width:2px;background:var(--ink);z-index:10;cursor:ew-resize;transform:translateX(-50%)}
 .ba-handle::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;background:var(--ink)}
@@ -1170,8 +1170,12 @@ function cflowUpdate(animate=true) {
     el.dataset.center = i === cflowIdx ? '1' : '0';
     const v = el.querySelector('video');
     if (v) {
-      if (i === cflowIdx) { v.preload='metadata'; }
-      else { v.pause(); }
+      if (i === cflowIdx) {
+        v.preload='auto';
+        v.play().catch(()=>{});
+      } else {
+        v.pause();
+      }
     }
   });
   const curEl = document.getElementById('cflow-cur');
@@ -1300,9 +1304,10 @@ new IntersectionObserver(([e])=>{ if(!e.isIntersecting) return;
 
   function updateBASlider(pos) {
     baPos = Math.max(0.02, Math.min(0.98, pos));
-    const pct = (baPos * 100).toFixed(2) + '%';
-    baAfterWrap.style.width = pct;
-    baHandle.style.left = pct;
+    const pct = (baPos * 100).toFixed(2);
+    // clip-path keeps the after image at full ba-before dimensions — no geometry distortion
+    baAfterWrap.style.clipPath = `inset(0 ${(100 - baPos * 100).toFixed(2)}% 0 0)`;
+    baHandle.style.left = pct + '%';
   }
 
   function baImgError(img, label) {
@@ -1433,13 +1438,15 @@ async function initModelViewer() {
     const camera = new PerspectiveCamera(45, w/h, 0.01, 100);
     camera.position.set(0,1.6,3.5);
 
-    scene.add(new AmbientLight(0xffffff,0.85));
-    const dir=new DirectionalLight(0xfff8f0,1.8);
-    dir.position.set(2,4,3); scene.add(dir);
-    const fill=new DirectionalLight(0xe0f0ff,0.6);
-    fill.position.set(-2,1,-2); scene.add(fill);
-    const rim=new DirectionalLight(0x4060ff,0.5);
-    rim.position.set(-3,2,-4); scene.add(rim);
+    scene.add(new AmbientLight(0xffffff,1.4));
+    const dir=new DirectionalLight(0xfff8f0,2.6);
+    dir.position.set(1.5,3,2.5); scene.add(dir);
+    const fill=new DirectionalLight(0xe8f0ff,1.0);
+    fill.position.set(-2,2,-1); scene.add(fill);
+    const rim=new DirectionalLight(0x5070ff,0.6);
+    rim.position.set(-2,3,-3); scene.add(rim);
+    const front=new DirectionalLight(0xffffff,0.8);
+    front.position.set(0,1,4); scene.add(front);
 
     const controls = new OrbitControls(camera,renderer.domElement);
     controls.enableDamping=true; controls.dampingFactor=0.06;
@@ -1455,10 +1462,11 @@ async function initModelViewer() {
       obj.position.y-=box.min.y;
       box.setFromObject(obj);
       const sp=box.getBoundingSphere(new Sphere());
-      const dist=sp.radius*2.4;
+      // 1.7× gives tight cinematic framing in portrait container (was 2.4×)
+      const dist=sp.radius*1.7;
       const mid=box.getCenter(new Vector3()).y;
-      camera.position.set(0,mid,dist);
-      controls.target.set(0,mid*0.9,0);
+      camera.position.set(0,mid*0.9,dist);
+      controls.target.set(0,mid*0.75,0);
       camera.near=dist*0.01; camera.far=dist*20;
       camera.updateProjectionMatrix(); controls.update();
     }
