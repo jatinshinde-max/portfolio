@@ -197,14 +197,14 @@ body:has(a:hover) #c-ring,body:has(button:hover) #c-ring{width:48px;height:48px;
 
 /* ── ABOUT ──────────────────────────────────── */
 #about{padding:0;background:var(--bg)}
-.about-statement-wrap{padding:clamp(6rem,12vh,10rem) clamp(1.5rem,5vw,4rem) clamp(3rem,5vh,4rem);background:var(--bg);border-bottom:1px solid var(--ink-ghost)}
+.about-statement-wrap{padding:clamp(4rem,7vh,6rem) clamp(1.5rem,5vw,4rem) clamp(2rem,4vh,3rem);background:var(--bg);border-bottom:1px solid var(--ink-ghost)}
 .about-stat-bar{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:clamp(2.5rem,5vh,4rem)}
 .about-stat{font-family:var(--f-mono);font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-mute);white-space:nowrap;display:flex;align-items:baseline;gap:.4rem}
 .about-stat-num{font-family:var(--f-display);font-weight:300;font-size:1.5rem;letter-spacing:-.03em;color:var(--ink);line-height:1}
 .about-stat-div{flex-shrink:0;width:1px;height:1.1em;background:var(--ink-ghost)}
 /* Statement + 2-col grid */
-.cap-section{max-width:1300px;margin:0 auto;padding:clamp(5rem,10vh,8rem) clamp(1.5rem,5vw,4rem)}
-.a-statement{font-family:var(--f-display);font-weight:200;font-size:clamp(2.8rem,6vw,5.5rem);line-height:1.04;letter-spacing:-.025em;color:var(--ink);max-width:22ch;margin-bottom:clamp(4rem,8vh,6rem)}
+.cap-section{max-width:1300px;margin:0 auto;padding:clamp(3.5rem,7vh,6rem) clamp(1.5rem,5vw,4rem)}
+.a-statement{font-family:var(--f-display);font-weight:200;font-size:clamp(2rem,3.8vw,3.5rem);line-height:1.06;letter-spacing:-.025em;color:var(--ink);max-width:26ch;margin-bottom:clamp(2.5rem,5vh,4rem)}
 .a-statement em{font-style:italic;color:var(--ink-dim)}
 .about-grid{display:grid;grid-template-columns:1fr;gap:clamp(3rem,6vh,5rem)}
 @media(min-width:900px){.about-grid{grid-template-columns:1fr 1fr;gap:clamp(3rem,5vw,5rem);align-items:start}}
@@ -297,9 +297,9 @@ footer{padding:2rem clamp(1.5rem,5vw,4rem);background:var(--bg);display:flex;jus
 .comm-header{padding:0 clamp(1.5rem,5vw,4rem)}
 .comm-rail-outer{overflow:hidden;margin-top:clamp(2rem,4vh,3rem)}
 .comm-rail{display:flex;gap:clamp(.5rem,.8vw,.75rem);padding-left:clamp(1.5rem,5vw,4rem);will-change:transform;transition:transform .52s var(--ease-out)}
-.comm-card{flex:0 0 auto;width:clamp(140px,17vw,200px);aspect-ratio:9/16;position:relative;cursor:none;overflow:hidden;background:var(--bg-1);border:1px solid rgba(255,255,255,.06);transition:border-color .3s,filter .3s}
-.comm-card.active{border-color:rgba(255,255,255,.18)}
-.comm-card:not(.active){filter:brightness(.6)}
+.comm-card{flex:0 0 auto;width:clamp(160px,20vw,280px);aspect-ratio:9/16;position:relative;cursor:none;overflow:hidden;background:var(--bg-1);border:1px solid rgba(255,255,255,.06);transition:border-color .3s,filter .3s,box-shadow .3s}
+.comm-card.active{border-color:rgba(255,255,255,.22);box-shadow:0 0 0 1px rgba(232,213,176,.15)}
+.comm-card:not(.active){filter:brightness(.5) saturate(.8)}
 .comm-card video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
 .comm-card-info{position:absolute;bottom:0;left:0;right:0;padding:2.5rem .875rem .875rem;background:linear-gradient(to top,rgba(6,5,12,.95) 0%,rgba(6,5,12,.5) 60%,transparent 100%);z-index:2;opacity:0;transition:opacity .3s}
 .comm-card.active .comm-card-info{opacity:1}
@@ -314,7 +314,7 @@ footer{padding:2rem clamp(1.5rem,5vw,4rem);background:var(--bg);display:flex;jus
 .comm-arrows{display:flex;gap:.75rem}
 .comm-arr{font-family:var(--f-mono);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;padding:.6rem 1.5rem;border:1px solid var(--ink-ghost);color:var(--ink-dim);transition:border-color .2s,color .2s;cursor:none}
 .comm-arr:hover{border-color:var(--ink-dim);color:var(--ink)}
-@media(max-width:768px){.comm-card{width:clamp(120px,38vw,160px)}}
+@media(max-width:768px){.comm-card{width:clamp(130px,40vw,180px)}}
 /* lightbox */
 #comm-lb{position:fixed;inset:0;z-index:800;background:rgba(6,5,12,.98);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
 #comm-lb.open{opacity:1;pointer-events:all}
@@ -1149,8 +1149,9 @@ let commIdx = 0;
 const commCards = [];
 
 function commGetCardW() {
-  const c = commCards[0];
-  if (!c) return 160;
+  // Use an inactive card for the standard width (active card may differ visually)
+  const c = commCards.find((_,i)=>i!==commIdx) || commCards[0];
+  if (!c) return 200;
   const style = getComputedStyle(commRail);
   const gap = parseFloat(style.gap) || 8;
   return c.offsetWidth + gap;
