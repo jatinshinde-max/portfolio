@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commercial CGI — Mockup v4</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:     #06050c;
+    --bg-1:   #0b0a14;
+    --bg-2:   #100f1c;
+    --ink:    rgba(255,255,255,.92);
+    --ink-dim:rgba(255,255,255,.45);
+    --ink-mute:rgba(255,255,255,.20);
+    --ink-ghost:rgba(255,255,255,.06);
+    --accent: #e8d5b0;
+    --gap:    2px;
+    --cell-w: calc((100vw - var(--gap) * 5) / 6);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'DM Mono', monospace;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* ── Section header ── */
+  .section-header {
+    padding: 72px 48px 40px;
+    display: flex;
+    align-items: baseline;
+    gap: 24px;
+  }
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 300;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .section-count {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    color: var(--ink-mute);
+  }
+
+  /* ── Brick grid ── */
+  .brick-grid {
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+    padding-bottom: 80px;
+  }
+
+  .brick-row {
+    display: flex;
+    flex-direction: row;
+    gap: var(--gap);
+    width: 100%;
+  }
+  .brick-row-2 {
+    justify-content: center;
+  }
+
+  /* ── Film cell ── */
+  .film-cell {
+    width: var(--cell-w);
+    aspect-ratio: 9 / 16;
+    position: relative;
+    overflow: hidden;
+    background: var(--bg-2);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .film-cell video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: var(--bg);
+  }
+
+  /* Film title overlay — bottom */
+  .film-title {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 28px 14px 14px;
+    background: linear-gradient(to top, rgba(6,5,12,.85) 0%, transparent 100%);
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    font-weight: 300;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .film-cell:hover .film-title {
+    opacity: 1;
+  }
+
+  /* Expand icon on hover */
+  .film-expand {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    background: rgba(6,5,12,.4);
+    backdrop-filter: blur(4px);
+  }
+  .film-expand svg {
+    width: 14px;
+    height: 14px;
+    stroke: rgba(255,255,255,.8);
+    fill: none;
+    stroke-width: 1.5;
+  }
+  .film-cell:hover .film-expand {
+    opacity: 1;
+  }
+
+  /* Film number badge */
+  .film-num {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    color: var(--ink-mute);
+  }
+
+  /* ── Full-screen viewer overlay ── */
+  #viewer {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(4,3,9,.96);
+    backdrop-filter: blur(12px);
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 20px;
+  }
+  #viewer.open {
+    display: flex;
+  }
+
+  .viewer-stage {
+    position: relative;
+    height: 88vh;
+    width: calc(88vh * 9 / 16);
+    background: var(--bg);
+    overflow: hidden;
+  }
+  .viewer-stage video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: var(--bg);
+  }
+
+  /* Audio button */
+  .viewer-audio {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--ink-mute);
+    border-radius: 50%;
+    background: rgba(6,5,12,.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .viewer-audio:hover { border-color: var(--accent); }
+  .viewer-audio svg { width: 14px; height: 14px; stroke: var(--ink-dim); fill: none; stroke-width: 1.5; }
+
+  .viewer-meta {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    width: calc(88vh * 9 / 16);
+  }
+  .viewer-title-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    flex: 1;
+  }
+  .viewer-nav {
+    display: flex;
+    gap: 12px;
+  }
+  .viewer-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    font-weight: 300;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    background: none;
+    border: 1px solid var(--ink-ghost);
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .viewer-btn:hover {
+    color: var(--ink);
+    border-color: var(--ink-mute);
+  }
+  .viewer-close {
+    position: fixed;
+    top: 28px;
+    right: 36px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--ink-mute);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+    padding: 8px;
+  }
+  .viewer-close:hover { color: var(--ink); }
+
+  /* Viewer filmstrip */
+  .viewer-filmstrip {
+    display: flex;
+    gap: 6px;
+    width: calc(88vh * 9 / 16);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .viewer-filmstrip::-webkit-scrollbar { display: none; }
+  .strip-thumb {
+    width: 36px;
+    aspect-ratio: 9/16;
+    flex-shrink: 0;
+    overflow: hidden;
+    border: 1px solid var(--ink-ghost);
+    cursor: pointer;
+    opacity: 0.45;
+    transition: opacity 0.2s, border-color 0.2s;
+    background: var(--bg-2);
+    position: relative;
+  }
+  .strip-thumb.active {
+    opacity: 1;
+    border-color: var(--accent);
+  }
+  .strip-thumb:hover { opacity: 0.75; }
+  .strip-thumb video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+</style>
+</head>
+<body>
+
+<div class="section-header">
+  <span class="section-label">Commercial CGI</span>
+  <span class="section-count">11 Films</span>
+</div>
+
+<div class="brick-grid" id="brickGrid">
+
+  <!-- Row 1 — 6 films -->
+  <div class="brick-row brick-row-1" id="row1"></div>
+
+  <!-- Row 2 — 5 films, centered (creates brick offset automatically) -->
+  <div class="brick-row brick-row-2" id="row2"></div>
+
+</div>
+
+<!-- Full-screen viewer -->
+<div id="viewer">
+  <button class="viewer-close" onclick="closeViewer()">Close &nbsp; ✕</button>
+  <div class="viewer-stage">
+    <video id="viewerVideo" autoplay loop playsinline preload="metadata"></video>
+    <button class="viewer-audio" id="audioBtn" onclick="toggleAudio()">
+      <svg id="iconMute" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+      <svg id="iconUnmute" viewBox="0 0 24 24" style="display:none"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+    </button>
+  </div>
+  <div class="viewer-meta">
+    <span class="viewer-title-text" id="viewerTitle"></span>
+    <div class="viewer-nav">
+      <button class="viewer-btn" onclick="prevFilm()">← Prev</button>
+      <button class="viewer-btn" onclick="nextFilm()">Next →</button>
+    </div>
+  </div>
+  <div class="viewer-filmstrip" id="viewerFilmstrip"></div>
+</div>
+
+<script>
+const CDN = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev';
+const ADS = CDN + '/gallery/ads/web-ready/';
+
+const FILMS = [
+  { title: 'Chocolate',            src: ADS + 'chocolate.mp4' },
+  { title: 'Earbuds',             src: ADS + 'earbuds.mp4' },
+  { title: 'Face Wash',           src: ADS + 'facewash.mp4' },
+  { title: 'Pepsi',               src: ADS + 'pepsi.mp4' },
+  { title: 'Serum',               src: ADS + 'serum.mp4' },
+  { title: 'Shoe',                src: ADS + 'shoe.mp4' },
+  { title: 'Smart Watch',         src: ADS + 'smart-watch.mp4' },
+  { title: '911 Commercial',      src: ADS + '911%20Commercial.mp4' },
+  { title: 'Moisturizer',         src: ADS + 'Moisturizer%20and%20Cleanser%20Ad-1.mp4' },
+  { title: 'RR Ad',               src: ADS + 'RR%20Ad.mp4' },
+  { title: 'Reel',                src: ADS + 'Reelvideo-29689.mp4' },
+];
+
+let currentFilm = 0;
+let muted = true;
+
+// Build grid
+const row1 = document.getElementById('row1');
+const row2 = document.getElementById('row2');
+const filmstrip = document.getElementById('viewerFilmstrip');
+
+FILMS.forEach((film, i) => {
+  const cell = document.createElement('div');
+  cell.className = 'film-cell';
+  cell.dataset.index = i;
+
+  cell.innerHTML = `
+    <video src="${film.src}" autoplay muted loop playsinline preload="metadata"></video>
+    <div class="film-num">${String(i+1).padStart(2,'0')}</div>
+    <div class="film-expand">
+      <svg viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+    </div>
+    <div class="film-title">${film.title}</div>
+  `;
+
+  cell.addEventListener('click', () => openViewer(i));
+  (i < 6 ? row1 : row2).appendChild(cell);
+
+  // Filmstrip thumb
+  const thumb = document.createElement('div');
+  thumb.className = 'strip-thumb';
+  thumb.dataset.index = i;
+  thumb.innerHTML = `<video src="${film.src}" muted loop playsinline preload="metadata"></video>`;
+  thumb.addEventListener('click', () => switchFilm(i));
+  filmstrip.appendChild(thumb);
+});
+
+// IntersectionObserver — play grid videos when visible
+const gridObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    const v = e.target.querySelector('video');
+    if (v) { e.isIntersecting ? v.play().catch(()=>{}) : v.pause(); }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.film-cell').forEach(c => gridObs.observe(c));
+
+// Viewer
+function openViewer(i) {
+  currentFilm = i;
+  const v = document.getElementById('viewerVideo');
+  v.src = FILMS[i].src;
+  v.muted = muted;
+  v.play().catch(()=>{});
+  document.getElementById('viewerTitle').textContent = FILMS[i].title;
+  document.getElementById('viewer').classList.add('open');
+  updateStripHighlight();
+  syncAudioIcon();
+}
+
+function closeViewer() {
+  document.getElementById('viewer').classList.remove('open');
+  const v = document.getElementById('viewerVideo');
+  v.pause();
+  v.src = '';
+}
+
+function switchFilm(i) {
+  currentFilm = i;
+  const v = document.getElementById('viewerVideo');
+  v.src = FILMS[i].src;
+  v.muted = muted;
+  v.play().catch(()=>{});
+  document.getElementById('viewerTitle').textContent = FILMS[i].title;
+  updateStripHighlight();
+}
+
+function prevFilm() {
+  switchFilm((currentFilm - 1 + FILMS.length) % FILMS.length);
+}
+function nextFilm() {
+  switchFilm((currentFilm + 1) % FILMS.length);
+}
+
+function toggleAudio() {
+  muted = !muted;
+  const v = document.getElementById('viewerVideo');
+  v.muted = muted;
+  syncAudioIcon();
+}
+function syncAudioIcon() {
+  document.getElementById('iconMute').style.display   = muted ? 'block' : 'none';
+  document.getElementById('iconUnmute').style.display = muted ? 'none'  : 'block';
+}
+
+function updateStripHighlight() {
+  document.querySelectorAll('.strip-thumb').forEach((t, i) => {
+    t.classList.toggle('active', i === currentFilm);
+  });
+  const active = document.querySelectorAll('.strip-thumb')[currentFilm];
+  active && active.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+}
+
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('viewer').classList.contains('open')) return;
+  if (e.key === 'Escape') closeViewer();
+  if (e.key === 'ArrowLeft')  prevFilm();
+  if (e.key === 'ArrowRight') nextFilm();
+});
+</script>
+</body>
+</html>

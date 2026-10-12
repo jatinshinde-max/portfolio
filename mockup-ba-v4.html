@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Before & After — Triptych Mockup V4</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&family=Inter+Tight:ital,wght@0,200;0,300;1,200&display=swap" rel="stylesheet">
+<style>
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #06050c;
+  --bg-1:     #0b0a14;
+  --bg-2:     #100f1c;
+  --ink:      rgba(255,255,255,.92);
+  --ink-dim:  rgba(255,255,255,.45);
+  --ink-mute: rgba(255,255,255,.20);
+  --ink-ghost:rgba(255,255,255,.06);
+  --accent:   #e8d5b0;
+  --panel-h:  88vh;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  overflow: hidden;
+}
+
+/* ─── Section label ─── */
+.section-label {
+  position: fixed;
+  top: 28px;
+  left: 32px;
+  font-family: 'DM Mono', monospace;
+  font-weight: 300;
+  font-size: 10px;
+  letter-spacing: .38em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  z-index: 10;
+}
+
+/* ─── Stage ─── */
+.stage {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── Triptych ─── */
+.triptych {
+  display: flex;
+  align-items: stretch;
+  height: var(--panel-h);
+}
+
+.panel-sep {
+  width: 1px;
+  background: rgba(255,255,255,.07);
+  flex-shrink: 0;
+}
+
+/* ─── Single panel ─── */
+.panel {
+  position: relative;
+  overflow: hidden;
+  height: var(--panel-h);
+  width: calc(var(--panel-h) * 9 / 16);
+  flex-shrink: 0;
+  background: var(--bg-1);
+  cursor: ew-resize;
+}
+
+/* Loading shimmer while images fetch */
+.panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--bg-2);
+  z-index: 0;
+}
+
+/* ─── Images ─── */
+.img-after,
+.img-before {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  z-index: 1;
+}
+
+/* Before image clips to left 46% statically — shows the split */
+.img-before {
+  clip-path: inset(0 54% 0 0);
+}
+
+/* ─── Divider ─── */
+.divider {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 46%;
+  width: 1px;
+  background: var(--accent);
+  opacity: .65;
+  z-index: 4;
+  transform: translateX(-.5px);
+}
+
+.handle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.handle-arrow {
+  width: 0; height: 0;
+  flex-shrink: 0;
+}
+
+.handle-arrow-l {
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-right: 5px solid var(--accent);
+}
+
+.handle-arrow-r {
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-left: 5px solid var(--accent);
+}
+
+/* ─── Panel labels ─── */
+.lbl {
+  position: absolute;
+  top: 16px;
+  font-family: 'DM Mono', monospace;
+  font-weight: 300;
+  font-size: 9px;
+  letter-spacing: .32em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  z-index: 5;
+  pointer-events: none;
+}
+
+.lbl-b { left: 14px; }
+.lbl-a { right: 14px; text-align: right; }
+
+/* ─── Project ID ─── */
+.project-id {
+  position: absolute;
+  bottom: 18px;
+  left: 14px;
+  z-index: 5;
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  pointer-events: none;
+}
+
+.proj-num {
+  font-family: 'DM Mono', monospace;
+  font-weight: 400;
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: .08em;
+}
+
+/* ─── Expand icon (top-right) ─── */
+.expand-icon {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 22px;
+  height: 22px;
+  z-index: 5;
+  opacity: 0;
+  transition: opacity .2s;
+  cursor: pointer;
+}
+
+.panel:hover .expand-icon { opacity: .6; }
+.expand-icon:hover { opacity: 1 !important; }
+
+.expand-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ─── Navigation ─── */
+.nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  /* match triptych width: 3 panels + 2 hairlines */
+  width: calc(var(--panel-h) * 9 / 16 * 3 + 2px);
+}
+
+.arrow-btn {
+  background: none;
+  border: none;
+  color: var(--ink-mute);
+  font-family: 'DM Mono', monospace;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 6px;
+  transition: color .2s;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.arrow-btn:hover { color: var(--ink); }
+.arrow-btn[disabled] { opacity: .22; cursor: default; pointer-events: none; }
+
+.filmstrip {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex: 1;
+  justify-content: center;
+}
+
+.dot {
+  width: 4px;
+  height: 18px;
+  border-radius: 1px;
+  background: var(--ink-ghost);
+  flex-shrink: 0;
+  transition: background .25s;
+}
+
+.dot.active {
+  background: var(--accent);
+}
+
+.counter {
+  font-family: 'DM Mono', monospace;
+  font-weight: 300;
+  font-size: 10px;
+  color: var(--ink-mute);
+  letter-spacing: .05em;
+  flex-shrink: 0;
+  min-width: 72px;
+  text-align: right;
+}
+
+/* ─── Expanded Viewer Overlay ─── */
+.viewer {
+  position: fixed;
+  inset: 0;
+  background: rgba(6,5,12,.96);
+  z-index: 100;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.viewer.open { display: flex; }
+
+.viewer-frame {
+  position: relative;
+  height: 90vh;
+  width: calc(90vh * 9 / 16);
+  background: var(--bg-1);
+  overflow: hidden;
+}
+
+.viewer-img-after,
+.viewer-img-before {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.viewer-img-before {
+  clip-path: inset(0 50% 0 0);
+}
+
+.viewer-divider {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: var(--accent);
+  z-index: 4;
+  transform: translateX(-.5px);
+}
+
+.viewer-handle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  background: rgba(6,5,12,.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: ew-resize;
+}
+
+/* Viewer controls */
+.viewer-controls {
+  position: fixed;
+  top: 28px;
+  right: 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.viewer-btn {
+  background: none;
+  border: none;
+  color: var(--ink-dim);
+  font-family: 'DM Mono', monospace;
+  font-weight: 300;
+  font-size: 10px;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 0;
+  transition: color .2s;
+}
+
+.viewer-btn:hover { color: var(--ink); }
+
+.viewer-proj-label {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'DM Mono', monospace;
+  font-weight: 300;
+  font-size: 10px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.viewer-proj-num {
+  color: var(--accent);
+}
+
+</style>
+</head>
+<body>
+
+<span class="section-label">Before &amp; After</span>
+
+<main class="stage">
+  <div class="triptych" id="triptych">
+
+    <!-- Panel 01 -->
+    <div class="panel" onclick="openViewer(1)">
+      <img class="img-after"  src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/Before%20and%20After/After%201.webp"  alt="" loading="eager">
+      <img class="img-before" src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/Before%20and%20After/Before%201.webp" alt="" loading="eager">
+      <div class="divider">
+        <div class="handle">
+          <span class="handle-arrow handle-arrow-l"></span>
+          <span class="handle-arrow handle-arrow-r"></span>
+        </div>
+      </div>
+      <span class="lbl lbl-b">Before</span>
+      <span class="lbl lbl-a">After</span>
+      <div class="project-id"><span class="proj-num">01</span></div>
+      <div class="expand-icon" title="Expand">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.2" color="rgba(255,255,255,.7)">
+          <path d="M3 8V3h5M17 8V3h-5M3 12v5h5M17 12v5h-5"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="panel-sep"></div>
+
+    <!-- Panel 02 -->
+    <div class="panel" onclick="openViewer(2)">
+      <img class="img-after"  src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/Before%20and%20After/After%202.webp"  alt="" loading="eager">
+      <img class="img-before" src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/Before%20and%20After/Before%202.webp" alt="" loading="eager">
+      <div class="divider">
+        <div class="handle">
+          <span class="handle-arrow handle-arrow-l"></span>
+          <span class="handle-arrow handle-arrow-r"></span>
+        </div>
+      </div>
+      <span class="lbl lbl-b">Before</span>
+      <span class="lbl lbl-a">After</span>
+      <div class="project-id"><span class="proj-num">02</span></div>
+      <div class="expand-icon" title="Expand">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.2" color="rgba(255,255,255,.7)">
+          <path d="M3 8V3h5M17 8V3h-5M3 12v5h5M17 12v5h-5"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="panel-sep"></div>
+
+    <!-- Panel 03 -->
+    <div class="panel" onclick="openViewer(3)">
+      <img class="img-after"  src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/Before%20and%20After/After%203.webp"  alt="" loading="eager">
+      <img class="img-before" src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/Before%20and%20After/Before%203.webp" alt="" loading="eager">
+      <div class="divider">
+        <div class="handle">
+          <span class="handle-arrow handle-arrow-l"></span>
+          <span class="handle-arrow handle-arrow-r"></span>
+        </div>
+      </div>
+      <span class="lbl lbl-b">Before</span>
+      <span class="lbl lbl-a">After</span>
+      <div class="project-id"><span class="proj-num">03</span></div>
+      <div class="expand-icon" title="Expand">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.2" color="rgba(255,255,255,.7)">
+          <path d="M3 8V3h5M17 8V3h-5M3 12v5h5M17 12v5h-5"/>
+        </svg>
+      </div>
+    </div>
+
+  </div><!-- /triptych -->
+</main>
+
+<!-- Navigation -->
+<nav class="nav">
+  <div class="nav-inner">
+    <button class="arrow-btn" disabled id="btn-prev">←</button>
+    <div class="filmstrip" id="filmstrip"></div>
+    <span class="counter" id="counter">01 · 02 · 03 / 14</span>
+    <button class="arrow-btn" id="btn-next">→</button>
+  </div>
+</nav>
+
+<!-- Expanded Viewer -->
+<div class="viewer" id="viewer">
+  <div class="viewer-frame" id="viewer-frame">
+    <img class="viewer-img-after"  id="viewer-after"  src="" alt="">
+    <img class="viewer-img-before" id="viewer-before" src="" alt="">
+    <div class="viewer-divider">
+      <div class="viewer-handle">
+        <span class="handle-arrow handle-arrow-l"></span>
+        <span class="handle-arrow handle-arrow-r"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="viewer-controls">
+    <button class="viewer-btn" onclick="navigateViewer(-1)">← Prev</button>
+    <button class="viewer-btn" onclick="navigateViewer(1)">Next →</button>
+    <button class="viewer-btn" onclick="closeViewer()">Close ✕</button>
+  </div>
+
+  <div class="viewer-proj-label">
+    <span>Before &amp; After</span>
+    <span>·</span>
+    <span class="viewer-proj-num" id="viewer-num">01</span>
+    <span>/ 14</span>
+  </div>
+</div>
+
+<script>
+const CDN = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev';
+const BASE = CDN + '/gallery/Before%20and%20After/';
+let currentGroup = 0; // 0-indexed group of 3
+const totalProjects = 14;
+let viewerIndex = 0;
+
+// Build filmstrip
+const fs = document.getElementById('filmstrip');
+for (let i = 0; i < totalProjects; i++) {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i < 3 ? ' active' : '');
+  d.dataset.index = i;
+  d.addEventListener('click', () => goToGroup(Math.floor(i / 3)));
+  fs.appendChild(d);
+}
+
+function updateNav() {
+  const totalGroups = Math.ceil(totalProjects / 3);
+  document.getElementById('btn-prev').disabled = currentGroup === 0;
+  document.getElementById('btn-next').disabled = (currentGroup + 1) * 3 >= totalProjects;
+
+  const start = currentGroup * 3;
+  document.querySelectorAll('.dot').forEach((d, i) => {
+    d.classList.toggle('active', i >= start && i < start + 3);
+  });
+
+  const p1 = String(start + 1).padStart(2, '0');
+  const p2 = String(Math.min(start + 2, totalProjects)).padStart(2, '0');
+  const p3 = String(Math.min(start + 3, totalProjects)).padStart(2, '0');
+  const label = start + 2 < totalProjects ? `${p1} · ${p2} · ${p3}` : `${p1} · ${p2}`;
+  document.getElementById('counter').textContent = label + ' / ' + totalProjects;
+}
+
+function goToGroup(g) {
+  currentGroup = g;
+  updateNav();
+  const panels = document.querySelectorAll('.panel');
+  const start = g * 3;
+  panels.forEach((panel, i) => {
+    const n = start + i + 1;
+    if (n <= totalProjects) {
+      panel.style.visibility = 'visible';
+      panel.querySelector('.img-after').src  = BASE + 'After%20'  + n + '.webp';
+      panel.querySelector('.img-before').src = BASE + 'Before%20' + n + '.webp';
+      panel.querySelector('.proj-num').textContent = String(n).padStart(2, '0');
+      panel.onclick = () => openViewer(n);
+    } else {
+      panel.style.visibility = 'hidden';
+    }
+  });
+}
+
+document.getElementById('btn-prev').addEventListener('click', () => {
+  if (currentGroup > 0) goToGroup(currentGroup - 1);
+});
+document.getElementById('btn-next').addEventListener('click', () => {
+  if ((currentGroup + 1) * 3 < totalProjects) goToGroup(currentGroup + 1);
+});
+
+document.addEventListener('keydown', e => {
+  if (document.getElementById('viewer').classList.contains('open')) {
+    if (e.key === 'ArrowLeft')  navigateViewer(-1);
+    if (e.key === 'ArrowRight') navigateViewer(1);
+    if (e.key === 'Escape') closeViewer();
+  } else {
+    if (e.key === 'ArrowLeft'  && currentGroup > 0) goToGroup(currentGroup - 1);
+    if (e.key === 'ArrowRight' && (currentGroup + 1) * 3 < totalProjects) goToGroup(currentGroup + 1);
+  }
+});
+
+function openViewer(n) {
+  viewerIndex = n;
+  document.getElementById('viewer-after').src  = BASE + 'After%20'  + n + '.webp';
+  document.getElementById('viewer-before').src = BASE + 'Before%20' + n + '.webp';
+  document.getElementById('viewer-num').textContent = String(n).padStart(2, '0');
+  document.getElementById('viewer').classList.add('open');
+
+  // Basic drag on viewer
+  initViewerDrag();
+}
+
+function closeViewer() {
+  document.getElementById('viewer').classList.remove('open');
+}
+
+function navigateViewer(dir) {
+  viewerIndex = Math.max(1, Math.min(totalProjects, viewerIndex + dir));
+  document.getElementById('viewer-after').src  = BASE + 'After%20'  + viewerIndex + '.webp';
+  document.getElementById('viewer-before').src = BASE + 'Before%20' + viewerIndex + '.webp';
+  document.getElementById('viewer-num').textContent = String(viewerIndex).padStart(2, '0');
+}
+
+function initViewerDrag() {
+  const frame  = document.getElementById('viewer-frame');
+  const before = frame.querySelector('.viewer-img-before');
+  const divider = frame.querySelector('.viewer-divider');
+  let dragging = false;
+
+  const onMove = (clientX) => {
+    const rect = frame.getBoundingClientRect();
+    const pct = Math.max(0, Math.min(100, (clientX - rect.left) / rect.width * 100));
+    divider.style.left = pct + '%';
+    before.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
+  };
+
+  // Remove old listeners if re-opened
+  frame._pdHandler && divider.removeEventListener('pointerdown', frame._pdHandler);
+
+  frame._pdHandler = e => {
+    e.preventDefault();
+    dragging = true;
+    divider.setPointerCapture(e.pointerId);
+  };
+
+  divider.addEventListener('pointerdown', frame._pdHandler);
+  divider.addEventListener('pointermove', e => { if (dragging) onMove(e.clientX); });
+  divider.addEventListener('pointerup', () => { dragging = false; });
+}
+</script>
+
+</body>
+</html>
