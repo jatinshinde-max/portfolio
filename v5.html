@@ -198,7 +198,7 @@ body:has(a:hover) #c-ring,body:has(button:hover) #c-ring{width:48px;height:48px;
 /* ── ABOUT ──────────────────────────────────── */
 #about{background:var(--bg);padding:0}
 /* Identity header */
-.about-identity{display:grid;grid-template-columns:1fr auto;align-items:start;gap:2rem;padding:clamp(4rem,8vh,7rem) clamp(1.5rem,5vw,4rem) clamp(2rem,4vh,3rem);border-bottom:1px solid var(--ink-ghost)}
+.about-identity{display:grid;grid-template-columns:1fr auto;align-items:start;gap:2rem;padding:clamp(4rem,8vh,7rem) clamp(1.5rem,5vw,4rem) clamp(1rem,2vh,1.5rem);border-bottom:1px solid var(--ink-ghost)}
 @media(max-width:768px){.about-identity{grid-template-columns:1fr;gap:1.5rem}}
 .about-id-left{}
 .about-id-name{font-family:var(--f-display);font-weight:200;font-size:clamp(2.4rem,5vw,4.5rem);line-height:.95;letter-spacing:-.035em;color:var(--ink)}
@@ -210,7 +210,7 @@ body:has(a:hover) #c-ring,body:has(button:hover) #c-ring{width:48px;height:48px;
 /* Body grid */
 .about-body{display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid var(--ink-ghost)}
 @media(max-width:900px){.about-body{grid-template-columns:1fr}}
-.about-col{padding:clamp(2.5rem,5vh,4rem) clamp(1.5rem,5vw,4rem)}
+.about-col{padding:clamp(1.5rem,3vh,2.5rem) clamp(1.5rem,5vw,4rem) clamp(2.5rem,5vh,4rem);display:flex;flex-direction:column}
 .about-col:first-child{border-right:1px solid var(--ink-ghost)}
 @media(max-width:900px){.about-col:first-child{border-right:none;border-bottom:1px solid var(--ink-ghost)}}
 /* Bio */
@@ -300,16 +300,25 @@ footer{padding:2rem clamp(1.5rem,5vw,4rem);background:var(--bg);display:flex;jus
 /* ── COMMERCIAL STAGE ─────────────────────── */
 #ads{padding:clamp(4rem,8vh,7rem) 0 clamp(2rem,4vh,3rem);background:var(--bg)}
 .comm-header{padding:0 clamp(1.5rem,5vw,4rem);margin-bottom:clamp(2rem,4vh,3rem)}
-.ads-stage-wrap{position:relative;width:100%;height:clamp(400px,70vh,680px);overflow:hidden;background:var(--bg)}
-.ads-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
-.ads-film{position:absolute;top:50%;transform-origin:center center;cursor:none;will-change:transform,opacity;transition:transform .55s cubic-bezier(.23,1,.32,1),opacity .45s cubic-bezier(.23,1,.32,1);pointer-events:auto}
-.ads-film-inner{position:relative;width:100%;height:100%;overflow:hidden}
-.ads-film-inner video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
-.ads-film-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(6,5,12,.85) 0%,rgba(6,5,12,.2) 40%,transparent 70%);z-index:2;opacity:0;transition:opacity .35s}
-.ads-film.ads-active .ads-film-grad{opacity:1}
-.ads-film-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:54px;height:54px;border-radius:50%;border:1.5px solid rgba(255,255,255,.7);background:rgba(6,5,12,.2);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;z-index:3;opacity:0;transition:opacity .3s;pointer-events:none}
-.ads-film.ads-active .ads-film-play{opacity:1}
-.ads-film-play svg{width:17px;height:17px;fill:white;margin-left:3px}
+/* Exhibition wall — 5 fixed asymmetric slots */
+.ads-exhibition{display:grid;grid-template-columns:8fr 14fr 36fr 18fr 11fr;gap:5px;height:clamp(440px,72vh,700px);align-items:end;padding:0 clamp(1.5rem,5vw,4rem)}
+.ads-slot{position:relative;overflow:hidden;background:var(--bg-1);cursor:none;transition:opacity .4s cubic-bezier(.23,1,.32,1)}
+.ads-slot[data-pos="0"]{height:50%}
+.ads-slot[data-pos="1"]{height:70%}
+.ads-slot[data-pos="2"]{height:100%}
+.ads-slot[data-pos="3"]{height:66%}
+.ads-slot[data-pos="4"]{height:44%}
+.ads-slot video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
+.ads-slot-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(6,5,12,.75) 0%,transparent 50%);z-index:1;pointer-events:none;opacity:0;transition:opacity .3s}
+.ads-slot[data-pos="2"] .ads-slot-grad{opacity:1}
+.ads-slot-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(255,255,255,.75);background:rgba(6,5,12,.2);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:2;opacity:0;transition:opacity .3s;pointer-events:none}
+.ads-slot[data-pos="2"] .ads-slot-play{opacity:1}
+.ads-slot-play svg{fill:white;width:16px;height:16px;margin-left:3px}
+.ads-slot-num{position:absolute;top:.5rem;left:.5rem;font-family:var(--f-mono);font-size:.42rem;letter-spacing:.15em;color:rgba(255,255,255,.5);background:rgba(6,5,12,.7);padding:.1rem .28rem;z-index:3;pointer-events:none}
+.ads-slot:not([data-pos="2"]){opacity:.55}
+.ads-slot:not([data-pos="2"]):hover{opacity:.82}
+.ads-slot-hidden{opacity:0!important;pointer-events:none}
+@media(max-width:640px){.ads-exhibition{grid-template-columns:1fr;height:clamp(340px,70vw,500px);padding:0 clamp(1.5rem,5vw,4rem)}.ads-slot:not([data-pos="2"]){display:none}.ads-slot[data-pos="2"]{height:100%}}
 /* info + nav */
 .ads-info-row{display:grid;grid-template-columns:1fr auto;align-items:end;gap:1.5rem;padding:clamp(1.25rem,2.5vh,2rem) clamp(1.5rem,5vw,4rem) 0}
 @media(max-width:640px){.ads-info-row{grid-template-columns:1fr}}
@@ -560,9 +569,7 @@ footer{padding:2rem clamp(1.5rem,5vw,4rem);background:var(--bg);display:flex;jus
     <div class="s-eyebrow">Commercial CGI</div>
     <h2 class="s-title reveal">Product.<br>Advertising.<br>Motion.</h2>
   </div>
-  <div class="ads-stage-wrap" id="ads-stage-wrap">
-    <div class="ads-stage" id="ads-stage"></div>
-  </div>
+  <div class="ads-exhibition" id="ads-exhibition"></div>
   <div class="ads-info-row">
     <div>
       <div class="ads-featured-title" id="ads-featured-title">Automotive</div>
@@ -1157,11 +1164,12 @@ const ADS = [
   { src:'gallery/ads/smart-watch.mp4',      title:'Smart Watch',   meta:'Product / CGI' },
 ];
 
-const adsStage  = document.getElementById('ads-stage');
-const adsWrap   = document.getElementById('ads-stage-wrap');
+const adsExhibition = document.getElementById('ads-exhibition');
 const adsThumbs = document.getElementById('ads-thumbs');
-const adsFilms  = [];
 let commIdx = 0;
+
+// Slot offsets from commIdx: [-2, -1, 0 (hero), +1, +2]
+const SLOT_OFFSETS = [-2, -1, 0, 1, 2];
 
 function openCommLb(i) {
   commLbVideo.src = `${CDN}/${ADS[i].src}`;
@@ -1174,38 +1182,38 @@ function openCommLb(i) {
   document.body.style.overflow = 'hidden';
 }
 
-// Build films
-ADS.forEach((ad, i) => {
-  const film = document.createElement('div');
-  film.className = 'ads-film';
-  film.dataset.idx = i;
-
-  const inner = document.createElement('div');
-  inner.className = 'ads-film-inner';
+// Build 5-slot exhibition wall
+SLOT_OFFSETS.forEach((offset, pos) => {
+  const slot = document.createElement('div');
+  slot.className = 'ads-slot';
+  slot.dataset.pos = pos;
 
   const video = document.createElement('video');
-  video.src = `${CDN}/${ad.src}`;
-  video.preload = i === 0 ? 'metadata' : 'none';
   video.muted = true; video.loop = true; video.playsInline = true;
   video.setAttribute('playsinline', '');
-  video.addEventListener('loadedmetadata', () => { video.currentTime = 0.5; }, {once:true});
-  inner.appendChild(video);
+  video.preload = 'metadata';
+  slot.appendChild(video);
 
-  const grad = document.createElement('div'); grad.className = 'ads-film-grad';
-  inner.appendChild(grad);
+  const grad = document.createElement('div'); grad.className = 'ads-slot-grad';
+  slot.appendChild(grad);
 
-  const playDiv = document.createElement('div'); playDiv.className = 'ads-film-play';
-  playDiv.innerHTML = '<svg viewBox="0 0 20 20"><path d="M4 3l14 7-14 7z"/></svg>';
-  inner.appendChild(playDiv);
+  const num = document.createElement('span'); num.className = 'ads-slot-num';
+  slot.appendChild(num);
 
-  film.appendChild(inner);
-  adsStage.appendChild(film);
-  adsFilms.push(film);
+  if (pos === 2) {
+    const play = document.createElement('div'); play.className = 'ads-slot-play';
+    play.innerHTML = '<svg viewBox="0 0 20 20"><path d="M4 3l14 7-14 7z"/></svg>';
+    slot.appendChild(play);
+  }
 
-  film.addEventListener('click', () => {
-    if (i !== commIdx) { commIdx = i; adsUpdate(); return; }
-    openCommLb(i);
+  slot.addEventListener('click', () => {
+    const idx = commIdx + offset;
+    if (idx < 0 || idx >= ADS.length) return;
+    if (pos === 2) { openCommLb(commIdx); }
+    else { commIdx = idx; adsUpdate(); }
   });
+
+  adsExhibition.appendChild(slot);
 });
 
 // Build thumb strip
@@ -1221,70 +1229,33 @@ ADS.forEach((ad, i) => {
 });
 
 function adsUpdate() {
-  const stageH = adsWrap.offsetHeight || 560;
-  const featH  = stageH * 0.86;
-  const featW  = featH * 9 / 16;
-  const scales = [1, 0.68, 0.50, 0.36, 0.26];
-  const gaps   = [22, 16, 12, 8];
+  const slots = adsExhibition.querySelectorAll('.ads-slot');
+  slots.forEach((slot, pos) => {
+    const offset = SLOT_OFFSETS[pos];
+    const idx = commIdx + offset;
+    const video = slot.querySelector('video');
+    const numEl = slot.querySelector('.ads-slot-num');
 
-  // Calculate center-out positions
-  const pos = {};
-  pos[commIdx] = { x: 0, s: 1, z: 10, op: 1 };
-
-  let rEdge = featW / 2;
-  let lEdge = -(featW / 2);
-
-  for (let step = 1; step <= 4; step++) {
-    const s    = scales[Math.min(step, scales.length - 1)];
-    const visW = featW * s;
-    const g    = gaps[Math.min(step - 1, gaps.length - 1)];
-    const op   = step === 1 ? 0.85 : step === 2 ? 0.65 : step === 3 ? 0.4 : 0.2;
-
-    const ri = commIdx + step;
-    const li = commIdx - step;
-
-    if (ri <= 8) {
-      const cx = rEdge + g + visW / 2;
-      pos[ri] = { x: cx, s, z: 10 - step, op };
-      rEdge = cx + visW / 2;
-    }
-    if (li >= 0) {
-      const cx = lEdge - g - visW / 2;
-      pos[li] = { x: cx, s, z: 10 - step, op };
-      lEdge = cx - visW / 2;
-    }
-  }
-
-  adsFilms.forEach((film, i) => {
-    film.style.width  = `${featW}px`;
-    film.style.height = `${featH}px`;
-
-    const p = pos[i];
-    if (!p || Math.abs(i - commIdx) > 4) {
-      film.style.opacity = '0';
-      film.style.pointerEvents = 'none';
-      film.style.transform = `translateY(-50%) translateX(${(i < commIdx ? -1 : 1) * (featW * 3)}px) scale(0.1)`;
+    if (idx < 0 || idx >= ADS.length) {
+      slot.classList.add('ads-slot-hidden');
+      if (video) { video.pause(); }
       return;
     }
+    slot.classList.remove('ads-slot-hidden');
 
-    film.style.transform    = `translateY(-50%) translateX(${p.x}px) scale(${p.s})`;
-    film.style.zIndex       = String(p.z);
-    film.style.opacity      = String(p.op);
-    film.style.pointerEvents = 'auto';
-    film.classList.toggle('ads-active', i === commIdx);
-
-    const v = film.querySelector('video');
-    if (v) {
-      if (i === commIdx) {
-        if (v.readyState === 0) { v.preload = 'auto'; v.load(); }
-        v.play().catch(() => {});
-      } else {
-        if (!v.paused) v.pause();
-        if (Math.abs(i - commIdx) <= 2 && v.readyState === 0) {
-          v.preload = 'metadata'; v.load();
-        }
+    if (video) {
+      if (slot.dataset.loadedIdx !== String(idx)) {
+        slot.dataset.loadedIdx = idx;
+        video.src = `${CDN}/${ADS[idx].src}`;
+        video.preload = 'metadata';
+        video.load();
+        video.addEventListener('loadedmetadata', () => { video.currentTime = 0.5; }, {once:true});
       }
+      if (pos === 2) { video.play().catch(()=>{}); }
+      else { video.pause(); }
     }
+
+    if (numEl) numEl.textContent = String(idx+1).padStart(2,'0');
   });
 
   // Update info
@@ -1311,19 +1282,15 @@ document.getElementById('ads-play-btn').addEventListener('click', () => {
   openCommLb(commIdx);
 });
 
-// Drag/swipe on stage
-{ let startX = 0, hasMoved = false, dragging = false;
-  adsWrap.addEventListener('pointerdown', e => {
-    dragging = true; hasMoved = false; startX = e.clientX;
-    adsWrap.setPointerCapture(e.pointerId);
+// Swipe on exhibition
+{ let startX = 0, dragging = false;
+  adsExhibition.addEventListener('pointerdown', e => {
+    if (e.target.closest('.ads-slot[data-pos="2"]')) return; // let hero clicks through
+    dragging = true; startX = e.clientX;
   });
-  adsWrap.addEventListener('pointermove', e => {
-    if (!dragging) return;
-    if (Math.abs(e.clientX - startX) > 10) hasMoved = true;
-  });
-  adsWrap.addEventListener('pointerup', e => {
+  adsExhibition.addEventListener('pointermove', e => {});
+  adsExhibition.addEventListener('pointerup', e => {
     if (!dragging) return; dragging = false;
-    if (!hasMoved) return;
     const dx = e.clientX - startX;
     if (Math.abs(dx) > 45) {
       if (dx < 0) commIdx = Math.min(commIdx + 1, 8);
@@ -1418,6 +1385,7 @@ window.addEventListener('resize', () => { clearTimeout(window._adsResizeT); wind
     setCardPos(0.5, i);
     const idx = i;
     card.addEventListener('pointerdown', e => {
+      if (e.target.closest('.ba-expand-btn')) return; // let expand button receive click
       dragging = true; hasDragged = false; card.setPointerCapture(e.pointerId);
       const r = card.getBoundingClientRect();
       setCardPos((e.clientX - r.left) / r.width, idx);
