@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Before / After — Jatin Shinde</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,200;0,300;1,200&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:     #06050c;
+  --bg-2:   #0d0b17;
+  --fg:     #e8e4d9;
+  --dim:    #6a6460;
+  --accent: #c8b89a;
+  --line:   rgba(200,184,154,0.14);
+  --gap:    8px;
+  --r:      5px;
+  --ease:   cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html { background: var(--bg); }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'DM Mono', monospace;
+  cursor: none;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Cursor ─────────────────────────────────────────────────── */
+#cur-dot, #cur-ring {
+  position: fixed; pointer-events: none; z-index: 9999;
+  border-radius: 50%; transform: translate(-50%,-50%);
+  mix-blend-mode: difference;
+}
+#cur-dot  { width: 8px;  height: 8px;  background: var(--accent); }
+#cur-ring {
+  width: 32px; height: 32px;
+  border: 1px solid var(--accent); opacity: 0.7;
+  transition: transform 0.32s var(--ease), opacity 0.2s;
+}
+@media (pointer: coarse) { #cur-dot, #cur-ring { display: none; } body { cursor: auto; } }
+
+/* ── Scroll root ─────────────────────────────────────────────── */
+/* Height is set via JS: vh + 3 × SCROLL_PER_STEP */
+#scroll-root { position: relative; }
+
+/* ── Stage (sticky full-screen) ──────────────────────────────── */
+#stage {
+  position: sticky; top: 0;
+  width: 100%; height: 100dvh;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* ── Top bar ─────────────────────────────────────────────────── */
+#top-bar {
+  flex: 0 0 44px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--line);
+  pointer-events: none;
+}
+.tb-label {
+  font-size: 0.56rem; font-weight: 300;
+  letter-spacing: 0.32em; text-transform: uppercase; color: var(--dim);
+}
+#tb-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.85rem; font-weight: 200;
+  letter-spacing: 0.04em; color: var(--accent);
+}
+#tb-counter { font-size: 0.56rem; letter-spacing: 0.22em; color: var(--dim); }
+
+/* Progress strip */
+#prog-wrap {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 1px; background: var(--line);
+  pointer-events: none;
+}
+#prog-fill {
+  height: 100%; width: 0%;
+  background: var(--accent);
+  transition: width 0.06s linear;
+}
+
+/* ── Panel row ───────────────────────────────────────────────── */
+#panels {
+  flex: 1; min-height: 0;
+  display: flex; gap: var(--gap); padding: var(--gap);
+}
+
+/* ── Single panel slot ───────────────────────────────────────── */
+.slot {
+  flex: 1; min-width: 0;
+  position: relative;
+  border-radius: var(--r);
+  overflow: hidden;
+  background: var(--bg-2);
+}
+
+/* ── A/B crossfade layers inside each slot ───────────────────── */
+/*
+  Each slot has two .layer divs stacked.
+  Only one is visible (opacity:1) at a time.
+  When changing groups: new images load into .layer-b (opacity:0),
+  then when all loaded → transition: .layer-a out, .layer-b in,
+  then swap roles. Never leaves a black frame.
+*/
+.layer {
+  position: absolute; inset: 0;
+  /* transition applied via JS only during swaps */
+}
+.layer.active   { opacity: 1; z-index: 2; }
+.layer.staging  { opacity: 0; z-index: 1; }
+
+/* ── Before/After comparison inside a layer ──────────────────── */
+.ba {
+  position: absolute; inset: 0;
+  touch-action: none;
+}
+.ba img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: contain;
+  object-position: center;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  display: block;
+}
+.ba .img-b { z-index: 1; background: var(--bg-2); }
+.ba .img-a {
+  z-index: 2;
+  clip-path: inset(0 50% 0 0); /* start at 50% — updated by drag */
+}
+
+/* Drag divider */
+.ba-line {
+  position: absolute; top: 0; bottom: 0;
+  left: 50%; width: 2px; transform: translateX(-50%);
+  background: rgba(255,255,255,0.82);
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  z-index: 10; pointer-events: none;
+}
+.ba-knob {
+  position: absolute; top: 50%;
+  left: 50%; transform: translate(-50%,-50%);
+  z-index: 11;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,0.95);
+  box-shadow: 0 2px 16px rgba(0,0,0,0.45);
+  display: flex; align-items: center; justify-content: center;
+  cursor: ew-resize; touch-action: none;
+  pointer-events: all;
+}
+.ba-knob svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+/* Slot number caption */
+.slot-num {
+  position: absolute; bottom: 10px; left: 0; right: 0;
+  z-index: 15;
+  text-align: center;
+  font-size: 0.52rem; letter-spacing: 0.28em; text-transform: uppercase;
+  color: var(--dim);
+  pointer-events: none;
+}
+
+/* Expand hint */
+.expand-hint {
+  position: absolute; top: 10px; right: 10px; z-index: 16;
+  font-size: 0.5rem; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--dim); background: rgba(6,5,12,0.5);
+  padding: 3px 6px; border-radius: 3px;
+  opacity: 0; transition: opacity 0.18s; pointer-events: none;
+}
+.slot:hover .expand-hint { opacity: 1; }
+
+/* Expand button (full-slot hit area, behind knob) */
+.slot-btn {
+  position: absolute; inset: 0; z-index: 9;
+  background: transparent; border: none; cursor: pointer;
+}
+
+/* ── Responsive: hide panels on narrow screens ───────────────── */
+@media (max-width: 1080px) { .slot:nth-child(4) { display: none; } }
+@media (max-width: 720px)  { .slot:nth-child(3) { display: none; } }
+@media (max-width: 480px)  { .slot:nth-child(2) { display: none; } }
+
+/* ── Expanded viewer ─────────────────────────────────────────── */
+#viewer {
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(6,5,12,0.96);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+#viewer.open { opacity: 1; pointer-events: all; }
+
+#vw-inner {
+  position: relative;
+  width: min(88dvw, calc(88dvh * 9 / 16));
+  aspect-ratio: 9 / 16;
+  border-radius: var(--r);
+  overflow: hidden;
+  background: var(--bg-2);
+  touch-action: none;
+}
+#vw-inner img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: contain; pointer-events: none;
+}
+#vw-img-a { clip-path: inset(0 50% 0 0); z-index: 2; }
+#vw-img-b { z-index: 1; background: var(--bg-2); }
+
+#vw-line {
+  position: absolute; top: 0; bottom: 0;
+  left: 50%; width: 2px; transform: translateX(-50%);
+  background: rgba(255,255,255,0.82); z-index: 10; pointer-events: none;
+}
+#vw-knob {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  z-index: 11; width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(255,255,255,0.95);
+  box-shadow: 0 2px 18px rgba(0,0,0,0.45);
+  display: flex; align-items: center; justify-content: center;
+  cursor: ew-resize; touch-action: none;
+}
+#vw-knob svg { width: 14px; height: 14px; }
+
+#vw-info {
+  margin-top: 18px;
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+}
+#vw-num { font-size: 0.56rem; letter-spacing: 0.3em; color: var(--dim); }
+#vw-nav { display: flex; gap: 20px; }
+.vw-btn {
+  background: none; border: 1px solid var(--line);
+  color: var(--dim); cursor: pointer; border-radius: 3px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.56rem; letter-spacing: 0.22em;
+  padding: 6px 16px;
+  transition: border-color 0.18s, color 0.18s;
+}
+.vw-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+#vw-close {
+  position: absolute; top: 22px; right: 24px;
+  background: none; border: none; cursor: pointer;
+  color: var(--dim); font-family: 'DM Mono', monospace;
+  font-size: 0.56rem; letter-spacing: 0.28em; text-transform: uppercase;
+  padding: 6px 10px; z-index: 10;
+  transition: color 0.18s;
+}
+#vw-close:hover { color: var(--accent); }
+
+/* ── Outro ───────────────────────────────────────────────────── */
+#outro {
+  min-height: 50dvh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; gap: 14px; padding: 60px 24px;
+}
+#outro .o-label { font-size: 0.56rem; letter-spacing: 0.32em; text-transform: uppercase; color: var(--dim); }
+#outro a {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem; font-weight: 200; color: var(--accent);
+  letter-spacing: 0.05em; text-decoration: none;
+  border-bottom: 1px solid var(--line); padding-bottom: 2px;
+  transition: border-color 0.18s;
+}
+#outro a:hover { border-color: var(--accent); }
+
+/* ── Transition fade (applied via JS only during image swap) ─── */
+.layer.fading-out {
+  transition: opacity 0.35s ease;
+  opacity: 0;
+}
+.layer.fading-in {
+  transition: opacity 0.35s ease;
+  opacity: 1;
+}
+</style>
+</head>
+<body>
+
+<div id="cur-dot"></div>
+<div id="cur-ring"></div>
+
+<div id="scroll-root">
+
+  <div id="stage">
+
+    <!-- Top bar: small label, no full-screen intro -->
+    <div id="top-bar">
+      <div style="display:flex;align-items:center;gap:16px;">
+        <span class="tb-label">Jatin Shinde</span>
+        <span id="tb-title">Before &amp; After</span>
+      </div>
+      <span id="tb-counter">01 — 04 &nbsp;/&nbsp; 14</span>
+      <div id="prog-wrap"><div id="prog-fill"></div></div>
+    </div>
+
+    <!-- Four panel slots -->
+    <div id="panels">
+
+      <!-- Slot 0 -->
+      <div class="slot" data-slot="0">
+        <div class="layer active" data-layer="a">
+          <div class="ba">
+            <img class="img-b" src="" alt="Before">
+            <img class="img-a" src="" alt="After">
+            <div class="ba-line"></div>
+            <div class="ba-knob">
+              <svg viewBox="0 0 13 13" fill="none"><path d="M4.5 2.5L2 6.5L4.5 10.5" stroke="#06050c" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 2.5L11 6.5L8.5 10.5" stroke="#06050c" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="layer staging" data-layer="b">
+          <div class="ba">
+            <img class="img-b" src="" alt="Before">
+            <img class="img-a" src="" alt="After">
+            <div class="ba-line"></div>
+            <div class="ba-knob">
+              <svg viewBox="0 0 13 13" fill="none"><path d="M4.5 2.5L2 6.5L4.5 10.5" stroke="#06050c" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 2.5L11 6.5L8.5 10.5" stroke="#06050c" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="slot-num">01</div>
+        <span class="expand-hint">Expand</span>
+        <button class="slot-btn" data-slot="0"></button>
+      </div>
+
+      <!-- Slot 1 -->
+      <div class="slot" data-slot="1">
+        <div class="layer active" data-layer="a">
+          <div class="ba">
+            <img class="img-b" src="" alt="Before">
+            <img class="img-a" src="" alt="After">
+            <div class="ba-line"></div>
+            <div class="ba-knob">
+              <svg viewBox="0 0 13 13" fill="none"><path d="M4.5 2.5L2 6.5L4.5 10.5" stroke="#06050c" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 2.5L11 6.5L8.5 10.5" stroke="#06050c" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="layer staging" data-layer="b">
+          <div class="ba">
+            <img class="img-b" src="" alt="Before">
+            <img class="img-a" src="" alt="After">
+            <div class="ba-line"></div>
+            <div class="ba-knob">
+              <svg viewBox="0 0 13 13" fill="none"><path d="M4.5 2.5L2 6.5L4.5 10.5" stroke="#06050c" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 2.5L11 6.5L8.5 10.5" stroke="#06050c" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="slot-num">02</div>
+        <span class="expand-hint">Expand</span>
+        <button class="slot-btn" data-slot="1"></button>
+      </div>
+
+      <!-- Slot 2 -->
+      <div class="slot" data-slot="2">
+        <div class="layer active" data-layer="a">
+          <div class="ba">
+            <img class="img-b" src="" alt="Before">
+            <img class="img-a" src="" alt="After">
+            <div class="ba-line"></div>
+            <div class="ba-knob">
+              <svg viewBox="0 0 13 13" fill="none"><path d="M4.5 2.5L2 6.5L4.5 10.5" stroke="#06050c" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 2.5L11 6.5L8.5 10.5" stroke="#06050c" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="layer staging" data-layer="b">
+          <div class="ba">
+            <img class="img-b" src="" alt="Before">
+            <img class="img-a" src="" alt="After">
+            <div class="ba-line"></div>
+            <div class="ba-knob">
+              <svg viewBox="0 0 13 13" fill="none"><path d="M4.5 2.5L2 6.5L4.5 10.5" stroke="#06050c" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 2.5L11 6.5L8.5 10.5" stroke="#06050c" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="slot-num">03</div>
+        <span class="expand-hint">Expand</span>
+        <button class="slot-btn" data-slot="2"></button>
+      </div>
+
+      <!-- Slot 3 -->
+      <div class="slot" data-slot="3">
+        <div class="layer active" data-layer="a">
+          <div class="ba">
+            <img class="img-b" src="" alt="Before">
+            <img class="img-a" src="" alt="After">
+            <div class="ba-line"></div>
+            <div class="ba-knob">
+              <svg viewBox="0 0 13 13" fill="none"><path d="M4.5 2.5L2 6.5L4.5 10.5" stroke="#06050c" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 2.5L11 6.5L8.5 10.5" stroke="#06050c" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="layer staging" data-layer="b">
+          <div class="ba">
+            <img class="img-b" src="" alt="Before">
+            <img class="img-a" src="" alt="After">
+            <div class="ba-line"></div>
+            <div class="ba-knob">
+              <svg viewBox="0 0 13 13" fill="none"><path d="M4.5 2.5L2 6.5L4.5 10.5" stroke="#06050c" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 2.5L11 6.5L8.5 10.5" stroke="#06050c" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="slot-num">04</div>
+        <span class="expand-hint">Expand</span>
+        <button class="slot-btn" data-slot="3"></button>
+      </div>
+
+    </div><!-- /panels -->
+  </div><!-- /stage -->
+
+</div><!-- /scroll-root -->
+
+<!-- Outro (after scroll section ends) -->
+<section id="outro">
+  <p class="o-label">Jatin Shinde — CGI &amp; VFX Portfolio</p>
+  <a href="/">Return to site</a>
+</section>
+
+<!-- Expanded viewer -->
+<div id="viewer" role="dialog" aria-modal="true">
+  <button id="vw-close">Close</button>
+  <div id="vw-inner">
+    <img id="vw-img-b" src="" alt="Before">
+    <img id="vw-img-a" src="" alt="After">
+    <div id="vw-line"></div>
+    <div id="vw-knob">
+      <svg viewBox="0 0 13 13" fill="none"><path d="M4.5 2.5L2 6.5L4.5 10.5" stroke="#06050c" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 2.5L11 6.5L8.5 10.5" stroke="#06050c" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+  <div id="vw-info">
+    <span id="vw-num">01 / 14</span>
+    <div id="vw-nav">
+      <button class="vw-btn" id="vw-prev">Prev</button>
+      <button class="vw-btn" id="vw-next">Next</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+'use strict';
+gsap.registerPlugin(ScrollTrigger);
+
+/* ── Constants ──────────────────────────────────────────────── */
+const CDN   = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/Before%20and%20After';
+const TOTAL = 14;
+const SCROLL_PER_STEP = 1400; // px of scroll per group transition
+
+// Groups: which 4 pair numbers to show per step
+// Step 0=[1-4], Step 1=[5-8], Step 2=[9-12], Step 3=[11-14]
+const GROUPS = [
+  [1,  2,  3,  4 ],
+  [5,  6,  7,  8 ],
+  [9,  10, 11, 12],
+  [11, 12, 13, 14],
+];
+const NUM_STEPS = GROUPS.length;        // 4
+const NUM_TRANSITIONS = NUM_STEPS - 1; // 3
+
+function pairURL(n, side) {
+  return `${CDN}/${side}%20${n}.webp`;
+}
+
+/* ── DOM ────────────────────────────────────────────────────── */
+const scrollRoot = document.getElementById('scroll-root');
+const tbCounter  = document.getElementById('tb-counter');
+const progFill   = document.getElementById('prog-fill');
+const slots      = Array.from(document.querySelectorAll('.slot'));
+
+/* Per-slot state */
+const slotState = slots.map(() => ({
+  activeLayer: 'a', // which layer is currently visible
+  divPct: [50, 50], // divider percent for layer a and layer b
+  dragging: false,
+}));
+
+/* ── Helpers ────────────────────────────────────────────────── */
+function getLayer(slotEl, which) {
+  return slotEl.querySelector(`.layer[data-layer="${which}"]`);
+}
+function stagingLabel(active) { return active === 'a' ? 'b' : 'a'; }
+
+/* Set images into a specific layer of a specific slot */
+function setLayerImages(slotEl, layerLabel, pairNum) {
+  const layer = getLayer(slotEl, layerLabel);
+  const ba    = layer.querySelector('.ba');
+  ba.querySelector('.img-b').src = pairURL(pairNum, 'Before');
+  ba.querySelector('.img-a').src = pairURL(pairNum, 'After');
+  layer.dataset.pairNum = pairNum;
+}
+
+/* Apply divider position to a specific layer */
+function applyDivider(slotEl, layerLabel, pct) {
+  const layer  = getLayer(slotEl, layerLabel);
+  const ba     = layer.querySelector('.ba');
+  const imgA   = ba.querySelector('.img-a');
+  const line   = ba.querySelector('.ba-line');
+  const knob   = ba.querySelector('.ba-knob');
+  imgA.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
+  line.style.left  = `${pct}%`;
+  knob.style.left  = `${pct}%`;
+}
+
+/* Update slot caption */
+function setCaption(slotEl, pairNum) {
+  const cap = slotEl.querySelector('.slot-num');
+  if (cap) cap.textContent = String(pairNum).padStart(2, '0');
+}
+
+/* ── Group state ─────────────────────────────────────────────── */
+let currentGroup = 0;
+let transitioning = false;
+
+/* Set the ACTIVE layer content immediately (no animation) */
+function applyGroupDirect(groupIdx) {
+  const group = GROUPS[groupIdx];
+  slots.forEach((slot, si) => {
+    const st     = slotState[si];
+    const active = st.activeLayer;
+    setLayerImages(slot, active, group[si]);
+    // Reset divider on active layer
+    st.divPct[active === 'a' ? 0 : 1] = 50;
+    applyDivider(slot, active, 50);
+    setCaption(slot, group[si]);
+    // Ensure correct opacity states
+    const layA = getLayer(slot, 'a');
+    const layB = getLayer(slot, 'b');
+    layA.style.transition = '';
+    layB.style.transition = '';
+    if (active === 'a') {
+      layA.style.opacity = '1'; layA.classList.add('active'); layA.classList.remove('staging');
+      layB.style.opacity = '0'; layB.classList.remove('active'); layB.classList.add('staging');
+    } else {
+      layB.style.opacity = '1'; layB.classList.add('active'); layB.classList.remove('staging');
+      layA.style.opacity = '0'; layA.classList.remove('active'); layA.classList.add('staging');
+    }
+  });
+  currentGroup = groupIdx;
+  updateHUD();
+}
+
+/* ── Crossfade transition ────────────────────────────────────── */
+/*
+  1. Load new group images into the staging layer.
+  2. Wait until ALL 8 images (4 slots × 2 images) are loaded.
+  3. CSS-transition the staging layer to opacity:1 and active to opacity:0.
+  4. Swap the active/staging roles.
+*/
+function transitionToGroup(groupIdx) {
+  if (transitioning || groupIdx === currentGroup) return;
+  transitioning = true;
+
+  const group     = GROUPS[groupIdx];
+  const FADE      = 320; // ms
+
+  // For each slot, load new images into staging layer
+  let loadedCount = 0;
+  const totalToLoad = slots.length * 2; // before + after per slot
+
+  function onAllLoaded() {
+    // Apply dividers to staging layers at 50%
+    slots.forEach((slot, si) => {
+      const st      = slotState[si];
+      const staging = stagingLabel(st.activeLayer);
+      st.divPct[staging === 'a' ? 0 : 1] = 50;
+      applyDivider(slot, staging, 50);
+    });
+
+    // Crossfade: fade staging IN, active OUT
+    slots.forEach((slot, si) => {
+      const st        = slotState[si];
+      const active    = st.activeLayer;
+      const staging   = stagingLabel(active);
+      const layActive  = getLayer(slot, active);
+      const layStaging = getLayer(slot, staging);
+
+      layStaging.style.transition = `opacity ${FADE}ms ease`;
+      layActive.style.transition  = `opacity ${FADE}ms ease`;
+      layStaging.style.opacity    = '1';
+      layActive.style.opacity     = '0';
+    });
+
+    setTimeout(() => {
+      // Swap roles
+      slots.forEach((slot, si) => {
+        const st        = slotState[si];
+        const active    = st.activeLayer;
+        const staging   = stagingLabel(active);
+        const layActive  = getLayer(slot, active);
+        const layStaging = getLayer(slot, staging);
+
+        layStaging.classList.add('active'); layStaging.classList.remove('staging');
+        layActive.classList.remove('active'); layActive.classList.add('staging');
+        layStaging.style.zIndex = '2'; layActive.style.zIndex = '1';
+        layStaging.style.transition = '';
+        layActive.style.transition  = '';
+
+        st.activeLayer = staging;
+        setCaption(slot, group[si]);
+      });
+
+      currentGroup  = groupIdx;
+      transitioning = false;
+      updateHUD();
+    }, FADE + 20);
+  }
+
+  function onOneLoaded() {
+    loadedCount++;
+    if (loadedCount >= totalToLoad) onAllLoaded();
+  }
+
+  // Begin loading into staging layers
+  slots.forEach((slot, si) => {
+    const st      = slotState[si];
+    const staging = stagingLabel(st.activeLayer);
+    const layer   = getLayer(slot, staging);
+    const ba      = layer.querySelector('.ba');
+    const imgB    = ba.querySelector('.img-b');
+    const imgA    = ba.querySelector('.img-a');
+
+    imgB.onload  = onOneLoaded;
+    imgB.onerror = onOneLoaded; // don't block on error
+    imgA.onload  = onOneLoaded;
+    imgA.onerror = onOneLoaded;
+
+    imgB.src = pairURL(group[si], 'Before');
+    imgA.src = pairURL(group[si], 'After');
+    layer.dataset.pairNum = group[si];
+
+    // If already cached, onload may not fire
+    if (imgB.complete) { imgB.onload = null; onOneLoaded(); }
+    if (imgA.complete) { imgA.onload = null; onOneLoaded(); }
+  });
+}
+
+/* ── Reduced-motion shortcut ─────────────────────────────────── */
+const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function goToGroup(idx) {
+  if (prefersReduced) {
+    applyGroupDirect(idx);
+  } else {
+    transitionToGroup(idx);
+  }
+}
+
+/* ── HUD update ──────────────────────────────────────────────── */
+function updateHUD() {
+  const group = GROUPS[currentGroup];
+  const vis   = getVisibleCount();
+  const nums  = group.slice(0, vis).map(n => String(n).padStart(2,'0')).join(' — ');
+  tbCounter.textContent = `${nums} / ${TOTAL}`;
+}
+function getVisibleCount() {
+  const w = window.innerWidth;
+  if (w > 1080) return 4;
+  if (w > 720)  return 3;
+  if (w > 480)  return 2;
+  return 1;
+}
+
+/* ── ScrollTrigger setup ─────────────────────────────────────── */
+// Total scroll height: viewport + 3 transitions × distance per step
+scrollRoot.style.height = `${window.innerHeight + NUM_TRANSITIONS * SCROLL_PER_STEP}px`;
+
+let lastTargetGroup = 0;
+
+ScrollTrigger.create({
+  trigger: scrollRoot,
+  start: 'top top',
+  end: `+=${NUM_TRANSITIONS * SCROLL_PER_STEP}`,
+  pin: document.getElementById('stage'),
+  scrub: false, // we handle group transitions ourselves
+  onUpdate(self) {
+    const p = self.progress; // 0..1
+    progFill.style.width = `${p * 100}%`;
+
+    // Map progress → group index (0..3)
+    const raw    = p * NUM_TRANSITIONS;
+    const target = Math.min(NUM_TRANSITIONS, Math.floor(raw + 0.5));
+    // Using round (0.5 threshold) gives a snap-feel without scrub jank
+
+    if (target !== lastTargetGroup) {
+      lastTargetGroup = target;
+      // Don't interrupt active drag
+      if (!slotState.some(s => s.dragging)) {
+        goToGroup(target);
+      }
+    }
+  },
+});
+
+/* ── Drag interaction ────────────────────────────────────────── */
+/*
+  Drag operates on the ACTIVE layer of each slot.
+  isDragging guard prevents transition from resetting divider mid-drag.
+  Pointer capture ensures drag continues if cursor leaves slot bounds.
+*/
+slots.forEach((slot, si) => {
+  // We attach drag to each slot's knobs.
+  // Use event delegation so it covers both layer-a and layer-b knobs.
+  slot.addEventListener('pointerdown', (e) => {
+    const knob = e.target.closest('.ba-knob');
+    if (!knob) return;
+
+    e.stopPropagation();
+    e.preventDefault();
+
+    slotState[si].dragging = true;
+    knob.setPointerCapture(e.pointerId);
+
+    // Find which layer's knob this is
+    const layer     = knob.closest('.layer');
+    const layerLabel = layer.dataset.layer;
+
+    function onMove(ev) {
+      if (!slotState[si].dragging) return;
+      const rect = slot.getBoundingClientRect();
+      const pct  = Math.min(100, Math.max(0, ((ev.clientX - rect.left) / rect.width) * 100));
+      const key  = layerLabel === 'a' ? 0 : 1;
+      slotState[si].divPct[key] = pct;
+      applyDivider(slot, layerLabel, pct);
+    }
+
+    function onEnd() {
+      slotState[si].dragging = false;
+      knob.removeEventListener('pointermove', onMove);
+      knob.removeEventListener('pointerup', onEnd);
+      knob.removeEventListener('pointercancel', onEnd);
+    }
+
+    knob.addEventListener('pointermove', onMove);
+    knob.addEventListener('pointerup', onEnd);
+    knob.addEventListener('pointercancel', onEnd);
+  });
+});
+
+/* Prevent slot-btn from triggering during drag */
+slots.forEach((slot, si) => {
+  const btn = slot.querySelector('.slot-btn');
+  btn.addEventListener('click', (e) => {
+    if (slotState[si].dragging) return;
+    const st      = slotState[si];
+    const active  = st.activeLayer;
+    const layer   = getLayer(slot, active);
+    const pairNum = parseInt(layer.dataset.pairNum) || GROUPS[currentGroup][si];
+    openViewer(pairNum);
+  });
+});
+
+/* ── Expanded viewer ─────────────────────────────────────────── */
+const viewer  = document.getElementById('viewer');
+const vwImgB  = document.getElementById('vw-img-b');
+const vwImgA  = document.getElementById('vw-img-a');
+const vwLine  = document.getElementById('vw-line');
+const vwKnob  = document.getElementById('vw-knob');
+const vwNum   = document.getElementById('vw-num');
+const vwClose = document.getElementById('vw-close');
+const vwPrev  = document.getElementById('vw-prev');
+const vwNext  = document.getElementById('vw-next');
+const vwInner = document.getElementById('vw-inner');
+
+let vwPair = 1;
+let vwDrag = false;
+
+function applyVwDivider(pct) {
+  vwImgA.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
+  vwLine.style.left     = `${pct}%`;
+  vwKnob.style.left     = `${pct}%`;
+}
+
+function openViewer(pairNum) {
+  vwPair = pairNum;
+  vwImgB.src = pairURL(pairNum, 'Before');
+  vwImgA.src = pairURL(pairNum, 'After');
+  vwNum.textContent = `${String(pairNum).padStart(2,'0')} / ${TOTAL}`;
+  applyVwDivider(50);
+  viewer.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  vwClose.focus();
+}
+
+function closeViewer() {
+  viewer.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+vwClose.addEventListener('click', closeViewer);
+vwPrev.addEventListener('click', () => { if (vwPair > 1)    openViewer(vwPair - 1); });
+vwNext.addEventListener('click', () => { if (vwPair < TOTAL) openViewer(vwPair + 1); });
+
+// Viewer drag
+vwKnob.addEventListener('pointerdown', (e) => {
+  e.stopPropagation();
+  vwDrag = true;
+  vwKnob.setPointerCapture(e.pointerId);
+});
+vwKnob.addEventListener('pointermove', (e) => {
+  if (!vwDrag) return;
+  const rect = vwInner.getBoundingClientRect();
+  const pct  = Math.min(100, Math.max(0, ((e.clientX - rect.left) / rect.width) * 100));
+  applyVwDivider(pct);
+});
+vwKnob.addEventListener('pointerup',     () => { vwDrag = false; });
+vwKnob.addEventListener('pointercancel', () => { vwDrag = false; });
+
+// Keyboard
+document.addEventListener('keydown', (e) => {
+  if (!viewer.classList.contains('open')) return;
+  if (e.key === 'Escape')      closeViewer();
+  if (e.key === 'ArrowLeft'  && vwPair > 1)     openViewer(vwPair - 1);
+  if (e.key === 'ArrowRight' && vwPair < TOTAL)  openViewer(vwPair + 1);
+});
+
+/* ── Custom cursor ───────────────────────────────────────────── */
+const curDot  = document.getElementById('cur-dot');
+const curRing = document.getElementById('cur-ring');
+let mx = -200, my = -200, rx = -200, ry = -200;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  curDot.style.left = `${mx}px`;
+  curDot.style.top  = `${my}px`;
+});
+(function raf() {
+  rx += (mx - rx) * 0.15;
+  ry += (my - ry) * 0.15;
+  curRing.style.left = `${rx}px`;
+  curRing.style.top  = `${ry}px`;
+  requestAnimationFrame(raf);
+})();
+
+document.querySelectorAll('button, a, .ba-knob, #vw-knob').forEach(el => {
+  el.addEventListener('mouseenter', () => { curRing.style.transform = 'translate(-50%,-50%) scale(1.7)'; });
+  el.addEventListener('mouseleave', () => { curRing.style.transform = 'translate(-50%,-50%) scale(1)'; });
+});
+
+/* ── Preload all groups in background ───────────────────────── */
+function preloadGroup(gIdx) {
+  GROUPS[gIdx].forEach(n => {
+    const b = new Image(); b.src = pairURL(n, 'Before');
+    const a = new Image(); a.src = pairURL(n, 'After');
+  });
+}
+
+/* ── Init ────────────────────────────────────────────────────── */
+// Load group 0 into active layers immediately
+applyGroupDirect(0);
+
+// Preload remaining groups
+setTimeout(() => {
+  for (let i = 1; i < NUM_STEPS; i++) preloadGroup(i);
+}, 500);
+
+/* ── Resize ──────────────────────────────────────────────────── */
+window.addEventListener('resize', () => {
+  scrollRoot.style.height = `${window.innerHeight + NUM_TRANSITIONS * SCROLL_PER_STEP}px`;
+  ScrollTrigger.refresh();
+  updateHUD();
+});
+</script>
+</body>
+</html>
