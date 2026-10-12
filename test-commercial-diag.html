@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commercial CGI — Media Diagnostics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&family=Inter+Tight:wght@200;300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:       #06050c;
+    --bg-1:     #0b0a14;
+    --bg-2:     #100f1c;
+    --ink:      rgba(255,255,255,.92);
+    --ink-dim:  rgba(255,255,255,.45);
+    --ink-mute: rgba(255,255,255,.20);
+    --ink-ghost:rgba(255,255,255,.06);
+    --accent:   #e8d5b0;
+    --ok:       #6ee7b7;
+    --warn:     #fbbf24;
+    --err:      #f87171;
+  }
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 300;
+    min-height: 100vh;
+  }
+  .page-header {
+    position: sticky; top: 0; z-index: 50;
+    background: var(--bg);
+    border-bottom: 1px solid var(--ink-ghost);
+    padding: 14px 32px;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .page-header h1 {
+    font-family: 'Inter Tight', sans-serif;
+    font-weight: 200; font-size: 13px;
+    letter-spacing: 0.28em; text-transform: uppercase;
+    color: var(--ink-dim);
+  }
+  .status-all { margin-left: auto; font-size: 10px; letter-spacing: 0.2em; color: var(--ink-mute); }
+
+  .intro {
+    padding: 24px 32px;
+    border-bottom: 1px solid var(--ink-ghost);
+    font-size: 11px; color: var(--ink-mute); line-height: 1.8;
+  }
+  .intro code { color: var(--accent); background: var(--ink-ghost); padding: 1px 5px; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1px;
+    background: var(--ink-ghost);
+    margin: 1px;
+  }
+
+  .film-card {
+    background: var(--bg-1);
+    padding: 20px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+
+  .film-card h2 {
+    font-family: 'Inter Tight', sans-serif;
+    font-weight: 200; font-size: 13px;
+    letter-spacing: 0.08em; color: var(--ink);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .film-index {
+    font-size: 10px; letter-spacing: 0.3em;
+    color: var(--ink-mute);
+  }
+
+  /* Video preview — 9:16 portrait */
+  .video-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 9/16;
+    background: #000;
+    overflow: hidden;
+  }
+  .video-wrap video {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+  .video-status-overlay {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,.5);
+    font-size: 11px; letter-spacing: 0.15em; color: var(--ink-mute);
+    pointer-events: none;
+  }
+  .video-status-overlay.hidden { display: none; }
+
+  /* Diagnostics table */
+  .diag-table { width: 100%; border-collapse: collapse; }
+  .diag-table tr { border-bottom: 1px solid var(--ink-ghost); }
+  .diag-table td { padding: 5px 4px; vertical-align: top; }
+  .diag-table .label {
+    width: 120px; color: var(--ink-mute);
+    font-size: 10px; letter-spacing: 0.18em;
+    padding-right: 12px; white-space: nowrap;
+  }
+  .diag-table .value {
+    color: var(--ink-dim); font-size: 11px; word-break: break-all;
+  }
+  .diag-table .value.ok   { color: var(--ok); }
+  .diag-table .value.warn { color: var(--warn); }
+  .diag-table .value.err  { color: var(--err); }
+
+  /* URL — monospace smaller */
+  .url-cell { font-size: 9px; word-break: break-all; color: var(--ink-mute); line-height: 1.6; }
+
+  /* Buttons row */
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .diag-btn {
+    background: none;
+    border: 1px solid var(--ink-mute);
+    color: var(--ink-dim);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.2em;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: border-color .15s, color .15s;
+    text-transform: uppercase;
+  }
+  .diag-btn:hover { border-color: var(--accent); color: var(--ink); }
+  .diag-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+  /* Console output */
+  .console-out {
+    background: var(--bg);
+    border: 1px solid var(--ink-ghost);
+    padding: 8px 10px;
+    font-size: 10px; line-height: 1.7;
+    color: var(--ink-mute);
+    max-height: 120px; overflow-y: auto;
+    white-space: pre-wrap; word-break: break-all;
+  }
+  .console-out .log-ok   { color: var(--ok); }
+  .console-out .log-warn { color: var(--warn); }
+  .console-out .log-err  { color: var(--err); }
+
+  ::-webkit-scrollbar { width: 3px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--ink-mute); }
+
+  /* Summary bar at bottom */
+  #summary {
+    position: sticky; bottom: 0;
+    background: var(--bg);
+    border-top: 1px solid var(--ink-ghost);
+    padding: 12px 32px;
+    display: flex; gap: 24px; align-items: center;
+    font-size: 10px; letter-spacing: 0.2em;
+  }
+  #summary .ok   { color: var(--ok); }
+  #summary .warn { color: var(--warn); }
+  #summary .err  { color: var(--err); }
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <h1>Commercial CGI — Media Diagnostics</h1>
+  <span class="status-all" id="statusAll">Initializing…</span>
+</header>
+
+<div class="intro">
+  Diagnostics page for 11 commercial films on Cloudflare R2.<br>
+  Base path: <code>https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/web-ready/</code><br>
+  Each card: video preview · readyState · networkState · error code &amp; message · dimensions · autoplay test · manual Play button
+</div>
+
+<div class="grid" id="grid"></div>
+
+<div id="summary">
+  <span id="sumOk"  class="ok">OK: –</span>
+  <span id="sumWarn" class="warn">WARN: –</span>
+  <span id="sumErr"  class="err">ERR: –</span>
+  <span id="sumNote" style="color:var(--ink-mute);margin-left:auto;">Open this page in Chrome for live results</span>
+</div>
+
+<script>
+const BASE = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/web-ready/';
+
+const FILMS = [
+  { label: 'Chocolate',             file: 'chocolate.mp4' },
+  { label: 'Earbuds',               file: 'earbuds.mp4' },
+  { label: 'Face Wash',             file: 'facewash.mp4' },
+  { label: 'Pepsi',                 file: 'pepsi.mp4' },
+  { label: 'Serum',                 file: 'serum.mp4' },
+  { label: 'Shoe',                  file: 'shoe.mp4' },
+  { label: 'Smart Watch',           file: 'smart-watch.mp4' },
+  { label: '911 Commercial',        file: '911%20Commercial.mp4' },
+  { label: 'Moisturizer & Cleanser', file: 'Moisturizer%20and%20Cleanser%20Ad-1.mp4' },
+  { label: 'RR Ad',                 file: 'RR%20Ad.mp4' },
+  { label: 'Reel Video',            file: 'Reelvideo-29689.mp4' },
+];
+
+// readyState map
+const RS = {0:'HAVE_NOTHING',1:'HAVE_METADATA',2:'HAVE_CURRENT_DATA',3:'HAVE_FUTURE_DATA',4:'HAVE_ENOUGH_DATA'};
+// networkState map
+const NS = {0:'EMPTY',1:'IDLE',2:'LOADING',3:'NO_SOURCE'};
+// MediaError code map
+const ME = {1:'ABORTED',2:'NETWORK',3:'DECODE',4:'SRC_NOT_SUPPORTED'};
+
+let counts = { ok: 0, warn: 0, err: 0 };
+
+function updateSummary() {
+  document.getElementById('sumOk').textContent  = `OK: ${counts.ok}`;
+  document.getElementById('sumWarn').textContent = `WARN: ${counts.warn}`;
+  document.getElementById('sumErr').textContent  = `ERR: ${counts.err}`;
+  document.getElementById('statusAll').textContent =
+    `${counts.ok} OK · ${counts.warn} WARN · ${counts.err} ERR`;
+}
+
+function classFor(rsVal) {
+  if (rsVal >= 3) return 'ok';
+  if (rsVal === 0) return 'err';
+  return 'warn';
+}
+
+function buildCard(film, idx) {
+  const url = BASE + film.file;
+
+  // Card shell
+  const card = document.createElement('div');
+  card.className = 'film-card';
+  card.id = `card-${idx}`;
+
+  // Title
+  const h2 = document.createElement('h2');
+  h2.innerHTML = `<span class="film-index">${String(idx+1).padStart(2,'0')}</span> ${film.label}`;
+  card.appendChild(h2);
+
+  // URL display
+  const urlDiv = document.createElement('div');
+  urlDiv.className = 'url-cell';
+  urlDiv.textContent = url;
+  card.appendChild(urlDiv);
+
+  // Video
+  const wrap = document.createElement('div');
+  wrap.className = 'video-wrap';
+  const video = document.createElement('video');
+  video.setAttribute('playsinline', '');
+  video.setAttribute('preload', 'metadata');
+  video.muted = true;
+  video.loop = true;
+  video.src = url;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'video-status-overlay';
+  overlay.textContent = 'Loading…';
+  wrap.appendChild(video);
+  wrap.appendChild(overlay);
+  card.appendChild(wrap);
+
+  // Diagnostics table
+  const table = document.createElement('table');
+  table.className = 'diag-table';
+
+  function row(label, id) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="label">${label}</td><td class="value" id="${id}">—</td>`;
+    table.appendChild(tr);
+    return tr;
+  }
+
+  row('readyState', `rs-${idx}`);
+  row('networkState', `ns-${idx}`);
+  row('Error code', `ec-${idx}`);
+  row('Error message', `em-${idx}`);
+  row('Video dimensions', `vd-${idx}`);
+  row('Paused', `pa-${idx}`);
+  row('Duration', `du-${idx}`);
+  row('HTTP status', `ht-${idx}`);
+  row('MIME type', `mt-${idx}`);
+  card.appendChild(table);
+
+  // Console log area
+  const consoleOut = document.createElement('div');
+  consoleOut.className = 'console-out';
+  consoleOut.id = `console-${idx}`;
+  consoleOut.textContent = 'Waiting for events…\n';
+  card.appendChild(consoleOut);
+
+  function log(msg, cls = '') {
+    const span = document.createElement('span');
+    if (cls) span.className = cls;
+    span.textContent = msg + '\n';
+    consoleOut.appendChild(span);
+    consoleOut.scrollTop = consoleOut.scrollHeight;
+  }
+
+  function setVal(id, text, cls = '') {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = text;
+    el.className = 'value' + (cls ? ' ' + cls : '');
+  }
+
+  function updateDiag() {
+    const rs = video.readyState;
+    const ns = video.networkState;
+    setVal(`rs-${idx}`, `${rs} — ${RS[rs] || '?'}`, classFor(rs));
+    setVal(`ns-${idx}`, `${ns} — ${NS[ns] || '?'}`,
+      ns === 3 ? 'err' : ns === 2 ? 'warn' : 'ok');
+
+    if (video.error) {
+      const code = video.error.code;
+      setVal(`ec-${idx}`, `${code} — ${ME[code] || '?'}`, 'err');
+      setVal(`em-${idx}`, video.error.message || '(no message)', 'err');
+    } else {
+      setVal(`ec-${idx}`, 'none', 'ok');
+      setVal(`em-${idx}`, '—', '');
+    }
+
+    const w = video.videoWidth, h = video.videoHeight;
+    setVal(`vd-${idx}`,
+      w && h ? `${w} × ${h}` : '(not loaded yet)',
+      w && h ? 'ok' : 'warn');
+
+    setVal(`pa-${idx}`, String(video.paused), video.paused ? 'warn' : 'ok');
+
+    const dur = video.duration;
+    setVal(`du-${idx}`,
+      isNaN(dur) ? '(unknown)' : `${dur.toFixed(2)}s`,
+      isNaN(dur) ? 'warn' : 'ok');
+  }
+
+  // HTTP check via fetch (HEAD)
+  fetch(url, { method: 'HEAD' })
+    .then(r => {
+      const mime = r.headers.get('content-type') || '(not reported)';
+      setVal(`ht-${idx}`, `${r.status} ${r.statusText}`, r.ok ? 'ok' : 'err');
+      setVal(`mt-${idx}`, mime, mime.includes('video') ? 'ok' : 'warn');
+      log(`[FETCH HEAD] ${r.status} ${r.statusText} · ${mime}`, r.ok ? 'log-ok' : 'log-err');
+    })
+    .catch(e => {
+      setVal(`ht-${idx}`, `FETCH ERROR: ${e.message}`, 'err');
+      setVal(`mt-${idx}`, '(unavailable)', 'warn');
+      log(`[FETCH HEAD ERROR] ${e.message}`, 'log-err');
+    });
+
+  // Video events
+  video.addEventListener('loadstart', () => {
+    log('[loadstart]');
+    overlay.textContent = 'loadstart…';
+  });
+  video.addEventListener('loadedmetadata', () => {
+    log(`[loadedmetadata] ${video.videoWidth}×${video.videoHeight}, dur=${video.duration?.toFixed(2)}s`, 'log-ok');
+    overlay.textContent = 'Metadata loaded';
+    updateDiag();
+  });
+  video.addEventListener('loadeddata', () => {
+    log('[loadeddata] first frame available', 'log-ok');
+    overlay.classList.add('hidden');
+    updateDiag();
+  });
+  video.addEventListener('canplay', () => {
+    log('[canplay]', 'log-ok');
+    updateDiag();
+  });
+  video.addEventListener('canplaythrough', () => {
+    log('[canplaythrough]', 'log-ok');
+    updateDiag();
+    // Try muted autoplay
+    video.play()
+      .then(() => {
+        log('[autoplay] SUCCESS — playing', 'log-ok');
+        overlay.classList.add('hidden');
+        updateDiag();
+        counts.ok++;
+        updateSummary();
+      })
+      .catch(e => {
+        log(`[autoplay] REJECTED — ${e.name}: ${e.message}`, 'log-warn');
+        overlay.textContent = 'Autoplay blocked';
+        updateDiag();
+        counts.warn++;
+        updateSummary();
+      });
+  });
+  video.addEventListener('error', () => {
+    const e = video.error;
+    const code = e ? e.code : '?';
+    const msg  = e ? (e.message || '(no message)') : '(unknown)';
+    log(`[error] code=${code} (${ME[code]||'?'}) ${msg}`, 'log-err');
+    overlay.textContent = `Error ${code}`;
+    overlay.style.color = '#f87171';
+    updateDiag();
+    counts.err++;
+    updateSummary();
+  });
+  video.addEventListener('stalled', () => log('[stalled]', 'log-warn'));
+  video.addEventListener('waiting', () => log('[waiting]', 'log-warn'));
+  video.addEventListener('playing', () => { log('[playing]', 'log-ok'); overlay.classList.add('hidden'); updateDiag(); });
+  video.addEventListener('pause',   () => { log('[pause]'); updateDiag(); });
+  video.addEventListener('emptied', () => log('[emptied]', 'log-warn'));
+
+  // Buttons
+  const btnRow = document.createElement('div');
+  btnRow.className = 'btn-row';
+
+  const btnPlay = document.createElement('button');
+  btnPlay.className = 'diag-btn';
+  btnPlay.textContent = 'Play (muted)';
+  btnPlay.addEventListener('click', () => {
+    video.muted = true;
+    video.play()
+      .then(() => log('[manual play] OK', 'log-ok'))
+      .catch(e => log(`[manual play] FAIL — ${e.name}: ${e.message}`, 'log-err'));
+    updateDiag();
+  });
+
+  const btnPause = document.createElement('button');
+  btnPause.className = 'diag-btn';
+  btnPause.textContent = 'Pause';
+  btnPause.addEventListener('click', () => { video.pause(); updateDiag(); });
+
+  const btnReload = document.createElement('button');
+  btnReload.className = 'diag-btn';
+  btnReload.textContent = 'Reload src';
+  btnReload.addEventListener('click', () => {
+    consoleOut.textContent = 'Reloading src…\n';
+    video.load();
+    updateDiag();
+    log('[reload] video.load() called');
+  });
+
+  const btnDiag = document.createElement('button');
+  btnDiag.className = 'diag-btn';
+  btnDiag.textContent = 'Refresh diag';
+  btnDiag.addEventListener('click', () => { updateDiag(); log('[refresh diag]'); });
+
+  const btnOpenDirect = document.createElement('button');
+  btnOpenDirect.className = 'diag-btn';
+  btnOpenDirect.textContent = 'Open URL';
+  btnOpenDirect.addEventListener('click', () => window.open(url, '_blank', 'noopener'));
+
+  btnRow.appendChild(btnPlay);
+  btnRow.appendChild(btnPause);
+  btnRow.appendChild(btnReload);
+  btnRow.appendChild(btnDiag);
+  btnRow.appendChild(btnOpenDirect);
+  card.appendChild(btnRow);
+
+  return card;
+}
+
+// Build grid
+const grid = document.getElementById('grid');
+FILMS.forEach((film, i) => {
+  grid.appendChild(buildCard(film, i));
+});
+
+updateSummary();
+</script>
+</body>
+</html>

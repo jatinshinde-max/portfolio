@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B/A Interaction Test — Hold-and-Drag Repair</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&family=Inter+Tight:wght@200;300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #06050c;
+    --bg-1:     #0b0a14;
+    --bg-2:     #100f1c;
+    --ink:      rgba(255,255,255,.92);
+    --ink-dim:  rgba(255,255,255,.45);
+    --ink-mute: rgba(255,255,255,.20);
+    --ink-ghost:rgba(255,255,255,.06);
+    --accent:   #e8d5b0;
+    --panel-h:  88vh;
+    --panel-w:  calc(var(--panel-h) * 9 / 16);
+    --divider-w: 2px;
+    --handle-r:  22px;
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'DM Mono', monospace;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Page header ────────────────────────────────────────── */
+  .page-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--ink-ghost);
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  .page-header h1 {
+    font-family: 'Inter Tight', sans-serif;
+    font-weight: 200;
+    font-size: 13px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+  }
+  .pair-counter {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--ink-mute);
+  }
+  .status-badge {
+    margin-left: auto;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border: 1px solid var(--ink-mute);
+    color: var(--ink-dim);
+  }
+
+  /* ── Stage: scroll container ────────────────────────────── */
+  .stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 64px;
+    padding: 64px 0 128px;
+  }
+
+  /* ── Row: label + panels ────────────────────────────────── */
+  .row-label {
+    width: 100%;
+    max-width: calc(var(--panel-w) * 4 + 48px);
+    padding: 0 16px;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: -48px;
+  }
+
+  .panels-row {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 0 32px;
+    width: 100%;
+  }
+
+  /* ── Individual comparison panel ───────────────────────── */
+  .comp-panel {
+    position: relative;
+    flex: 0 0 var(--panel-w);
+    height: var(--panel-h);
+    overflow: hidden;
+    border: 1px solid var(--ink-ghost);
+    cursor: col-resize;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none; /* prevent browser touch scroll stealing */
+  }
+
+  /* Animated entry — panels slide up as one composition */
+  .comp-panel {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+  .comp-panel.revealed {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1),
+                transform 0.7s cubic-bezier(0.22,1,0.36,1);
+  }
+
+  /* Images */
+  .comp-panel img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    display: block;
+    pointer-events: none;
+    draggable: false;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .comp-panel img[draggable="false"] { -webkit-user-drag: none; }
+
+  /* After image: always full, underneath */
+  .img-after { z-index: 1; }
+
+  /* Before image: clipped from the right, on top */
+  .img-before {
+    z-index: 2;
+    clip-path: inset(0 50% 0 0); /* initial 50/50 split */
+  }
+
+  /* Divider line */
+  .divider {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: var(--divider-w);
+    background: var(--accent);
+    z-index: 10;
+    transform: translateX(-50%);
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  /* Handle */
+  .handle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: calc(var(--handle-r) * 2);
+    height: calc(var(--handle-r) * 2);
+    border-radius: 50%;
+    background: var(--bg);
+    border: 1.5px solid var(--accent);
+    transform: translate(-50%, -50%);
+    z-index: 11;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+  }
+  .handle::before,
+  .handle::after {
+    content: '';
+    display: block;
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+  }
+  .handle::before {
+    border-right: 6px solid var(--accent);
+  }
+  .handle::after {
+    border-left: 6px solid var(--accent);
+  }
+
+  /* Labels on panel */
+  .label-before, .label-after {
+    position: absolute;
+    bottom: 14px;
+    z-index: 12;
+    font-size: 9px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    background: rgba(6,5,12,0.7);
+    backdrop-filter: blur(4px);
+    pointer-events: none;
+    color: var(--ink-dim);
+    transition: opacity 0.2s;
+  }
+  .label-before { left: 12px; }
+  .label-after  { right: 12px; }
+
+  /* Pair number badge */
+  .pair-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 12;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    color: var(--ink-mute);
+    pointer-events: none;
+  }
+
+  /* Expand button */
+  .btn-expand {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 20;
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--ink-mute);
+    background: rgba(6,5,12,0.7);
+    backdrop-filter: blur(4px);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+    color: var(--ink-dim);
+  }
+  .btn-expand svg { width: 14px; height: 14px; }
+  .comp-panel:hover .btn-expand { opacity: 1; }
+
+  /* ── Filmstrip / pair nav ───────────────────────────────── */
+  .filmstrip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 0 0;
+  }
+  .film-dot {
+    width: 24px;
+    height: 3px;
+    background: var(--ink-mute);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .film-dot.active { background: var(--accent); transform: scaleY(1.5); }
+  .film-dot:hover  { background: var(--ink-dim); }
+
+  /* ── Expanded viewer overlay ────────────────────────────── */
+  .viewer-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(6,5,12,0.94);
+    backdrop-filter: blur(8px);
+    align-items: center;
+    justify-content: center;
+  }
+  .viewer-overlay.open {
+    display: flex;
+  }
+  .viewer-stage {
+    position: relative;
+    height: 88vh;
+    width: calc(88vh * 9 / 16);
+    cursor: col-resize;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+  }
+  .viewer-stage img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    draggable: false;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .viewer-stage img[draggable="false"] { -webkit-user-drag: none; }
+  .viewer-stage .img-after { z-index: 1; }
+  .viewer-stage .img-before { z-index: 2; clip-path: inset(0 50% 0 0); }
+  .viewer-stage .divider { left: 50%; }
+  .viewer-stage .handle  { left: 50%; }
+
+  .viewer-controls {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 30;
+    display: flex;
+    gap: 8px;
+  }
+  .viewer-btn {
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--ink-mute);
+    background: rgba(6,5,12,0.8);
+    backdrop-filter: blur(4px);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-dim);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .viewer-btn:hover { border-color: var(--accent); color: var(--ink); }
+  .viewer-btn svg { width: 16px; height: 16px; }
+
+  .viewer-pair-info {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    pointer-events: none;
+  }
+
+  /* ── Scrollbar ──────────────────────────────────────────── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--ink-mute); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <h1>Before / After — Interaction Test</h1>
+  <span class="pair-counter" id="pairCounter">Pair 1–3 of 14</span>
+  <span class="status-badge">Phase 1 — Repair</span>
+</header>
+
+<main class="stage" id="stage"></main>
+
+<!-- Expanded Viewer -->
+<div class="viewer-overlay" id="viewerOverlay">
+  <div class="viewer-stage" id="viewerStage">
+    <img class="img-after"  id="viewerAfter"  src="" alt="After"  draggable="false" ondragstart="return false">
+    <img class="img-before" id="viewerBefore" src="" alt="Before" draggable="false" ondragstart="return false">
+    <div class="divider" id="viewerDivider">
+      <div class="handle"></div>
+    </div>
+    <div class="label-before">Before</div>
+    <div class="label-after">After</div>
+  </div>
+  <div class="viewer-controls">
+    <button class="viewer-btn" id="viewerPrev" title="Previous pair" aria-label="Previous pair">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <button class="viewer-btn" id="viewerNext" title="Next pair" aria-label="Next pair">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 6 15 12 9 18"/></svg>
+    </button>
+    <button class="viewer-btn" id="viewerClose" title="Close" aria-label="Close viewer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="viewer-pair-info" id="viewerPairInfo">Pair 1 of 14</div>
+</div>
+
+<script type="module">
+// ─── Config ──────────────────────────────────────────────────────────────────
+const CDN   = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ba';
+const TOTAL = 14;
+const PANELS_DEFAULT = 3;  // 3 panels on standard desktop
+const PANELS_WIDE    = 4;  // 4 panels when viewport comfortably permits
+const WIDE_BREAKPOINT = 1680; // px — use 4 panels above this width
+
+// Determine how many panels to show
+const panelCount = () => window.innerWidth >= WIDE_BREAKPOINT ? PANELS_WIDE : PANELS_DEFAULT;
+
+// ─── State ───────────────────────────────────────────────────────────────────
+let currentGroup = 0;   // which group of panels is visible (index 0-based)
+let viewerPairIdx = 0;  // which pair is open in the viewer (0-based)
+let panels = [];        // live panel DOM nodes
+
+// ─── Build DOM ───────────────────────────────────────────────────────────────
+const stage = document.getElementById('stage');
+const pairCounter = document.getElementById('pairCounter');
+
+function pairURL(n, side) {
+  // n: 1-based pair number, side: 'Before' or 'After'
+  return `${CDN}/${side}%20${n}.webp`;
+}
+
+function buildGroup(startPair) {
+  const count = panelCount();
+  const pairs = [];
+  for (let i = 0; i < count; i++) {
+    const p = startPair + i;
+    if (p <= TOTAL) pairs.push(p);
+  }
+  return pairs;
+}
+
+function renderGroup(startPair, animate = true) {
+  stage.innerHTML = '';
+  panels = [];
+
+  const count = panelCount();
+  const pairs = buildGroup(startPair);
+
+  // Set CSS --panel-h to fill most of viewport height, leaving room for header
+  document.documentElement.style.setProperty('--panel-w',
+    `calc(var(--panel-h) * 9 / 16)`);
+
+  // ── Row of panels ──────────────────────────────────────────────────
+  const row = document.createElement('div');
+  row.className = 'panels-row';
+
+  pairs.forEach((pairN, idx) => {
+    const panel = createPanel(pairN);
+    row.appendChild(panel);
+    panels.push(panel);
+
+    if (animate) {
+      panel.style.transitionDelay = `${idx * 0.07}s`;
+      requestAnimationFrame(() => requestAnimationFrame(() => panel.classList.add('revealed')));
+    } else {
+      panel.classList.add('revealed');
+    }
+  });
+
+  stage.appendChild(row);
+
+  // ── Filmstrip ──────────────────────────────────────────────────────
+  const filmstrip = document.createElement('div');
+  filmstrip.className = 'filmstrip';
+
+  for (let p = 1; p <= TOTAL; p++) {
+    const dot = document.createElement('div');
+    dot.className = 'film-dot' + (p === startPair ? ' active' : '');
+    dot.dataset.pair = p;
+    dot.title = `Pair ${p}`;
+    dot.addEventListener('click', () => {
+      currentGroup = p - 1;
+      renderGroup(p, true);
+    });
+    filmstrip.appendChild(dot);
+  }
+  stage.appendChild(filmstrip);
+
+  // ── Prev / Next group nav ──────────────────────────────────────────
+  const navRow = document.createElement('div');
+  navRow.style.cssText = 'display:flex;gap:12px;justify-content:center;margin-top:4px;';
+
+  const btnPrev = document.createElement('button');
+  btnPrev.className = 'viewer-btn';
+  btnPrev.style.cssText = 'width:auto;padding:0 16px;gap:6px;';
+  btnPrev.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="14"><polyline points="15 18 9 12 15 6"/></svg><span style="font-size:10px;letter-spacing:.22em;">PREV</span>`;
+  btnPrev.disabled = startPair === 1;
+  btnPrev.style.opacity = startPair === 1 ? '0.3' : '1';
+  btnPrev.addEventListener('click', () => {
+    const prev = Math.max(1, startPair - panelCount());
+    currentGroup = prev - 1;
+    renderGroup(prev, true);
+  });
+
+  const btnNext = document.createElement('button');
+  btnNext.className = 'viewer-btn';
+  btnNext.style.cssText = 'width:auto;padding:0 16px;gap:6px;';
+  btnNext.innerHTML = `<span style="font-size:10px;letter-spacing:.22em;">NEXT</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="14"><polyline points="9 6 15 12 9 18"/></svg>`;
+  const nextStart = startPair + panelCount();
+  btnNext.disabled = nextStart > TOTAL;
+  btnNext.style.opacity = nextStart > TOTAL ? '0.3' : '1';
+  btnNext.addEventListener('click', () => {
+    if (nextStart <= TOTAL) {
+      currentGroup = nextStart - 1;
+      renderGroup(nextStart, true);
+    }
+  });
+
+  navRow.appendChild(btnPrev);
+  navRow.appendChild(btnNext);
+  stage.appendChild(navRow);
+
+  updateCounter(startPair);
+}
+
+function updateCounter(startPair) {
+  const count = panelCount();
+  const end = Math.min(startPair + count - 1, TOTAL);
+  pairCounter.textContent = `Pair ${startPair}–${end} of ${TOTAL}`;
+}
+
+// ─── Panel factory ───────────────────────────────────────────────────────────
+function createPanel(pairN) {
+  const panel = document.createElement('div');
+  panel.className = 'comp-panel';
+  panel.dataset.pair = pairN;
+
+  const imgAfter  = document.createElement('img');
+  imgAfter.className = 'img-after';
+  imgAfter.src = pairURL(pairN, 'After');
+  imgAfter.alt = `After ${pairN}`;
+  imgAfter.draggable = false;
+  imgAfter.setAttribute('ondragstart', 'return false');
+
+  const imgBefore = document.createElement('img');
+  imgBefore.className = 'img-before';
+  imgBefore.src = pairURL(pairN, 'Before');
+  imgBefore.alt = `Before ${pairN}`;
+  imgBefore.draggable = false;
+  imgBefore.setAttribute('ondragstart', 'return false');
+
+  const divider = document.createElement('div');
+  divider.className = 'divider';
+  const handle = document.createElement('div');
+  handle.className = 'handle';
+  divider.appendChild(handle);
+
+  const lblBefore = document.createElement('div');
+  lblBefore.className = 'label-before';
+  lblBefore.textContent = 'Before';
+  const lblAfter = document.createElement('div');
+  lblAfter.className = 'label-after';
+  lblAfter.textContent = 'After';
+
+  const badge = document.createElement('div');
+  badge.className = 'pair-badge';
+  badge.textContent = String(pairN).padStart(2, '0');
+
+  const btnExpand = document.createElement('button');
+  btnExpand.className = 'btn-expand';
+  btnExpand.setAttribute('aria-label', `Expand pair ${pairN}`);
+  btnExpand.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>`;
+
+  panel.appendChild(imgAfter);
+  panel.appendChild(imgBefore);
+  panel.appendChild(divider);
+  panel.appendChild(lblBefore);
+  panel.appendChild(lblAfter);
+  panel.appendChild(badge);
+  panel.appendChild(btnExpand);
+
+  // Set initial split to 50%
+  let splitPct = 50; // percentage of panel WIDTH shown as "Before" (left side)
+
+  function applySplit(pct) {
+    splitPct = Math.max(0, Math.min(100, pct));
+    // clip-path: inset(0 RIGHT% 0 0)
+    // When splitPct = 50 → right clip = 50% → shows left half as Before
+    // When splitPct = 0  → right clip = 100% → Before hidden
+    // When splitPct = 100 → right clip = 0% → Before fully visible
+    const rightClip = 100 - splitPct;
+    imgBefore.style.clipPath = `inset(0 ${rightClip}% 0 0)`;
+    divider.style.left = `${splitPct}%`;
+    handle.style.left  = '';  // handle is inside divider, centered
+  }
+
+  // ── Pointer Capture drag ────────────────────────────────────────────
+  let isDragging   = false;
+  let dragStartX   = 0;
+  let dragStartSplit = 50;
+  const CLICK_THRESHOLD = 4; // px — below this is a click, not a drag
+
+  panel.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0 && e.pointerType === 'mouse') return;
+    isDragging = false;
+    dragStartX = e.clientX;
+    dragStartSplit = splitPct;
+
+    panel.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+
+  panel.addEventListener('pointermove', (e) => {
+    if (!panel.hasPointerCapture(e.pointerId)) return;
+
+    const dx = e.clientX - dragStartX;
+    if (!isDragging && Math.abs(dx) > CLICK_THRESHOLD) {
+      isDragging = true;
+      panel.style.cursor = 'col-resize';
+    }
+    if (!isDragging) return;
+
+    const rect = panel.getBoundingClientRect();
+    const pct = ((e.clientX - rect.left) / rect.width) * 100;
+    applySplit(pct);
+  });
+
+  panel.addEventListener('pointerup', (e) => {
+    if (!panel.hasPointerCapture(e.pointerId)) return;
+    panel.releasePointerCapture(e.pointerId);
+    panel.style.cursor = 'col-resize';
+
+    if (!isDragging) {
+      // Treat as a click — but only from expand button
+    }
+    isDragging = false;
+  });
+
+  panel.addEventListener('pointercancel', (e) => {
+    if (panel.hasPointerCapture(e.pointerId)) {
+      panel.releasePointerCapture(e.pointerId);
+    }
+    isDragging = false;
+    panel.style.cursor = 'col-resize';
+  });
+
+  // Expand button — open viewer (only if not dragging)
+  btnExpand.addEventListener('pointerdown', (e) => e.stopPropagation());
+  btnExpand.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openViewer(pairN, splitPct);
+  });
+
+  applySplit(50);
+  return panel;
+}
+
+// ─── Viewer ──────────────────────────────────────────────────────────────────
+const overlay      = document.getElementById('viewerOverlay');
+const viewerStage  = document.getElementById('viewerStage');
+const viewerAfter  = document.getElementById('viewerAfter');
+const viewerBefore = document.getElementById('viewerBefore');
+const viewerDivider= document.getElementById('viewerDivider');
+const viewerPairInfo = document.getElementById('viewerPairInfo');
+const btnClose     = document.getElementById('viewerClose');
+const btnViewerPrev = document.getElementById('viewerPrev');
+const btnViewerNext = document.getElementById('viewerNext');
+
+function openViewer(pairN, splitPct = 50) {
+  viewerPairIdx = pairN - 1;
+  loadViewerPair(viewerPairIdx, splitPct);
+  overlay.classList.add('open');
+}
+
+function loadViewerPair(idx, splitPct = 50) {
+  const n = idx + 1;
+  viewerAfter.src  = pairURL(n, 'After');
+  viewerBefore.src = pairURL(n, 'Before');
+  viewerPairInfo.textContent = `Pair ${n} of ${TOTAL}`;
+
+  btnViewerPrev.style.opacity = idx === 0 ? '0.3' : '1';
+  btnViewerNext.style.opacity = idx === TOTAL - 1 ? '0.3' : '1';
+
+  applyViewerSplit(splitPct);
+}
+
+function applyViewerSplit(pct) {
+  const clamped = Math.max(0, Math.min(100, pct));
+  const rightClip = 100 - clamped;
+  viewerBefore.style.clipPath = `inset(0 ${rightClip}% 0 0)`;
+  viewerDivider.style.left = `${clamped}%`;
+}
+
+btnClose.addEventListener('click', () => overlay.classList.remove('open'));
+overlay.addEventListener('click', (e) => {
+  if (e.target === overlay) overlay.classList.remove('open');
+});
+
+btnViewerPrev.addEventListener('click', () => {
+  if (viewerPairIdx > 0) loadViewerPair(--viewerPairIdx);
+});
+btnViewerNext.addEventListener('click', () => {
+  if (viewerPairIdx < TOTAL - 1) loadViewerPair(++viewerPairIdx);
+});
+
+// Viewer drag
+{
+  let isDragging = false, dragStartX = 0;
+
+  viewerStage.addEventListener('pointerdown', (e) => {
+    isDragging = false;
+    dragStartX = e.clientX;
+    viewerStage.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+
+  viewerStage.addEventListener('pointermove', (e) => {
+    if (!viewerStage.hasPointerCapture(e.pointerId)) return;
+    if (Math.abs(e.clientX - dragStartX) > 4) isDragging = true;
+    if (!isDragging) return;
+    const rect = viewerStage.getBoundingClientRect();
+    const pct = ((e.clientX - rect.left) / rect.width) * 100;
+    applyViewerSplit(pct);
+  });
+
+  viewerStage.addEventListener('pointerup', (e) => {
+    if (viewerStage.hasPointerCapture(e.pointerId)) {
+      viewerStage.releasePointerCapture(e.pointerId);
+    }
+    isDragging = false;
+  });
+
+  viewerStage.addEventListener('pointercancel', (e) => {
+    if (viewerStage.hasPointerCapture(e.pointerId)) {
+      viewerStage.releasePointerCapture(e.pointerId);
+    }
+    isDragging = false;
+  });
+}
+
+// Keyboard nav
+document.addEventListener('keydown', (e) => {
+  if (!overlay.classList.contains('open')) return;
+  if (e.key === 'Escape') overlay.classList.remove('open');
+  if (e.key === 'ArrowLeft' && viewerPairIdx > 0) loadViewerPair(--viewerPairIdx);
+  if (e.key === 'ArrowRight' && viewerPairIdx < TOTAL - 1) loadViewerPair(++viewerPairIdx);
+});
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+renderGroup(1, true);
+
+// Re-render on significant resize (breakpoint crossing)
+let lastCount = panelCount();
+window.addEventListener('resize', () => {
+  const newCount = panelCount();
+  if (newCount !== lastCount) {
+    lastCount = newCount;
+    renderGroup(currentGroup + 1, false);
+  }
+});
+</script>
+</body>
+</html>
