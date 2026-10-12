@@ -14,10 +14,13 @@
   --accent:#e8d5b0;
   --f-display:'Inter Tight',sans-serif;--f-body:'Inter',sans-serif;--f-mono:'DM Mono',monospace;
   --ease-out:cubic-bezier(.23,1,.32,1);
+  --cdn:https://pub-88341f47988743aba3154d2af5c6327e.r2.dev;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);-webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden}
+
+/* ─── SECTION HEADER ─── */
 .section-header{
   padding:clamp(4rem,8vw,8rem) clamp(2rem,5vw,6rem) 3rem;
   display:flex;align-items:flex-end;justify-content:space-between;
@@ -36,34 +39,82 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);-webkit-fon
   font-family:var(--f-mono);font-size:.7rem;letter-spacing:.18em;
   text-transform:uppercase;color:var(--ink-mute);text-align:right;
 }
-.ba-grid{padding:0 clamp(1.5rem,4vw,5rem) clamp(4rem,8vw,8rem);}
-.row-cinema{margin-top:5rem;}
-.row-asym{display:grid;grid-template-columns:3fr 2fr;gap:1.2rem;margin-top:5rem;}
-.row-asym-r{display:grid;grid-template-columns:2fr 3fr;gap:1.2rem;margin-top:5rem;}
-.row-asym .small-stack,.row-asym-r .small-stack{display:grid;grid-template-rows:1fr 1fr;gap:1.2rem;}
-.row-pair{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-top:5rem;}
-.row-trio{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.2rem;margin-top:5rem;}
-.row-editorial{display:grid;grid-template-columns:5fr 2fr;gap:2rem;align-items:center;margin-top:5rem;}
+
+/* ─── LAYOUT GRID ─── */
+.ba-grid{
+  padding:0 clamp(1.5rem,4vw,5rem) clamp(4rem,8vw,8rem);
+}
+
+/* ─── ROW TYPES ─── */
+/* CINEMATIC ROW: one full-width panel */
+.row-cinema{
+  margin-top:5rem;
+}
+/* ASYMMETRIC ROW: large 3/5 + stacked small 2/5 */
+.row-asym{
+  display:grid;
+  grid-template-columns:3fr 2fr;
+  gap:1.2rem;
+  margin-top:5rem;
+}
+.row-asym-r{
+  display:grid;
+  grid-template-columns:2fr 3fr;
+  gap:1.2rem;
+  margin-top:5rem;
+}
+.row-asym .small-stack,
+.row-asym-r .small-stack{
+  display:grid;grid-template-rows:1fr 1fr;gap:1.2rem;
+}
+/* PAIR ROW: two equal medium panels */
+.row-pair{
+  display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;
+  margin-top:5rem;
+}
+/* TRIO ROW: three equal panels */
+.row-trio{
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.2rem;
+  margin-top:5rem;
+}
+/* EDITORIAL ROW: one wide + one narrow with text pull */
+.row-editorial{
+  display:grid;grid-template-columns:5fr 2fr;gap:2rem;
+  align-items:center;margin-top:5rem;
+}
+
+/* ─── COMPARISON CARD ─── */
 .ba-card{
   position:relative;overflow:hidden;background:var(--bg-1);
-  cursor:ew-resize;border:1px solid var(--ink-ghost);
+  cursor:ew-resize;
+  border:1px solid var(--ink-ghost);
   transition:border-color .4s var(--ease-out);
 }
 .ba-card:hover{border-color:var(--ink-mute)}
+
+/* Aspect ratio helpers */
 .ba-card[data-size="cinema"]{aspect-ratio:21/9}
 .ba-card[data-size="large"]{aspect-ratio:4/3}
 .ba-card[data-size="medium"]{aspect-ratio:3/2}
+.ba-card[data-size="small"]{aspect-ratio:3/2}
+.ba-card[data-size="tall"]{aspect-ratio:9/16}
+
+/* Images */
 .ba-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
 .ba-after{clip-path:inset(0 50% 0 0);transition:none}
+
+/* Divider */
 .ba-divider{
   position:absolute;top:0;bottom:0;left:50%;width:1px;
   background:var(--accent);transform:translateX(-50%);pointer-events:none;
+  transition:opacity .3s;
 }
 .ba-divider::before{
   content:'';position:absolute;top:50%;left:50%;
   width:2.4rem;height:2.4rem;border-radius:50%;
   background:var(--accent);border:1px solid rgba(0,0,0,.3);
   transform:translate(-50%,-50%);
+  display:flex;align-items:center;justify-content:center;
 }
 .ba-divider::after{
   content:'◂ ▸';position:absolute;top:50%;left:50%;
@@ -71,6 +122,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);-webkit-fon
   font-size:.55rem;color:var(--bg);letter-spacing:.1em;
   pointer-events:none;
 }
+
+/* Card label */
 .ba-label{
   position:absolute;bottom:1rem;left:1rem;
   font-family:var(--f-mono);font-size:.62rem;letter-spacing:.22em;
@@ -83,6 +136,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);-webkit-fon
   font-family:var(--f-mono);font-size:.62rem;letter-spacing:.14em;
   color:var(--accent);opacity:.7;pointer-events:none;
 }
+
+/* Expand button */
 .ba-expand{
   position:absolute;bottom:1rem;right:1rem;
   width:2rem;height:2rem;border-radius:50%;
@@ -93,10 +148,15 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);-webkit-fon
   pointer-events:all;
 }
 .ba-expand:hover{background:var(--accent);border-color:var(--accent);color:var(--bg)}
-.ba-pull{padding:1rem;}
+
+/* ─── EDITORIAL PULL TEXT ─── */
+.ba-pull{
+  padding:1rem;
+}
 .pull-num{
   font-family:var(--f-mono);font-size:4rem;font-weight:300;
-  color:var(--ink-ghost);letter-spacing:-.04em;line-height:1;margin-bottom:1.5rem;
+  color:var(--ink-ghost);letter-spacing:-.04em;line-height:1;
+  margin-bottom:1.5rem;
 }
 .pull-text{
   font-family:var(--f-display);font-weight:200;
@@ -104,8 +164,15 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);-webkit-fon
   color:var(--ink-dim);letter-spacing:-.01em;
 }
 .pull-accent{color:var(--accent)}
-.reveal{opacity:0;transform:translateY(2.5rem);transition:opacity .9s var(--ease-out),transform .9s var(--ease-out)}
+
+/* ─── REVEAL ANIMATION ─── */
+.reveal{
+  opacity:0;transform:translateY(2.5rem);
+  transition:opacity .9s var(--ease-out), transform .9s var(--ease-out);
+}
 .reveal.visible{opacity:1;transform:none}
+
+/* ─── LIGHTBOX ─── */
 .lb{
   position:fixed;inset:0;z-index:999;
   background:rgba(6,5,12,.96);backdrop-filter:blur(8px);
@@ -124,6 +191,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);-webkit-fon
   color:var(--ink);font-size:1rem;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
 }
+
+/* ─── SECTION NOTE ─── */
 .preview-note{
   font-family:var(--f-mono);font-size:.65rem;letter-spacing:.12em;
   color:var(--ink-mute);text-align:center;padding:2rem;
@@ -132,6 +201,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);-webkit-fon
 </style>
 </head>
 <body>
+
 <section>
   <div class="section-header reveal">
     <div>
@@ -140,7 +210,10 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);-webkit-fon
     </div>
     <div class="section-meta">14 comparisons<br>Drag to reveal</div>
   </div>
+
   <div class="ba-grid">
+
+    <!-- CINEMA ROW: #01 full width cinematic panorama -->
     <div class="row-cinema reveal">
       <div class="ba-card" data-size="cinema" data-n="1">
         <img class="ba-img ba-before" src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/Before%20and%20After/Before%201.webp" alt="Before 01">
@@ -151,6 +224,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);-webkit-fon
         <button class="ba-expand" aria-label="Expand">⤢</button>
       </div>
     </div>
+
+    <!-- ASYM ROW: #02 large + #03 + #04 stacked -->
     <div class="row-asym reveal" style="transition-delay:.1s">
       <div class="ba-card" data-size="large" data-n="2">
         <img class="ba-img ba-before" src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/Before%20and%20After/Before%202.webp" alt="Before 02">
@@ -176,6 +251,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);-webkit-fon
         </div>
       </div>
     </div>
+
+    <!-- EDITORIAL ROW: #05 wide + pull quote -->
     <div class="row-editorial reveal" style="transition-delay:.05s">
       <div class="ba-card" data-size="large" data-n="5">
         <img class="ba-img ba-before" src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/Before%20and%20After/Before%205.webp" alt="Before 05">
@@ -189,6 +266,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);-webkit-fon
         <p class="pull-text">Every frame begins as raw render data.<br><span class="pull-accent">Colour, light, and atmosphere</span> are built in post — not in the engine.</p>
       </div>
     </div>
+
+    <!-- PAIR ROW: #06 + #07 equal -->
     <div class="row-pair reveal" style="transition-delay:.1s">
       <div class="ba-card" data-size="medium" data-n="6">
         <img class="ba-img ba-before" src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/Before%20and%20After/Before%206.webp" alt="Before 06">
@@ -205,6 +284,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);-webkit-fon
         <button class="ba-expand" aria-label="Expand">⤢</button>
       </div>
     </div>
+
+    <!-- ASYM REVERSE ROW: #08 + #09 stacked + #10 large -->
     <div class="row-asym-r reveal" style="transition-delay:.08s">
       <div class="small-stack">
         <div class="ba-card" data-size="medium" data-n="8">
@@ -230,6 +311,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);-webkit-fon
         <button class="ba-expand" aria-label="Expand">⤢</button>
       </div>
     </div>
+
+    <!-- TRIO ROW: #11 + #12 + #13 -->
     <div class="row-trio reveal" style="transition-delay:.12s">
       <div class="ba-card" data-size="medium" data-n="11">
         <img class="ba-img ba-before" src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/Before%20and%20After/Before%2011.webp" alt="Before 11">
@@ -240,7 +323,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);-webkit-fon
       </div>
       <div class="ba-card" data-size="medium" data-n="12">
         <img class="ba-img ba-before" src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/Before%20and%20After/Before%2012.webp" alt="Before 12">
-        <img class="ba-img ba-after" src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/Before%20and%20After/After%2012.webp" alt="After 13">
+        <img class="ba-img ba-after" src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/Before%20and%20After/After%2012.webp" alt="After 12">
         <div class="ba-divider"></div>
         <div class="ba-num">12</div>
         <button class="ba-expand" aria-label="Expand">⤢</button>
@@ -253,6 +336,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);-webkit-fon
         <button class="ba-expand" aria-label="Expand">⤢</button>
       </div>
     </div>
+
+    <!-- CINEMA CLOSE: #14 full width -->
     <div class="row-cinema reveal" style="transition-delay:.06s">
       <div class="ba-card" data-size="cinema" data-n="14">
         <img class="ba-img ba-before" src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/Before%20and%20After/Before%2014.webp" alt="Before 14">
@@ -263,8 +348,11 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);-webkit-fon
         <button class="ba-expand" aria-label="Expand">⤢</button>
       </div>
     </div>
-  </div>
+
+  </div><!-- /ba-grid -->
 </section>
+
+<!-- LIGHTBOX -->
 <div class="lb" id="lb" role="dialog" aria-modal="true">
   <div class="lb-inner" id="lb-inner">
     <img class="ba-img ba-before" id="lb-before" src="" alt="">
@@ -273,55 +361,88 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);-webkit-fon
   </div>
   <button class="lb-close" id="lb-close" aria-label="Close">✕</button>
 </div>
+
 <div class="preview-note">DESIGN PREVIEW A2 MODIFIED — Studio Wall · Alternating Rhythm · 14 comparisons · Fully functional drag · Expand to lightbox</div>
+
 <script>
 const CDN='https://pub-88341f47988743aba3154d2af5c6327e.r2.dev';
+
+/* ─── DRAG INTERACTION ─── */
 function initCard(card){
+  const before=card.querySelector('.ba-before');
   const after=card.querySelector('.ba-after');
   const div=card.querySelector('.ba-divider');
   let dragging=false;
+
   function setPos(pct){
     pct=Math.max(2,Math.min(98,pct));
     after.style.clipPath=`inset(0 ${100-pct}% 0 0)`;
     div.style.left=pct+'%';
   }
+
   function getPct(e){
     const r=card.getBoundingClientRect();
-    return ((e.clientX)-r.left)/r.width*100;
+    const x=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
+    return (x/r.width)*100;
   }
+
   card.addEventListener('pointerdown',e=>{
     if(e.target.classList.contains('ba-expand'))return;
-    dragging=true;card.setPointerCapture(e.pointerId);setPos(getPct(e));
+    dragging=true;
+    card.setPointerCapture(e.pointerId);
+    setPos(getPct(e));
   });
-  card.addEventListener('pointermove',e=>{if(dragging)setPos(getPct(e));});
+  card.addEventListener('pointermove',e=>{
+    if(!dragging)return;
+    setPos(getPct(e));
+  });
   card.addEventListener('pointerup',()=>dragging=false);
   card.addEventListener('pointercancel',()=>dragging=false);
 }
+
 document.querySelectorAll('.ba-card').forEach(initCard);
+
+/* ─── LIGHTBOX ─── */
 const lb=document.getElementById('lb');
 const lbInner=document.getElementById('lb-inner');
 const lbBefore=document.getElementById('lb-before');
 const lbAfter=document.getElementById('lb-after');
 const lbDiv=document.getElementById('lb-div');
 let lbDrag=false;
+
 document.querySelectorAll('.ba-expand').forEach(btn=>{
   btn.addEventListener('click',e=>{
     e.stopPropagation();
-    const card=btn.closest('.ba-card');const n=card.dataset.n;
+    const card=btn.closest('.ba-card');
+    const n=card.dataset.n;
     lbBefore.src=`${CDN}/gallery/Before%20and%20After/Before%20${n}.webp`;
     lbAfter.src=`${CDN}/gallery/Before%20and%20After/After%20${n}.webp`;
-    lbAfter.style.clipPath='inset(0 50% 0 0)';lbDiv.style.left='50%';
+    lbAfter.style.clipPath='inset(0 50% 0 0)';
+    lbDiv.style.left='50%';
     lb.classList.add('open');
   });
 });
-function lbSetPos(pct){pct=Math.max(2,Math.min(98,pct));lbAfter.style.clipPath=`inset(0 ${100-pct}% 0 0)`;lbDiv.style.left=pct+'%';}
-lbInner.addEventListener('pointerdown',e=>{lbDrag=true;lbInner.setPointerCapture(e.pointerId);lbSetPos(((e.clientX)-lbInner.getBoundingClientRect().left)/lbInner.getBoundingClientRect().width*100);});
-lbInner.addEventListener('pointermove',e=>{if(lbDrag)lbSetPos(((e.clientX)-lbInner.getBoundingClientRect().left)/lbInner.getBoundingClientRect().width*100);});
+
+function lbSetPos(pct){
+  pct=Math.max(2,Math.min(98,pct));
+  lbAfter.style.clipPath=`inset(0 ${100-pct}% 0 0)`;
+  lbDiv.style.left=pct+'%';
+}
+function lbGetPct(e){
+  const r=lbInner.getBoundingClientRect();
+  return ((e.clientX-r.left)/r.width)*100;
+}
+lbInner.addEventListener('pointerdown',e=>{lbDrag=true;lbInner.setPointerCapture(e.pointerId);lbSetPos(lbGetPct(e))});
+lbInner.addEventListener('pointermove',e=>{if(lbDrag)lbSetPos(lbGetPct(e))});
 lbInner.addEventListener('pointerup',()=>lbDrag=false);
 document.getElementById('lb-close').addEventListener('click',()=>lb.classList.remove('open'));
-lb.addEventListener('click',e=>{if(e.target===lb)lb.classList.remove('open');});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')lb.classList.remove('open');});
-const io=new IntersectionObserver(entries=>{entries.forEach(en=>{if(en.isIntersecting)en.target.classList.add('visible');});},{threshold:.12});
+lb.addEventListener('click',e=>{if(e.target===lb)lb.classList.remove('open')});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')lb.classList.remove('open')});
+
+/* ─── REVEAL ON SCROLL ─── */
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(en=>{if(en.isIntersecting)en.target.classList.add('visible')});
+},{threshold:.12});
 document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 </script>
 </body>

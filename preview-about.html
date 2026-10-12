@@ -17,20 +17,35 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+/* ══════════════════════════════════════
+   SECTION 1 — IDENTITY STATEMENT
+   Full-height, the name IS the design
+══════════════════════════════════════ */
 .identity-block{
   min-height:100vh;display:flex;flex-direction:column;
   padding:clamp(4rem,8vw,8rem) clamp(2rem,6vw,7rem);
   position:relative;overflow:hidden;
 }
+
+/* Large rotated "J" initial — atmospheric, not decorative */
 .bg-initial{
   position:absolute;right:-0.05em;top:50%;transform:translateY(-50%);
   font-family:var(--f-display);font-weight:200;
   font-size:clamp(20rem,40vw,50rem);line-height:1;letter-spacing:-.05em;
-  color:transparent;-webkit-text-stroke:1px rgba(232,213,176,.07);
+  color:transparent;
+  -webkit-text-stroke:1px rgba(232,213,176,.07);
   pointer-events:none;user-select:none;
 }
-.id-eyebrow{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.32em;text-transform:uppercase;color:var(--accent);margin-bottom:auto;}
+
+.id-eyebrow{
+  font-family:var(--f-mono);font-size:.7rem;letter-spacing:.32em;
+  text-transform:uppercase;color:var(--accent);
+  margin-bottom:auto;
+}
 .id-name-block{margin:auto 0}
+
+/* The name — large, editorial, stacked */
 .id-first{
   font-family:var(--f-display);font-weight:200;
   font-size:clamp(3rem,9vw,9rem);
@@ -41,9 +56,12 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);-webkit-fon
   font-family:var(--f-display);font-weight:200;
   font-size:clamp(3rem,9vw,9rem);
   letter-spacing:-.04em;line-height:.95;
-  color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.35);
+  color:transparent;
+  -webkit-text-stroke:1px rgba(255,255,255,.35);
   display:block;margin-top:.05em;
 }
+
+/* Tagline flows under the name */
 .id-tagline{
   margin-top:2.5rem;
   font-family:var(--f-display);font-weight:300;font-style:italic;
@@ -52,6 +70,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);-webkit-fon
   color:var(--ink-dim);max-width:32ch;
 }
 .id-tagline em{font-style:normal;color:var(--accent)}
+
+/* Years badge — typographic, not résumé */
 .id-years{
   position:absolute;right:clamp(2rem,6vw,7rem);bottom:clamp(3rem,5vw,5rem);
   text-align:right;
@@ -61,14 +81,31 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);-webkit-fon
   font-size:clamp(4rem,8vw,8rem);
   letter-spacing:-.05em;line-height:1;color:var(--accent);opacity:.7;
 }
-.id-years-label{font-family:var(--f-mono);font-size:.65rem;letter-spacing:.28em;text-transform:uppercase;color:var(--ink-mute);margin-top:.3rem;}
-.manifesto-block{padding:clamp(5rem,10vw,10rem) clamp(2rem,6vw,7rem);border-top:1px solid var(--ink-ghost);}
+.id-years-label{
+  font-family:var(--f-mono);font-size:.65rem;letter-spacing:.28em;
+  text-transform:uppercase;color:var(--ink-mute);margin-top:.3rem;
+}
+
+/* ══════════════════════════════════════
+   SECTION 2 — DISCIPLINES AS MANIFESTO
+   Not a list. A declaration.
+══════════════════════════════════════ */
+.manifesto-block{
+  padding:clamp(5rem,10vw,10rem) clamp(2rem,6vw,7rem);
+  border-top:1px solid var(--ink-ghost);
+}
+
 .manifesto-line{
   display:flex;align-items:baseline;
-  padding:1.2rem 0;border-bottom:1px solid var(--ink-ghost);overflow:hidden;
+  padding:1.2rem 0;border-bottom:1px solid var(--ink-ghost);
+  overflow:hidden;
 }
 .manifesto-line:first-child{border-top:1px solid var(--ink-ghost)}
-.mf-index{font-family:var(--f-mono);font-size:.65rem;letter-spacing:.14em;color:var(--ink-mute);min-width:4ch;flex-shrink:0;}
+
+.mf-index{
+  font-family:var(--f-mono);font-size:.65rem;letter-spacing:.14em;
+  color:var(--ink-mute);min-width:4ch;flex-shrink:0;
+}
 .mf-discipline{
   font-family:var(--f-display);font-weight:200;
   font-size:clamp(1.6rem,3.5vw,3.2rem);
@@ -76,49 +113,132 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);-webkit-fon
   flex:1;padding:0 2rem;
   transition:color .25s var(--ease-out);
 }
-.manifesto-line:hover .mf-discipline{color:var(--accent)}
-.mf-tools{font-family:var(--f-mono);font-size:.65rem;letter-spacing:.1em;color:var(--ink-mute);text-align:right;flex-shrink:0;max-width:18ch;line-height:1.6;}
-.software-block{padding:clamp(4rem,8vw,8rem) clamp(2rem,6vw,7rem);border-top:1px solid var(--ink-ghost);}
-.sw-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:3rem;}
-.sw-label{font-family:var(--f-mono);font-size:.65rem;letter-spacing:.32em;text-transform:uppercase;color:var(--accent);}
-.sw-count{font-family:var(--f-mono);font-size:.65rem;letter-spacing:.1em;color:var(--ink-mute);}
-.sw-field{display:flex;flex-wrap:wrap;align-items:baseline;gap:1.5rem 2.5rem;}
-.sw-item{font-family:var(--f-display);font-weight:200;letter-spacing:-.02em;line-height:1;transition:color .2s;cursor:default;}
+.mf-discipline:hover,.manifesto-line:hover .mf-discipline{color:var(--accent)}
+.mf-tools{
+  font-family:var(--f-mono);font-size:.65rem;letter-spacing:.1em;
+  color:var(--ink-mute);text-align:right;flex-shrink:0;
+  max-width:18ch;line-height:1.6;
+}
+
+/* ══════════════════════════════════════
+   SECTION 3 — SOFTWARE AS VISUAL FIELD
+   Not a table. A constellation.
+══════════════════════════════════════ */
+.software-block{
+  padding:clamp(4rem,8vw,8rem) clamp(2rem,6vw,7rem);
+  border-top:1px solid var(--ink-ghost);
+  position:relative;overflow:hidden;
+}
+
+.sw-header{
+  display:flex;align-items:baseline;justify-content:space-between;
+  margin-bottom:3rem;
+}
+.sw-label{
+  font-family:var(--f-mono);font-size:.65rem;letter-spacing:.32em;
+  text-transform:uppercase;color:var(--accent);
+}
+.sw-count{
+  font-family:var(--f-mono);font-size:.65rem;letter-spacing:.1em;
+  color:var(--ink-mute);
+}
+
+/* Software constellation — size encodes proficiency, not alphabetical grid */
+.sw-field{
+  display:flex;flex-wrap:wrap;align-items:baseline;gap:1.5rem 2.5rem;
+}
+.sw-item{
+  font-family:var(--f-display);font-weight:200;
+  letter-spacing:-.02em;line-height:1;
+  transition:color .2s;cursor:default;
+}
 .sw-item:hover{color:var(--accent)}
+
+/* Proficiency tiers = font size */
 .sw-item[data-tier="1"]{font-size:clamp(1.6rem,3vw,2.8rem);color:var(--ink)}
 .sw-item[data-tier="2"]{font-size:clamp(1.1rem,2vw,1.8rem);color:var(--ink-dim)}
 .sw-item[data-tier="3"]{font-size:clamp(.85rem,1.3vw,1.2rem);color:var(--ink-mute)}
+
+/* Profession tag */
+.sw-item::after{
+  content:attr(data-cat);
+  display:none;
+}
+
+/* ══════════════════════════════════════
+   SECTION 4 — RECOGNITION / CONTACT
+   Minimal. Confident. Not a résumé.
+══════════════════════════════════════ */
 .contact-block{
   padding:clamp(4rem,8vw,8rem) clamp(2rem,6vw,7rem);
   border-top:1px solid var(--ink-ghost);
-  display:flex;align-items:flex-end;justify-content:space-between;gap:4rem;
+  display:flex;align-items:flex-end;justify-content:space-between;
+  gap:4rem;
 }
-.contact-eyebrow{font-family:var(--f-mono);font-size:.65rem;letter-spacing:.32em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:1.5rem;}
-.contact-cta{font-family:var(--f-display);font-weight:200;font-size:clamp(1.6rem,3vw,2.8rem);letter-spacing:-.03em;line-height:1.1;color:var(--ink);margin-bottom:2rem;}
-.contact-email{font-family:var(--f-mono);font-size:.8rem;letter-spacing:.08em;color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(232,213,176,.25);padding-bottom:.2rem;transition:border-color .2s;}
+.contact-left{}
+.contact-eyebrow{
+  font-family:var(--f-mono);font-size:.65rem;letter-spacing:.32em;
+  text-transform:uppercase;color:var(--ink-mute);margin-bottom:1.5rem;
+}
+.contact-cta{
+  font-family:var(--f-display);font-weight:200;
+  font-size:clamp(1.6rem,3vw,2.8rem);letter-spacing:-.03em;
+  line-height:1.1;color:var(--ink);margin-bottom:2rem;
+}
+.contact-email{
+  font-family:var(--f-mono);font-size:.8rem;letter-spacing:.08em;
+  color:var(--accent);text-decoration:none;
+  border-bottom:1px solid rgba(232,213,176,.25);
+  padding-bottom:.2rem;
+  transition:border-color .2s;
+}
 .contact-email:hover{border-color:var(--accent)}
+
 .contact-right{text-align:right}
-.studios-label{font-family:var(--f-mono);font-size:.6rem;letter-spacing:.28em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:1rem;}
-.studios-name{font-family:var(--f-display);font-weight:200;font-size:clamp(1.2rem,2vw,1.8rem);letter-spacing:-.02em;color:var(--ink-dim);}
+.studios-label{
+  font-family:var(--f-mono);font-size:.6rem;letter-spacing:.28em;
+  text-transform:uppercase;color:var(--ink-mute);margin-bottom:1rem;
+}
+.studios-name{
+  font-family:var(--f-display);font-weight:200;
+  font-size:clamp(1.2rem,2vw,1.8rem);letter-spacing:-.02em;
+  color:var(--ink-dim);
+}
+
+/* ─── REVEAL ─── */
 .reveal{opacity:0;transform:translateY(2rem);transition:opacity .9s var(--ease-out),transform .9s var(--ease-out)}
 .reveal.visible{opacity:1;transform:none}
-.preview-note{font-family:var(--f-mono);font-size:.65rem;letter-spacing:.12em;color:var(--ink-mute);text-align:center;padding:2rem;border-top:1px solid var(--ink-ghost);}
+
+/* Preview note */
+.preview-note{
+  font-family:var(--f-mono);font-size:.65rem;letter-spacing:.12em;
+  color:var(--ink-mute);text-align:center;padding:2rem;
+  border-top:1px solid var(--ink-ghost);
+}
 </style>
 </head>
 <body>
+
+<!-- SECTION 1: IDENTITY STATEMENT -->
 <section class="identity-block reveal">
   <div class="bg-initial" aria-hidden="true">J</div>
   <div class="id-eyebrow">Design Preview — C2 Modified</div>
   <div class="id-name-block">
     <span class="id-first">Jatin</span>
     <span class="id-last">Shinde</span>
-    <p class="id-tagline">I don't make content.<br>I build <em>worlds</em> — environments, characters,<br>and the light between them.</p>
+    <p class="id-tagline">
+      I don't make content.<br>
+      I build <em>worlds</em> — environments, characters,<br>
+      and the light between them.
+    </p>
   </div>
   <div class="id-years">
     <div class="id-years-num">7+</div>
     <div class="id-years-label">Years of practice</div>
   </div>
 </section>
+
+<!-- SECTION 2: DISCIPLINES AS MANIFESTO -->
 <section class="manifesto-block">
   <div class="manifesto-line reveal" style="transition-delay:.05s">
     <span class="mf-index">01</span>
@@ -151,17 +271,25 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);-webkit-fon
     <span class="mf-tools">Art Direction<br>Creative Strategy</span>
   </div>
 </section>
+
+<!-- SECTION 3: SOFTWARE CONSTELLATION -->
 <section class="software-block">
-  <div class="sw-header reveal"><span class="sw-label">Software</span><span class="sw-count">13 tools</span></div>
+  <div class="sw-header reveal">
+    <span class="sw-label">Software</span>
+    <span class="sw-count">13 tools</span>
+  </div>
   <div class="sw-field reveal" style="transition-delay:.06s">
+    <!-- Tier 1: primary daily tools -->
     <span class="sw-item" data-tier="1">Unreal Engine 5</span>
     <span class="sw-item" data-tier="1">Blender</span>
     <span class="sw-item" data-tier="1">After Effects</span>
+    <!-- Tier 2: regular tools -->
     <span class="sw-item" data-tier="2">Substance 3D Painter</span>
     <span class="sw-item" data-tier="2">Character Creator 4</span>
     <span class="sw-item" data-tier="2">DaVinci Resolve</span>
     <span class="sw-item" data-tier="2">Premiere Pro</span>
     <span class="sw-item" data-tier="2">Marvelous Designer</span>
+    <!-- Tier 3: supporting tools -->
     <span class="sw-item" data-tier="3">Photoshop</span>
     <span class="sw-item" data-tier="3">Illustrator</span>
     <span class="sw-item" data-tier="3">Lightroom</span>
@@ -169,6 +297,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);-webkit-fon
     <span class="sw-item" data-tier="3">Corel Draw</span>
   </div>
 </section>
+
+<!-- SECTION 4: CONTACT -->
 <section class="contact-block reveal">
   <div class="contact-left">
     <div class="contact-eyebrow">Let's work</div>
@@ -180,9 +310,13 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);-webkit-fon
     <div class="studios-name">Imaginators Studio</div>
   </div>
 </section>
-<div class="preview-note">DESIGN PREVIEW C2 MODIFIED — Creative Identity · Name as graphic element · Manifesto disciplines · Software constellation (size = proficiency)</div>
+
+<div class="preview-note">DESIGN PREVIEW C2 MODIFIED — Creative Identity · Name as graphic element · Manifesto disciplines · Software constellation (size = proficiency) · Contact</div>
+
 <script>
-const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:.1});
+const io=new IntersectionObserver(es=>{
+  es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')});
+},{threshold:.1});
 document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 </script>
 </body>
