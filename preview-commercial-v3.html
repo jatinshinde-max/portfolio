@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commercial CGI — Design Preview v3 · The Parallax Stage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,200;0,300;1,200;1,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #06050c;
+  --bg-1:     #0b0a14;
+  --bg-2:     #100f1c;
+  --ink:      rgba(255,255,255,.92);
+  --ink-dim:  rgba(255,255,255,.45);
+  --ink-mute: rgba(255,255,255,.20);
+  --ink-ghost:rgba(255,255,255,.06);
+  --accent:   #e8d5b0;
+  --f-display:'Inter Tight',sans-serif;
+  --f-mono:   'DM Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{background:var(--bg);color:var(--ink);font-family:var(--f-display);scroll-behavior:smooth;}
+body{min-height:100vh;overflow-x:hidden;}
+::selection{background:var(--accent);color:#06050c;}
+
+/* ── PAGE HEADER ── */
+.page-header {
+  padding: 48px 64px 20px;
+  border-bottom: 1px solid var(--ink-ghost);
+  display: flex; justify-content: space-between; align-items: flex-end;
+  position: sticky; top: 0; z-index: 200;
+  background: var(--bg);
+}
+.page-label { font-family:var(--f-mono); font-size:9px; letter-spacing:.4em; text-transform:uppercase; color:var(--ink-dim); }
+.page-note  { font-family:var(--f-mono); font-size:9px; color:var(--ink-mute); letter-spacing:.15em; }
+
+/* ── STAGE INTRO ── */
+.stage-intro {
+  min-height: 40vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 64px 48px;
+}
+.stage-count {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .4em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin-bottom: 16px;
+}
+.stage-title {
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-size: clamp(28px, 4vw, 52px);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--ink);
+  max-width: 600px;
+}
+
+/* ── PARALLAX STAGE ── */
+.parallax-stage {
+  padding: 40px 0 120px;
+  overflow: hidden;
+}
+
+.depth-row {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 0 32px;
+  margin-bottom: 0;
+  will-change: transform;
+}
+
+/* Row 1 — foreground, 3 films */
+.depth-row-1 {
+  margin-bottom: 12px;
+  z-index: 3;
+  position: relative;
+}
+.depth-row-1 .film-card {
+  height: 54vh;
+  width: calc(54vh * 9 / 16);
+  min-width: 140px;
+  max-width: 300px;
+}
+
+/* Row 2 — midground, 4 films */
+.depth-row-2 {
+  margin-bottom: 12px;
+  z-index: 2;
+  position: relative;
+}
+.depth-row-2 .film-card {
+  height: 44vh;
+  width: calc(44vh * 9 / 16);
+  min-width: 110px;
+  max-width: 240px;
+}
+
+/* Row 3 — background, 4 films */
+.depth-row-3 {
+  z-index: 1;
+  position: relative;
+}
+.depth-row-3 .film-card {
+  height: 36vh;
+  width: calc(36vh * 9 / 16);
+  min-width: 90px;
+  max-width: 200px;
+}
+
+/* ── FILM CARD ── */
+.film-card {
+  position: relative;
+  flex-shrink: 0;
+  cursor: pointer;
+  overflow: hidden;
+  border: 1px solid var(--ink-ghost);
+  background: var(--bg-2);
+  transition: border-color 0.3s;
+}
+.film-card:hover {
+  border-color: var(--accent);
+}
+.film-card video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  background: #000;
+}
+.film-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 24px 10px 10px;
+  background: linear-gradient(to top, rgba(6,5,12,.85) 0%, transparent 100%);
+  font-family: var(--f-mono);
+  font-size: 8px;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.film-card:hover .film-label {
+  opacity: 1;
+}
+.film-play-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px; height: 40px;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.film-play-hint svg { width: 14px; height: 14px; fill: var(--ink); margin-left: 2px; }
+.film-card:hover .film-play-hint {
+  opacity: 1;
+}
+
+/* ── VIEWER OVERLAY ── */
+.viewer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(6,5,12,.95);
+  z-index: 500;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.viewer-overlay.open {
+  display: flex;
+}
+
+.viewer-inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-height: 90vh;
+  max-width: calc(90vh * 9 / 16);
+  width: 100%;
+}
+
+.viewer-video-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+  background: #000;
+  border: 1px solid var(--ink-ghost);
+}
+.viewer-video-wrap video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.viewer-sound-prompt {
+  position: absolute;
+  inset: 0;
+  background: rgba(6,5,12,.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  z-index: 10;
+}
+.viewer-sound-prompt.hidden { display: none; }
+.sound-prompt-text {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+.sound-prompt-btn {
+  padding: 10px 28px;
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.sound-prompt-btn:hover { background: rgba(232,213,176,.08); }
+
+.viewer-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0 0;
+  width: 100%;
+}
+.ctrl-btn {
+  width: 36px; height: 36px;
+  border: 1px solid var(--ink-ghost);
+  background: transparent;
+  color: var(--ink-dim);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+  flex-shrink: 0;
+}
+.ctrl-btn:hover { border-color: var(--ink-dim); color: var(--ink); }
+.ctrl-btn svg { width: 14px; height: 14px; fill: currentColor; }
+
+.seek-bar {
+  flex: 1;
+  height: 1px;
+  background: var(--ink-ghost);
+  position: relative;
+  cursor: pointer;
+}
+.seek-progress {
+  height: 100%;
+  background: var(--accent);
+  width: 0%;
+  pointer-events: none;
+}
+.seek-bar:hover .seek-progress { background: var(--ink); }
+
+.volume-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.volume-slider {
+  -webkit-appearance: none;
+  width: 60px;
+  height: 1px;
+  background: var(--ink-ghost);
+  outline: none;
+}
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 10px; height: 10px;
+  background: var(--accent);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.viewer-title {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .35em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  padding-top: 12px;
+  width: 100%;
+}
+
+.viewer-close {
+  position: absolute;
+  top: -48px;
+  right: 0;
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px 0;
+}
+.viewer-close:hover { color: var(--ink); }
+
+/* ── RESPONSIVE ── */
+@media(max-width: 900px) {
+  .page-header { padding: 32px 24px 16px; }
+  .stage-intro { padding: 0 24px 40px; }
+  .depth-row { gap: 8px; padding: 0 12px; }
+  .depth-row-1 .film-card { height: 40vh; width: calc(40vh * 9/16); }
+  .depth-row-2 .film-card { height: 32vh; width: calc(32vh * 9/16); }
+  .depth-row-3 .film-card { height: 26vh; width: calc(26vh * 9/16); }
+}
+@media(max-width: 600px) {
+  .depth-row { gap: 6px; padding: 0 8px; }
+  .depth-row-1 .film-card { height: 36vh; width: calc(36vh * 9/16); min-width: 72px; }
+  .depth-row-2 .film-card { height: 28vh; width: calc(28vh * 9/16); min-width: 56px; }
+  .depth-row-3 .film-card { height: 22vh; width: calc(22vh * 9/16); min-width: 44px; }
+  .viewer-inner { max-width: 95vw; max-height: 80vh; }
+  .volume-wrap { display: none; }
+}
+
+/* ── REDUCED MOTION ── */
+@media(prefers-reduced-motion: reduce) {
+  .depth-row { will-change: auto; }
+}
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <span class="page-label">Design Preview · Commercial CGI — v3</span>
+  <span class="page-note">Development branch · Not production</span>
+</header>
+
+<div class="stage-intro">
+  <div class="stage-count" id="stageCount">11 Films</div>
+  <h1 class="stage-title" id="stageTitle">Commercial &amp; CGI</h1>
+</div>
+
+<div class="parallax-stage" id="parallaxStage">
+
+  <!-- Row 1 — foreground -->
+  <div class="depth-row depth-row-1" id="row1"></div>
+
+  <!-- Row 2 — midground -->
+  <div class="depth-row depth-row-2" id="row2"></div>
+
+  <!-- Row 3 — background -->
+  <div class="depth-row depth-row-3" id="row3"></div>
+
+</div>
+
+<!-- ── VIEWER OVERLAY ── -->
+<div class="viewer-overlay" id="viewerOverlay" role="dialog" aria-modal="true" aria-label="Film viewer">
+  <div class="viewer-inner">
+    <button class="viewer-close" id="viewerClose">Close ✕</button>
+    <div class="viewer-video-wrap">
+      <video id="viewerVideo" playsinline preload="metadata"></video>
+      <div class="viewer-sound-prompt" id="soundPrompt">
+        <span class="sound-prompt-text">Playback blocked by browser</span>
+        <button class="sound-prompt-btn" id="soundPromptBtn">Play with Sound</button>
+      </div>
+    </div>
+    <div class="viewer-controls">
+      <button class="ctrl-btn" id="ctrlPlayPause" aria-label="Play/Pause">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+      <div class="seek-bar" id="seekBar">
+        <div class="seek-progress" id="seekProgress"></div>
+      </div>
+      <div class="volume-wrap">
+        <button class="ctrl-btn" id="ctrlMute" aria-label="Mute/Unmute">
+          <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+        </button>
+        <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.05" value="0.8">
+      </div>
+      <button class="ctrl-btn" id="ctrlFullscreen" aria-label="Fullscreen">
+        <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+      </button>
+    </div>
+    <div class="viewer-title" id="viewerTitle"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+const CDN  = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev';
+const BASE = CDN + '/gallery/ads/web-ready/';
+
+const films = [
+  { file: 'chocolate.mp4',                           title: 'Chocolate' },
+  { file: 'earbuds.mp4',                             title: 'Earbuds' },
+  { file: 'facewash.mp4',                            title: 'Face Wash' },
+  { file: 'pepsi.mp4',                               title: 'Pepsi' },
+  { file: 'serum.mp4',                               title: 'Serum' },
+  { file: 'shoe.mp4',                                title: 'Shoe' },
+  { file: 'smart-watch.mp4',                         title: 'Smart Watch' },
+  { file: '911%20Commercial.mp4',                    title: '911 Commercial' },
+  { file: 'Moisturizer%20and%20Cleanser%20Ad-1.mp4', title: 'Moisturizer & Cleanser' },
+  { file: 'RR%20Ad.mp4',                             title: 'RR Ad' },
+  { file: 'Reelvideo-29689.mp4',                     title: 'Reel' },
+];
+
+// Row assignments: [0-2], [3-6], [7-10]
+const rows = [
+  { el: document.getElementById('row1'), indices: [0, 1, 2] },
+  { el: document.getElementById('row2'), indices: [3, 4, 5, 6] },
+  { el: document.getElementById('row3'), indices: [7, 8, 9, 10] },
+];
+
+const allVideos = [];
+
+// ── Build film cards ──
+rows.forEach(({ el, indices }) => {
+  indices.forEach(i => {
+    const film = films[i];
+
+    const card = document.createElement('div');
+    card.className = 'film-card';
+    card.dataset.index = i;
+
+    const video = document.createElement('video');
+    video.src = BASE + film.file;
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.preload = 'metadata';
+    video.setAttribute('playsinline', '');
+
+    const label = document.createElement('div');
+    label.className = 'film-label';
+    label.textContent = film.title;
+
+    const hint = document.createElement('div');
+    hint.className = 'film-play-hint';
+    hint.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+
+    card.appendChild(video);
+    card.appendChild(label);
+    card.appendChild(hint);
+    el.appendChild(card);
+
+    allVideos.push({ video, card, index: i, film });
+
+    card.addEventListener('click', () => openViewer(i));
+  });
+});
+
+// ── IntersectionObserver: autoplay all visible gallery videos ──
+const ioOptions = { threshold: 0.15 };
+const io = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    const item = allVideos.find(v => v.card === entry.target);
+    if (!item) return;
+    if (entry.isIntersecting) {
+      item.video.play().catch(() => {});
+    } else {
+      item.video.pause();
+    }
+  });
+}, ioOptions);
+
+allVideos.forEach(({ card }) => io.observe(card));
+
+// ── GSAP Parallax (scrub) for depth rows ──
+const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+if (!prefersReduced) {
+  // Row 2 — midground — subtle upward drift
+  gsap.to('#row2', {
+    y: -40,
+    ease: 'none',
+    scrollTrigger: {
+      trigger: '#parallaxStage',
+      start: 'top bottom',
+      end: 'bottom top',
+      scrub: 1.2,
+    }
+  });
+
+  // Row 3 — background — stronger upward drift (recedes)
+  gsap.to('#row3', {
+    y: -80,
+    ease: 'none',
+    scrollTrigger: {
+      trigger: '#parallaxStage',
+      start: 'top bottom',
+      end: 'bottom top',
+      scrub: 1.8,
+    }
+  });
+
+  // Stage intro clip reveal
+  const tlIntro = gsap.timeline({
+    scrollTrigger: { trigger: '.stage-intro', start: 'top 80%', once: true }
+  });
+  tlIntro
+    .from('#stageCount', { opacity: 0, y: 8, duration: 0.5, ease: 'power2.out' })
+    .from('#stageTitle', { opacity: 0, y: 16, duration: 0.7, ease: 'expo.out' }, '-=0.2');
+}
+
+// ── Viewer ──
+const overlay   = document.getElementById('viewerOverlay');
+const vVideo    = document.getElementById('viewerVideo');
+const vTitle    = document.getElementById('viewerTitle');
+const vClose    = document.getElementById('viewerClose');
+const ctrlPP    = document.getElementById('ctrlPlayPause');
+const ctrlMute  = document.getElementById('ctrlMute');
+const volSlider = document.getElementById('volumeSlider');
+const ctrlFS    = document.getElementById('ctrlFullscreen');
+const seekBar   = document.getElementById('seekBar');
+const seekProg  = document.getElementById('seekProgress');
+const sndPrompt = document.getElementById('soundPrompt');
+const sndBtn    = document.getElementById('soundPromptBtn');
+
+let viewerOpen = false;
+
+function openViewer(index) {
+  const { film } = allVideos.find(v => v.index === index);
+  vVideo.src = BASE + film.file;
+  vVideo.muted = false;
+  vVideo.volume = parseFloat(volSlider.value);
+  vTitle.textContent = film.title;
+  overlay.classList.add('open');
+  viewerOpen = true;
+  sndPrompt.classList.add('hidden');
+
+  vVideo.play().then(() => {
+    sndPrompt.classList.add('hidden');
+    updatePlayBtn();
+  }).catch(() => {
+    sndPrompt.classList.remove('hidden');
+  });
+
+  document.body.style.overflow = 'hidden';
+}
+
+function closeViewer() {
+  vVideo.pause();
+  vVideo.src = '';
+  overlay.classList.remove('open');
+  viewerOpen = false;
+  document.body.style.overflow = '';
+}
+
+vClose.addEventListener('click', closeViewer);
+overlay.addEventListener('click', e => { if (e.target === overlay) closeViewer(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && viewerOpen) closeViewer(); });
+
+// Play/Pause
+ctrlPP.addEventListener('click', () => {
+  if (vVideo.paused) { vVideo.play().then(updatePlayBtn).catch(()=>{}); }
+  else { vVideo.pause(); updatePlayBtn(); }
+});
+vVideo.addEventListener('play',  updatePlayBtn);
+vVideo.addEventListener('pause', updatePlayBtn);
+
+function updatePlayBtn() {
+  ctrlPP.innerHTML = vVideo.paused
+    ? '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>'
+    : '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+}
+
+// Volume / Mute
+ctrlMute.addEventListener('click', () => {
+  vVideo.muted = !vVideo.muted;
+  updateMuteBtn();
+});
+volSlider.addEventListener('input', () => {
+  vVideo.volume = parseFloat(volSlider.value);
+  vVideo.muted = parseFloat(volSlider.value) === 0;
+  updateMuteBtn();
+});
+function updateMuteBtn() {
+  ctrlMute.innerHTML = (vVideo.muted || vVideo.volume === 0)
+    ? '<svg viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>'
+    : '<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>';
+}
+
+// Seek
+vVideo.addEventListener('timeupdate', () => {
+  if (!vVideo.duration) return;
+  seekProg.style.width = (vVideo.currentTime / vVideo.duration * 100) + '%';
+});
+seekBar.addEventListener('click', e => {
+  const r = seekBar.getBoundingClientRect();
+  vVideo.currentTime = ((e.clientX - r.left) / r.width) * vVideo.duration;
+});
+
+// Fullscreen
+ctrlFS.addEventListener('click', () => {
+  const wrap = document.querySelector('.viewer-video-wrap');
+  if (document.fullscreenElement) {
+    document.exitFullscreen().catch(()=>{});
+  } else {
+    wrap.requestFullscreen().catch(()=>{});
+  }
+});
+
+// Sound prompt fallback
+sndBtn.addEventListener('click', () => {
+  sndPrompt.classList.add('hidden');
+  vVideo.muted = false;
+  vVideo.play().then(updatePlayBtn).catch(()=>{});
+});
+</script>
+</body>
+</html>

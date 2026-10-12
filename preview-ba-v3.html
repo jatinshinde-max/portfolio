@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Before &amp; After — Design Preview v3 · The Sequence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #06050c;
+  --bg-1:     #0b0a14;
+  --bg-2:     #100f1c;
+  --ink:      rgba(255,255,255,.92);
+  --ink-dim:  rgba(255,255,255,.45);
+  --ink-mute: rgba(255,255,255,.20);
+  --ink-ghost:rgba(255,255,255,.06);
+  --accent:   #e8d5b0;
+  --f-display:'Inter Tight',sans-serif;
+  --f-mono:   'DM Mono',monospace;
+  --ease-out: cubic-bezier(.23,1,.32,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--f-display);overflow:hidden;}
+::selection{background:var(--accent);color:#06050c;}
+
+/* ── STAGE ── */
+#stage {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── FRAME ── */
+.pair-frame {
+  position: relative;
+  height: 78vh;
+  width: calc(78vh * 9 / 16); /* correct 9:16 */
+  flex-shrink: 0;
+  overflow: hidden;
+  user-select: none;
+  touch-action: none;
+  cursor: ew-resize;
+}
+
+/* Both images fill the frame exactly */
+.pair-frame img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+  background: var(--bg-1);
+  pointer-events: none;
+}
+
+/* Before wrapper clips the before image */
+.before-wrap {
+  position: absolute;
+  inset: 0;
+  width: 50%;
+  overflow: hidden;
+  z-index: 2;
+}
+.before-wrap img {
+  width: 100%; /* match frame width, not wrap width */
+  min-width: calc(100vw); /* will be overridden by JS */
+}
+
+/* After is always full frame under before */
+.after-img { z-index: 1; }
+
+/* Divider line */
+.divider {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1px;
+  height: 100%;
+  background: rgba(255,255,255,.7);
+  z-index: 5;
+  cursor: ew-resize;
+  touch-action: none;
+}
+.divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.9);
+  border: 1px solid rgba(0,0,0,.15);
+}
+.divider::after {
+  content: '◀ ▶';
+  position: absolute;
+  top: calc(50% + 18px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 7px;
+  letter-spacing: .1em;
+  color: rgba(0,0,0,.6);
+  white-space: nowrap;
+  font-family: var(--f-mono);
+  pointer-events: none;
+}
+
+/* Labels */
+.ba-label {
+  position: absolute;
+  bottom: 16px;
+  font-family: var(--f-mono);
+  font-size: 8px;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.6);
+  z-index: 6;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  background: rgba(0,0,0,.4);
+  padding: 4px 8px;
+}
+.label-before { left: 12px; opacity: 0; }
+.label-after  { right: 12px; opacity: 0; }
+
+/* ── FRAME WRAPPER for transitions ── */
+#frameWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 78vh;
+  width: calc(78vh * 9 / 16);
+}
+
+/* ── PROJECT NUMBER ── */
+#projectNum {
+  position: fixed;
+  top: 48px;
+  left: 64px;
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .4em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+/* ── PAGE COUNTER ── */
+#pageCounter {
+  position: fixed;
+  bottom: 40px;
+  right: 80px;
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: .2em;
+  color: var(--ink-mute);
+}
+
+/* ── TICK NAVIGATION ── */
+#tickNav {
+  position: fixed;
+  right: 28px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 50;
+}
+.tick {
+  width: 2px;
+  height: 16px;
+  background: var(--ink-ghost);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  border-radius: 1px;
+}
+.tick.active {
+  background: var(--ink-dim);
+  transform: scaleX(1.5);
+}
+.tick:hover:not(.active) {
+  background: var(--ink-mute);
+}
+
+/* ── KEYBOARD HINTS ── */
+#hints {
+  position: fixed;
+  bottom: 40px;
+  left: 64px;
+  font-family: var(--f-mono);
+  font-size: 8px;
+  letter-spacing: .25em;
+  color: var(--ink-mute);
+}
+
+/* ── PAGE HEADER ── */
+#pageHeader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 20px 64px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 80;
+  border-bottom: 1px solid var(--ink-ghost);
+  background: var(--bg);
+}
+.page-label { font-family:var(--f-mono); font-size:9px; letter-spacing:.4em; text-transform:uppercase; color:var(--ink-dim); }
+.page-note  { font-family:var(--f-mono); font-size:9px; color:var(--ink-mute); letter-spacing:.15em; }
+
+/* ── EXPAND BUTTON ── */
+#expandBtn {
+  position: fixed;
+  top: 60px;
+  right: 64px;
+  font-family: var(--f-mono);
+  font-size: 8px;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  cursor: pointer;
+  border: 1px solid var(--ink-ghost);
+  padding: 8px 16px;
+  background: transparent;
+  transition: color 0.2s, border-color 0.2s;
+  z-index: 80;
+}
+#expandBtn:hover { color: var(--ink); border-color: var(--ink-dim); }
+
+/* ── OVERLAY ── */
+#overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s;
+}
+#overlay.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+#overlayFrame {
+  position: relative;
+  height: 90vh;
+  width: calc(90vh * 9 / 16);
+  overflow: hidden;
+  cursor: ew-resize;
+  touch-action: none;
+  user-select: none;
+  flex-shrink: 0;
+}
+#overlayFrame img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: var(--bg-1);
+  pointer-events: none;
+}
+#overlayBeforeWrap {
+  position: absolute;
+  inset: 0;
+  width: 50%;
+  overflow: hidden;
+  z-index: 2;
+}
+#overlayBeforeWrap img { min-width: 100vw; /* overridden by JS */ }
+#overlayDivider {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1px;
+  height: 100%;
+  background: rgba(255,255,255,.7);
+  z-index: 5;
+  cursor: ew-resize;
+  touch-action: none;
+}
+#overlayDivider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.9);
+}
+#overlayClose {
+  position: fixed;
+  top: 32px;
+  right: 40px;
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .35em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  cursor: pointer;
+  border: 1px solid var(--ink-ghost);
+  padding: 8px 16px;
+  background: transparent;
+  transition: color 0.2s, border-color 0.2s;
+  z-index: 210;
+}
+#overlayClose:hover { color: var(--ink); border-color: var(--ink-dim); }
+#overlayPrev, #overlayNext {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .3em;
+  color: var(--ink-mute);
+  cursor: pointer;
+  padding: 16px 20px;
+  background: transparent;
+  border: 1px solid var(--ink-ghost);
+  transition: color 0.2s, border-color 0.2s;
+  z-index: 210;
+}
+#overlayPrev { left: 32px; }
+#overlayNext { right: 32px; }
+#overlayPrev:hover, #overlayNext:hover { color: var(--ink); border-color: var(--ink-dim); }
+#overlayCounter {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .3em;
+  color: var(--ink-mute);
+}
+
+/* ── LOADING INDICATOR ── */
+.loading-state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .3em;
+  color: var(--ink-mute);
+  background: var(--bg-1);
+  z-index: 10;
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width: 768px) {
+  #pageHeader { padding: 16px 20px; }
+  #tickNav { right: 12px; gap: 7px; }
+  .tick { height: 12px; }
+  #hints { left: 20px; font-size: 7px; }
+  #projectNum { left: 20px; }
+  #pageCounter { right: 50px; }
+  #expandBtn { top: 52px; right: 20px; padding: 6px 12px; }
+  #frameWrap, .pair-frame {
+    height: 70vh;
+    width: calc(70vh * 9 / 16);
+  }
+  #overlayFrame {
+    height: 80vh;
+    width: calc(80vh * 9 / 16);
+  }
+  #overlayPrev { left: 8px; padding: 12px 10px; }
+  #overlayNext { right: 8px; padding: 12px 10px; }
+}
+
+@media(max-width: 420px) {
+  #frameWrap, .pair-frame {
+    height: 65vh;
+    width: calc(65vh * 9 / 16);
+  }
+}
+
+/* ── REDUCED MOTION ── */
+@media(prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+</style>
+</head>
+<body>
+
+<div id="pageHeader">
+  <span class="page-label">Design Preview · Before &amp; After — v3</span>
+  <span class="page-note">Development branch · Not production</span>
+</div>
+
+<div id="projectNum">Before &amp; After</div>
+
+<button id="expandBtn">Expand</button>
+
+<div id="stage">
+  <div id="frameWrap">
+    <!-- pair-frame injected by JS -->
+    <div class="loading-state" id="initLoader">Loading…</div>
+  </div>
+</div>
+
+<div id="tickNav"></div>
+<div id="pageCounter">01 / 14</div>
+<div id="hints">← → Navigate &nbsp;|&nbsp; Drag to compare</div>
+
+<!-- OVERLAY -->
+<div id="overlay">
+  <div id="overlayFrame">
+    <div id="overlayBeforeWrap"><img id="oBeforeImg" src="" alt="Before"></div>
+    <img id="oAfterImg" src="" alt="After">
+    <div id="overlayDivider"></div>
+    <span class="ba-label label-before" id="oLabelB">Before</span>
+    <span class="ba-label label-after"  id="oLabelA">After</span>
+  </div>
+  <button id="overlayClose">Close</button>
+  <button id="overlayPrev">← Prev</button>
+  <button id="overlayNext">Next →</button>
+  <div id="overlayCounter">01 / 14</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+(function() {
+  const CDN = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev';
+  const BASE = CDN + '/gallery/Before%20and%20After/';
+
+  // Build pairs array — 14 pairs, no zero-padding
+  const pairs = Array.from({ length: 14 }, (_, i) => ({
+    before: BASE + 'Before%20' + (i + 1) + '.webp',
+    after:  BASE + 'After%20'  + (i + 1) + '.webp',
+  }));
+
+  let current = 0;
+  let transitioning = false;
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ── DOM REFS ──
+  const stage     = document.getElementById('stage');
+  const frameWrap = document.getElementById('frameWrap');
+  const tickNav   = document.getElementById('tickNav');
+  const counter   = document.getElementById('pageCounter');
+  const expandBtn = document.getElementById('expandBtn');
+  const initLoader = document.getElementById('initLoader');
+
+  // ── BUILD TICK NAV ──
+  for (let i = 0; i < 14; i++) {
+    const t = document.createElement('div');
+    t.className = 'tick' + (i === 0 ? ' active' : '');
+    t.dataset.idx = i;
+    t.addEventListener('click', () => goTo(parseInt(t.dataset.idx)));
+    tickNav.appendChild(t);
+  }
+
+  // ── BUILD FRAME ──
+  function createFrame() {
+    const f = document.createElement('div');
+    f.className = 'pair-frame';
+    f.id = 'pairFrame';
+
+    // After image (underneath)
+    const afterImg = document.createElement('img');
+    afterImg.className = 'after-img';
+    afterImg.alt = 'After';
+    f.appendChild(afterImg);
+
+    // Before wrap + image (on top, clipped)
+    const beforeWrap = document.createElement('div');
+    beforeWrap.className = 'before-wrap';
+    const beforeImg = document.createElement('img');
+    beforeImg.alt = 'Before';
+    beforeWrap.appendChild(beforeImg);
+    f.appendChild(beforeWrap);
+
+    // Labels
+    const lblB = document.createElement('span');
+    lblB.className = 'ba-label label-before';
+    lblB.textContent = 'Before';
+    f.appendChild(lblB);
+
+    const lblA = document.createElement('span');
+    lblA.className = 'ba-label label-after';
+    lblA.textContent = 'After';
+    f.appendChild(lblA);
+
+    // Divider
+    const div = document.createElement('div');
+    div.className = 'divider';
+    f.appendChild(div);
+
+    frameWrap.appendChild(f);
+    initLoader.remove();
+
+    setupDivider(f, beforeWrap, div, lblB, lblA);
+    return { f, afterImg, beforeImg, beforeWrap, div, lblB, lblA };
+  }
+
+  // ── DIVIDER LOGIC ──
+  function setupDivider(frame, beforeWrap, divider, lblB, lblA) {
+    let pct = 50;
+    let dragging = false;
+
+    function apply(p) {
+      pct = Math.max(0, Math.min(100, p));
+      divider.style.left = pct + '%';
+      beforeWrap.style.width = pct + '%';
+      // Fix before image width so it doesn't stretch
+      const bImg = beforeWrap.querySelector('img');
+      bImg.style.width = frame.offsetWidth + 'px';
+
+      lblB.style.opacity = pct > 65 ? '1' : '0';
+      lblA.style.opacity = pct < 35 ? '1' : '0';
+    }
+
+    divider.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      divider.setPointerCapture(e.pointerId);
+      dragging = true;
+    });
+    divider.addEventListener('pointermove', e => {
+      if (!dragging) return;
+      const rect = frame.getBoundingClientRect();
+      apply((e.clientX - rect.left) / rect.width * 100);
+    });
+    divider.addEventListener('pointerup',   () => { dragging = false; });
+    divider.addEventListener('pointercancel', () => { dragging = false; });
+
+    // Allow click on frame (not just divider) to drag too
+    frame.addEventListener('pointerdown', e => {
+      if (e.target === divider) return;
+      frame.setPointerCapture(e.pointerId);
+      dragging = true;
+      const rect = frame.getBoundingClientRect();
+      apply((e.clientX - rect.left) / rect.width * 100);
+    });
+    frame.addEventListener('pointermove', e => {
+      if (!dragging || e.target === divider) return;
+      const rect = frame.getBoundingClientRect();
+      apply((e.clientX - rect.left) / rect.width * 100);
+    });
+    frame.addEventListener('pointerup',   () => { dragging = false; });
+    frame.addEventListener('pointercancel', () => { dragging = false; });
+
+    // Touch support already covered by pointer events
+    apply(50);
+  }
+
+  // ── LOAD PAIR INTO FRAME ──
+  let frameEl = null;
+
+  function loadPair(idx) {
+    if (!frameEl) {
+      frameEl = createFrame();
+    }
+    const { f, afterImg, beforeImg, beforeWrap, div, lblB, lblA } = frameEl;
+    const pair = pairs[idx];
+
+    // Reset divider
+    div.style.left = '50%';
+    beforeWrap.style.width = '50%';
+    lblB.style.opacity = '0';
+    lblA.style.opacity = '0';
+
+    beforeImg.src = pair.before;
+    afterImg.src  = pair.after;
+
+    // Fix before image width
+    const fixBeforeWidth = () => {
+      beforeImg.style.width = f.offsetWidth + 'px';
+    };
+    beforeImg.onload = fixBeforeWidth;
+    fixBeforeWidth();
+  }
+
+  // ── TRANSITION ──
+  function goTo(idx, direction) {
+    if (transitioning || idx === current) return;
+    transitioning = true;
+
+    const prev = current;
+    current = Math.max(0, Math.min(13, idx));
+
+    // Determine direction for transition
+    const dir = direction !== undefined ? direction : (idx > prev ? 1 : -1);
+
+    if (prefersReduced) {
+      loadPair(current);
+      updateUI();
+      transitioning = false;
+      return;
+    }
+
+    // Clip upward transition
+    const f = document.getElementById('pairFrame');
+    if (f) {
+      gsap.to(f, {
+        clipPath: 'inset(0 0 100% 0)',
+        opacity: 0,
+        duration: 0.45,
+        ease: 'expo.in',
+        onComplete: () => {
+          loadPair(current);
+          gsap.fromTo(f,
+            { clipPath: 'inset(100% 0 0% 0)', opacity: 0, scale: 0.97 },
+            { clipPath: 'inset(0% 0 0% 0)', opacity: 1, scale: 1, duration: 0.55, ease: 'expo.out',
+              onComplete: () => { transitioning = false; }
+            }
+          );
+        }
+      });
+    } else {
+      loadPair(current);
+      updateUI();
+      transitioning = false;
+    }
+
+    updateUI();
+  }
+
+  function updateUI() {
+    // Ticks
+    document.querySelectorAll('.tick').forEach((t, i) => {
+      t.classList.toggle('active', i === current);
+    });
+    // Counter
+    counter.textContent = String(current + 1).padStart(2, '0') + ' / 14';
+  }
+
+  // ── INIT ──
+  loadPair(0);
+  updateUI();
+
+  // Animate in on load
+  if (!prefersReduced) {
+    const f = document.getElementById('pairFrame');
+    if (f) {
+      gsap.from(f, { opacity: 0, scale: 0.96, duration: 0.8, ease: 'expo.out', delay: 0.2 });
+    }
+  }
+
+  // ── KEYBOARD ──
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(current + 1, 1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   goTo(current - 1, -1);
+    if (e.key === 'Escape') closeOverlay();
+  });
+
+  // ── WHEEL ──
+  let wheelLock = false;
+  document.addEventListener('wheel', e => {
+    e.preventDefault();
+    if (wheelLock) return;
+    wheelLock = true;
+    setTimeout(() => { wheelLock = false; }, 600);
+    if (e.deltaY > 0) goTo(current + 1, 1);
+    else              goTo(current - 1, -1);
+  }, { passive: false });
+
+  // ── EXPAND / OVERLAY ──
+  const overlay     = document.getElementById('overlay');
+  const oBeforeImg  = document.getElementById('oBeforeImg');
+  const oAfterImg   = document.getElementById('oAfterImg');
+  const oBeforeWrap = document.getElementById('overlayBeforeWrap');
+  const oDivider    = document.getElementById('overlayDivider');
+  const oCounter    = document.getElementById('overlayCounter');
+  const oLabelB     = document.getElementById('oLabelB');
+  const oLabelA     = document.getElementById('oLabelA');
+  const overlayFrame = document.getElementById('overlayFrame');
+  let oIdx = 0;
+
+  function setupOverlayDivider() {
+    let dragging = false;
+    function apply(p) {
+      p = Math.max(0, Math.min(100, p));
+      oDivider.style.left = p + '%';
+      oBeforeWrap.style.width = p + '%';
+      oBeforeImg.style.width = overlayFrame.offsetWidth + 'px';
+      oLabelB.style.opacity = p > 65 ? '1' : '0';
+      oLabelA.style.opacity = p < 35 ? '1' : '0';
+    }
+    oDivider.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      oDivider.setPointerCapture(e.pointerId);
+      dragging = true;
+    });
+    oDivider.addEventListener('pointermove', e => {
+      if (!dragging) return;
+      const rect = overlayFrame.getBoundingClientRect();
+      apply((e.clientX - rect.left) / rect.width * 100);
+    });
+    oDivider.addEventListener('pointerup', () => { dragging = false; });
+    oDivider.addEventListener('pointercancel', () => { dragging = false; });
+    overlayFrame.addEventListener('pointerdown', e => {
+      if (e.target === oDivider) return;
+      overlayFrame.setPointerCapture(e.pointerId);
+      dragging = true;
+      const rect = overlayFrame.getBoundingClientRect();
+      apply((e.clientX - rect.left) / rect.width * 100);
+    });
+    overlayFrame.addEventListener('pointermove', e => {
+      if (!dragging || e.target === oDivider) return;
+      const rect = overlayFrame.getBoundingClientRect();
+      apply((e.clientX - rect.left) / rect.width * 100);
+    });
+    overlayFrame.addEventListener('pointerup', () => { dragging = false; });
+    overlayFrame.addEventListener('pointercancel', () => { dragging = false; });
+    apply(50);
+  }
+
+  function openOverlay(idx) {
+    oIdx = idx;
+    const pair = pairs[idx];
+    oBeforeImg.src = pair.before;
+    oAfterImg.src  = pair.after;
+    oDivider.style.left = '50%';
+    oBeforeWrap.style.width = '50%';
+    oLabelB.style.opacity = '0';
+    oLabelA.style.opacity = '0';
+    oCounter.textContent = String(idx + 1).padStart(2, '0') + ' / 14';
+    oBeforeImg.onload = () => { oBeforeImg.style.width = overlayFrame.offsetWidth + 'px'; };
+    oBeforeImg.style.width = overlayFrame.offsetWidth + 'px';
+    overlay.classList.add('visible');
+  }
+
+  function closeOverlay() {
+    overlay.classList.remove('visible');
+  }
+
+  function overlayNav(delta) {
+    oIdx = Math.max(0, Math.min(13, oIdx + delta));
+    openOverlay(oIdx);
+  }
+
+  setupOverlayDivider();
+
+  expandBtn.addEventListener('click', () => openOverlay(current));
+  document.getElementById('overlayClose').addEventListener('click', closeOverlay);
+  document.getElementById('overlayPrev').addEventListener('click', () => overlayNav(-1));
+  document.getElementById('overlayNext').addEventListener('click', () => overlayNav(1));
+
+  // Also open overlay on frame click (not divider)
+  document.addEventListener('click', e => {
+    const frame = document.getElementById('pairFrame');
+    if (frame && frame.contains(e.target) && !e.target.closest('.divider')) {
+      openOverlay(current);
+    }
+  });
+
+})();
+</script>
+</body>
+</html>

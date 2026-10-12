@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About — Design Preview v3 · The Credits Sequence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,200;0,300;1,200;1,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #06050c;
+  --bg-1:     #0b0a14;
+  --bg-2:     #100f1c;
+  --ink:      rgba(255,255,255,.92);
+  --ink-dim:  rgba(255,255,255,.45);
+  --ink-mute: rgba(255,255,255,.20);
+  --ink-ghost:rgba(255,255,255,.06);
+  --accent:   #e8d5b0;
+  --f-display:'Inter Tight',sans-serif;
+  --f-mono:   'DM Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{background:var(--bg);color:var(--ink);font-family:var(--f-display);scroll-behavior:smooth;}
+body{min-height:100vh;overflow-x:hidden;}
+::selection{background:var(--accent);color:#06050c;}
+
+/* ── PAGE HEADER ── */
+.page-header {
+  padding: 48px 64px 20px;
+  border-bottom: 1px solid var(--ink-ghost);
+  display: flex; justify-content: space-between; align-items: flex-end;
+  position: sticky; top: 0; z-index: 100;
+  background: var(--bg);
+}
+.page-label { font-family:var(--f-mono); font-size:9px; letter-spacing:.4em; text-transform:uppercase; color:var(--ink-dim); }
+.page-note  { font-family:var(--f-mono); font-size:9px; color:var(--ink-mute); letter-spacing:.15em; }
+
+/* ── STICKY SECTION LABEL ── */
+.section-label {
+  position: fixed;
+  top: 72px;
+  left: 64px;
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .4em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  opacity: 0;
+  transition: opacity 0.4s;
+  z-index: 99;
+  pointer-events: none;
+}
+.section-label.visible { opacity: 1; }
+
+/* ── ACTS CONTAINER ── */
+.credits-wrap {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+/* ── ACT I — STATEMENT ── */
+.act-statement {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 80px 0;
+}
+
+.statement-line {
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-size: clamp(22px, 3.2vw, 38px);
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  color: var(--ink);
+  max-width: 560px;
+  /* clip reveal — starts hidden */
+  clip-path: inset(0 0 100% 0);
+}
+
+.statement-rule {
+  width: 48px;
+  height: 1px;
+  background: var(--ink-ghost);
+  margin: 36px auto;
+  opacity: 0;
+}
+
+.statement-byline {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .38em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  clip-path: inset(0 0 100% 0);
+}
+
+/* ── ACT II — DISCIPLINES ── */
+.act-disciplines {
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 80px 0 60px;
+}
+
+.act-heading {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .4em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin-bottom: 48px;
+  opacity: 0;
+}
+
+.discipline-line {
+  display: flex;
+  align-items: baseline;
+  gap: 24px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--ink-ghost);
+  clip-path: inset(0 0 100% 0);
+}
+.discipline-line:first-of-type { border-top: 1px solid var(--ink-ghost); }
+
+.disc-num {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .2em;
+  color: var(--ink-mute);
+  min-width: 24px;
+  flex-shrink: 0;
+}
+.disc-name {
+  font-family: var(--f-display);
+  font-weight: 300;
+  font-size: 16px;
+  letter-spacing: 0.005em;
+  color: var(--ink-dim);
+}
+
+/* ── ACT III — TECHNICAL CREDITS ── */
+.act-tools {
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px 0 120px;
+}
+
+.tools-section { margin-bottom: 40px; }
+
+.tools-section-label {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .4em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin-bottom: 20px;
+  opacity: 0;
+}
+
+.credit-row {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 0 20px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--ink-ghost);
+  clip-path: inset(0 0 100% 0);
+  align-items: baseline;
+}
+.credit-row:first-of-type { border-top: 1px solid var(--ink-ghost); }
+
+.credit-cat {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  flex-shrink: 0;
+}
+.credit-name {
+  font-family: var(--f-display);
+  font-weight: 300;
+  font-size: 14px;
+  color: var(--ink-dim);
+}
+
+.ai-separator {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 32px 0 20px;
+  opacity: 0;
+}
+.ai-sep-line { flex: 1; height: 1px; background: var(--ink-ghost); }
+.ai-sep-label {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .4em;
+  text-transform: uppercase;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width: 768px) {
+  .page-header { padding: 32px 24px 16px; }
+  .section-label { left: 24px; }
+  .credits-wrap { padding: 0 24px; }
+  .statement-line { font-size: clamp(20px, 5vw, 28px); }
+  .credit-row { grid-template-columns: 110px 1fr; }
+  .act-statement, .act-disciplines, .act-tools { padding: 60px 0; }
+}
+
+/* ── REDUCED MOTION ── */
+@media(prefers-reduced-motion: reduce) {
+  .statement-line,
+  .statement-byline,
+  .discipline-line,
+  .credit-row {
+    clip-path: inset(0 0 0% 0) !important;
+    opacity: 1 !important;
+  }
+  .statement-rule,
+  .act-heading,
+  .tools-section-label,
+  .ai-separator {
+    opacity: 1 !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <span class="page-label">Design Preview · About — v3</span>
+  <span class="page-note">Development branch · Not production</span>
+</header>
+
+<div class="section-label" id="sectionLabel">— About —</div>
+
+<main class="credits-wrap" id="creditsMain">
+
+  <!-- ACT I — THE STATEMENT -->
+  <section class="act-statement" id="actStatement">
+    <p class="statement-line" id="statementLine">
+      CGI &amp; VFX Artist — building visual worlds from concept to final render.
+    </p>
+    <div class="statement-rule" id="statementRule"></div>
+    <span class="statement-byline" id="statementByline">
+      Creative Direction&nbsp;&nbsp;·&nbsp;&nbsp;Production&nbsp;&nbsp;·&nbsp;&nbsp;7+ Years
+    </span>
+  </section>
+
+  <!-- ACT II — DISCIPLINES -->
+  <section class="act-disciplines" id="actDisciplines">
+    <span class="act-heading" id="discHeading">Core Disciplines</span>
+
+    <div class="discipline-line disc-item">
+      <span class="disc-num">01</span>
+      <span class="disc-name">Environment &amp; World Building</span>
+    </div>
+    <div class="discipline-line disc-item">
+      <span class="disc-num">02</span>
+      <span class="disc-name">Character &amp; Creature Design</span>
+    </div>
+    <div class="discipline-line disc-item">
+      <span class="disc-num">03</span>
+      <span class="disc-name">Visual Effects &amp; Compositing</span>
+    </div>
+    <div class="discipline-line disc-item">
+      <span class="disc-num">04</span>
+      <span class="disc-name">Commercial Motion &amp; CGI</span>
+    </div>
+    <div class="discipline-line disc-item">
+      <span class="disc-num">05</span>
+      <span class="disc-name">Creative Direction &amp; Production</span>
+    </div>
+  </section>
+
+  <!-- ACT III — TECHNICAL CREDITS -->
+  <section class="act-tools" id="actTools">
+
+    <div class="tools-section">
+      <div class="tools-section-label" id="toolsLabel1">Software &amp; Tools</div>
+
+      <div class="credit-row credit-item">
+        <span class="credit-cat">Motion · VFX</span>
+        <span class="credit-name">Adobe After Effects</span>
+      </div>
+      <div class="credit-row credit-item">
+        <span class="credit-cat">Editing</span>
+        <span class="credit-name">Adobe Premiere Pro</span>
+      </div>
+      <div class="credit-row credit-item">
+        <span class="credit-cat">Image</span>
+        <span class="credit-name">Adobe Photoshop</span>
+      </div>
+      <div class="credit-row credit-item">
+        <span class="credit-cat">Vector</span>
+        <span class="credit-name">Adobe Illustrator</span>
+      </div>
+      <div class="credit-row credit-item">
+        <span class="credit-cat">Audio</span>
+        <span class="credit-name">Adobe Audition</span>
+      </div>
+      <div class="credit-row credit-item">
+        <span class="credit-cat">Colour</span>
+        <span class="credit-name">Adobe Lightroom</span>
+      </div>
+      <div class="credit-row credit-item">
+        <span class="credit-cat">Colour · Edit</span>
+        <span class="credit-name">DaVinci Resolve</span>
+      </div>
+      <div class="credit-row credit-item">
+        <span class="credit-cat">Vector</span>
+        <span class="credit-name">CorelDRAW</span>
+      </div>
+      <div class="credit-row credit-item">
+        <span class="credit-cat">Real-Time · VFX</span>
+        <span class="credit-name">Unreal Engine 5</span>
+      </div>
+      <div class="credit-row credit-item">
+        <span class="credit-cat">3D · Modelling</span>
+        <span class="credit-name">Blender</span>
+      </div>
+      <div class="credit-row credit-item">
+        <span class="credit-cat">Texturing</span>
+        <span class="credit-name">Substance 3D Painter</span>
+      </div>
+      <div class="credit-row credit-item">
+        <span class="credit-cat">Character</span>
+        <span class="credit-name">Character Creator 4</span>
+      </div>
+      <div class="credit-row credit-item">
+        <span class="credit-cat">Cloth · Simulation</span>
+        <span class="credit-name">Marvelous Designer</span>
+      </div>
+    </div>
+
+    <div class="ai-separator" id="aiSeparator">
+      <div class="ai-sep-line"></div>
+      <span class="ai-sep-label">AI &amp; Generative</span>
+      <div class="ai-sep-line"></div>
+    </div>
+
+    <div class="tools-section">
+      <div class="credit-row credit-item-ai">
+        <span class="credit-cat">Pipeline</span>
+        <span class="credit-name">ComfyUI</span>
+      </div>
+      <div class="credit-row credit-item-ai">
+        <span class="credit-cat">Integration</span>
+        <span class="credit-name">Generative AI Workflows</span>
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+if (!prefersReduced) {
+
+  // ── Sticky section label ──
+  ScrollTrigger.create({
+    trigger: '#creditsMain',
+    start: 'top 60px',
+    end: 'bottom bottom',
+    onEnter: () => document.getElementById('sectionLabel').classList.add('visible'),
+    onLeave: () => document.getElementById('sectionLabel').classList.remove('visible'),
+    onEnterBack: () => document.getElementById('sectionLabel').classList.add('visible'),
+    onLeaveBack: () => document.getElementById('sectionLabel').classList.remove('visible'),
+  });
+
+  // ── ACT I — Statement clip reveal ──
+  const tl1 = gsap.timeline({
+    scrollTrigger: {
+      trigger: '#actStatement',
+      start: 'top 72%',
+      once: true,
+    }
+  });
+  tl1
+    .to('#statementLine', { clipPath: 'inset(0 0 0% 0)', duration: 1.0, ease: 'expo.out' })
+    .to('#statementRule', { opacity: 1, duration: 0.5, ease: 'power2.out' }, '-=0.3')
+    .to('#statementByline', { clipPath: 'inset(0 0 0% 0)', duration: 0.8, ease: 'expo.out' }, '-=0.3');
+
+  // ── ACT II — Disciplines clip reveal ──
+  const tl2 = gsap.timeline({
+    scrollTrigger: {
+      trigger: '#actDisciplines',
+      start: 'top 75%',
+      once: true,
+    }
+  });
+  tl2
+    .to('#discHeading', { opacity: 1, duration: 0.5, ease: 'power2.out' })
+    .to('.disc-item', {
+      clipPath: 'inset(0 0 0% 0)',
+      duration: 0.7,
+      ease: 'expo.out',
+      stagger: 0.08,
+    }, '-=0.2');
+
+  // ── ACT III — Tools clip reveal ──
+  const tl3 = gsap.timeline({
+    scrollTrigger: {
+      trigger: '#actTools',
+      start: 'top 75%',
+      once: true,
+    }
+  });
+  tl3
+    .to('#toolsLabel1', { opacity: 1, duration: 0.5, ease: 'power2.out' })
+    .to('.credit-item', {
+      clipPath: 'inset(0 0 0% 0)',
+      duration: 0.55,
+      ease: 'expo.out',
+      stagger: 0.04,
+    }, '-=0.2')
+    .to('#aiSeparator', { opacity: 1, duration: 0.5, ease: 'power2.out' }, '-=0.1')
+    .to('.credit-item-ai', {
+      clipPath: 'inset(0 0 0% 0)',
+      duration: 0.6,
+      ease: 'expo.out',
+      stagger: 0.08,
+    }, '-=0.1');
+
+} else {
+  // Reduced motion: show everything immediately
+  document.getElementById('sectionLabel').classList.add('visible');
+  document.querySelectorAll('.statement-line, .statement-byline, .discipline-line, .credit-row').forEach(el => {
+    el.style.clipPath = 'inset(0 0 0% 0)';
+  });
+  document.querySelectorAll('.statement-rule, .act-heading, .tools-section-label, .ai-separator').forEach(el => {
+    el.style.opacity = '1';
+  });
+}
+</script>
+</body>
+</html>
