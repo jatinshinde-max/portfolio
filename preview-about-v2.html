@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About — Design Preview v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;300;400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #06050c;
+  --bg-1:     #0b0a14;
+  --bg-2:     #100f1c;
+  --ink:      rgba(255,255,255,.92);
+  --ink-dim:  rgba(255,255,255,.45);
+  --ink-mute: rgba(255,255,255,.20);
+  --ink-ghost:rgba(255,255,255,.06);
+  --accent:   #e8d5b0;
+  --f-display:'Inter Tight',sans-serif;
+  --f-mono:   'DM Mono',monospace;
+  --ease-out: cubic-bezier(.23,1,.32,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{background:var(--bg);color:var(--ink);font-family:var(--f-display);}
+body{min-height:100vh;overflow-x:hidden;}
+::selection{background:var(--accent);color:#06050c;}
+
+/* ── PAGE HEADER ── */
+.page-header {
+  padding: 56px 64px 24px;
+  border-bottom: 1px solid var(--ink-ghost);
+  display: flex; justify-content: space-between; align-items: flex-end;
+}
+.page-label { font-family:var(--f-mono); font-size:10px; letter-spacing:.4em; text-transform:uppercase; color:var(--ink-dim); }
+.page-note  { font-family:var(--f-mono); font-size:10px; color:var(--ink-mute); letter-spacing:.15em; }
+
+/* ── SECTION ── */
+.section {
+  padding: 80px 64px 100px;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* ── SECTION HEADER ── */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 72px;
+}
+.section-header-line {
+  flex: 1;
+  height: 1px;
+  background: var(--ink-ghost);
+}
+.section-header-label {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: .4em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  flex-shrink: 0;
+}
+
+/* ── TWO-COLUMN LAYOUT ── */
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+}
+
+/* ── LEFT — IDENTITY ── */
+.identity-col {}
+
+.col-label {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .4em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  display: block;
+  margin-bottom: 32px;
+}
+.col-label::before {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 1px;
+  background: var(--ink-mute);
+  vertical-align: middle;
+  margin-right: 12px;
+}
+
+.name-byline {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: .4em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  display: block;
+  margin-bottom: 12px;
+}
+
+.discipline-headline {
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-size: clamp(32px, 3.2vw, 52px);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: var(--ink);
+  margin-bottom: 32px;
+}
+
+.bio-text {
+  font-family: var(--f-display);
+  font-weight: 300;
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--ink-dim);
+  max-width: 52ch;
+  margin-bottom: 40px;
+}
+
+/* Disciplines */
+.disciplines-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-top: 1px solid var(--ink-ghost);
+}
+.discipline-item {
+  display: flex;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--ink-ghost);
+  gap: 16px;
+}
+.discipline-num {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .2em;
+  color: var(--ink-mute);
+  min-width: 20px;
+}
+.discipline-name {
+  font-family: var(--f-display);
+  font-weight: 300;
+  font-size: 14px;
+  letter-spacing: .01em;
+  color: var(--ink-dim);
+}
+
+/* ── RIGHT — TOOLS ── */
+.tools-col {}
+
+/* Tools group */
+.tools-group {
+  margin-bottom: 40px;
+}
+.tools-group-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 4px;
+}
+.tools-group-label {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .4em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  flex-shrink: 0;
+}
+.tools-group-header::before {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 1px;
+  background: var(--ink-mute);
+  flex-shrink: 0;
+}
+.tools-group-header::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--ink-ghost);
+}
+
+/* Tool rows */
+.tool-list {
+  list-style: none;
+  border-top: 1px solid var(--ink-ghost);
+}
+.tool-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--ink-ghost);
+  gap: 16px;
+  transition: background 0.15s;
+  position: relative;
+}
+.tool-row::before {
+  content: '';
+  position: absolute;
+  left: -24px; right: -24px;
+  top: 0; bottom: 0;
+  background: transparent;
+  transition: background 0.15s;
+  pointer-events: none;
+}
+.tool-row:hover::before { background: var(--ink-ghost); }
+.tool-name {
+  font-family: var(--f-display);
+  font-weight: 300;
+  font-size: 14px;
+  color: var(--ink);
+  letter-spacing: 0;
+}
+.tool-category {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* AI block */
+.ai-block {
+  background: var(--bg-1);
+  border: 1px solid var(--ink-ghost);
+  padding: 24px;
+  position: relative;
+}
+.ai-block::before {
+  content: 'AI & GENERATIVE';
+  position: absolute;
+  top: -1px; left: 24px;
+  transform: translateY(-50%);
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .4em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--bg);
+  padding: 0 8px;
+}
+.ai-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--ink-ghost);
+  gap: 16px;
+}
+.ai-item:last-child { border-bottom: none; padding-bottom: 0; }
+.ai-item:first-child { padding-top: 0; }
+.ai-name {
+  font-family: var(--f-display);
+  font-weight: 300;
+  font-size: 14px;
+  color: var(--ink);
+}
+.ai-desc {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  flex-shrink: 0;
+  text-align: right;
+}
+
+/* Experience stat */
+.exp-row {
+  margin-top: 32px;
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding-top: 24px;
+  border-top: 1px solid var(--ink-ghost);
+}
+.exp-num {
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-size: 48px;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+  line-height: 1;
+}
+.exp-label {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .35em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  line-height: 1.5;
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width: 900px) {
+  .section { padding: 60px 32px 80px; }
+  .about-grid { grid-template-columns: 1fr; gap: 64px; }
+}
+@media(max-width: 600px) {
+  .page-header { padding: 32px 24px 16px; }
+  .section { padding: 48px 24px 60px; }
+  .discipline-headline { font-size: 28px; }
+}
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <span class="page-label">Design Preview · About — v2</span>
+  <span class="page-note">Development branch only — not production</span>
+</header>
+
+<section class="section">
+
+  <div class="section-header">
+    <span class="section-header-label">About</span>
+    <div class="section-header-line"></div>
+  </div>
+
+  <div class="about-grid">
+
+    <!-- LEFT: IDENTITY -->
+    <div class="identity-col">
+      <span class="col-label">Identity</span>
+
+      <span class="name-byline">Jatin Shinde</span>
+      <h2 class="discipline-headline">CGI &amp; VFX Artist</h2>
+
+      <p class="bio-text">
+        I build visual worlds — environments, characters, and effects rendered
+        to cinematic standard. For 7+ years I have led creative teams translating
+        complex ideas into compelling motion, from product films to virtual production
+        environments built inside Unreal Engine.
+      </p>
+
+      <div class="disciplines-row">
+        <div class="discipline-item">
+          <span class="discipline-num">01</span>
+          <span class="discipline-name">Environment &amp; World Building</span>
+        </div>
+        <div class="discipline-item">
+          <span class="discipline-num">02</span>
+          <span class="discipline-name">Character &amp; Creature Design</span>
+        </div>
+        <div class="discipline-item">
+          <span class="discipline-num">03</span>
+          <span class="discipline-name">Visual Effects &amp; Compositing</span>
+        </div>
+        <div class="discipline-item">
+          <span class="discipline-num">04</span>
+          <span class="discipline-name">Commercial Motion &amp; CGI</span>
+        </div>
+        <div class="discipline-item">
+          <span class="discipline-num">05</span>
+          <span class="discipline-name">Creative Direction &amp; Production</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: TOOLS -->
+    <div class="tools-col">
+      <span class="col-label">Software &amp; Tools</span>
+
+      <div class="tools-group">
+        <div class="tools-group-header">
+          <span class="tools-group-label">Creative Suite</span>
+        </div>
+        <ul class="tool-list">
+          <li class="tool-row">
+            <span class="tool-name">Adobe After Effects</span>
+            <span class="tool-category">Motion · VFX</span>
+          </li>
+          <li class="tool-row">
+            <span class="tool-name">Adobe Premiere Pro</span>
+            <span class="tool-category">Editing</span>
+          </li>
+          <li class="tool-row">
+            <span class="tool-name">Adobe Photoshop</span>
+            <span class="tool-category">Image</span>
+          </li>
+          <li class="tool-row">
+            <span class="tool-name">Adobe Illustrator</span>
+            <span class="tool-category">Vector</span>
+          </li>
+          <li class="tool-row">
+            <span class="tool-name">Adobe Audition</span>
+            <span class="tool-category">Audio</span>
+          </li>
+          <li class="tool-row">
+            <span class="tool-name">Adobe Lightroom</span>
+            <span class="tool-category">Colour</span>
+          </li>
+          <li class="tool-row">
+            <span class="tool-name">DaVinci Resolve</span>
+            <span class="tool-category">Colour · Edit</span>
+          </li>
+          <li class="tool-row">
+            <span class="tool-name">CorelDRAW</span>
+            <span class="tool-category">Vector</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="tools-group">
+        <div class="tools-group-header">
+          <span class="tools-group-label">3D &amp; Real-Time</span>
+        </div>
+        <ul class="tool-list">
+          <li class="tool-row">
+            <span class="tool-name">Unreal Engine 5</span>
+            <span class="tool-category">Real-Time · VFX</span>
+          </li>
+          <li class="tool-row">
+            <span class="tool-name">Blender</span>
+            <span class="tool-category">3D · Modelling</span>
+          </li>
+          <li class="tool-row">
+            <span class="tool-name">Adobe Substance 3D Painter</span>
+            <span class="tool-category">Texturing</span>
+          </li>
+          <li class="tool-row">
+            <span class="tool-name">Character Creator 4</span>
+            <span class="tool-category">Character</span>
+          </li>
+          <li class="tool-row">
+            <span class="tool-name">Marvelous Designer</span>
+            <span class="tool-category">Cloth · Simulation</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="ai-block">
+        <div class="ai-item">
+          <span class="ai-name">ComfyUI</span>
+          <span class="ai-desc">Generative Pipeline</span>
+        </div>
+        <div class="ai-item">
+          <span class="ai-name">Generative AI Workflows</span>
+          <span class="ai-desc">Integration · Production</span>
+        </div>
+      </div>
+
+      <div class="exp-row">
+        <span class="exp-num">7+</span>
+        <span class="exp-label">Years of professional<br>CGI &amp; VFX production</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+</body>
+</html>
