@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Before / After — Jatin Shinde</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@200;300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #06050c;
+    --bg-2:     #0d0b17;
+    --fg:       #e8e4d9;
+    --fg-dim:   #7a7267;
+    --accent:   #c8b89a;
+    --line:     rgba(200,184,154,0.18);
+    --panel-gap: 10px;
+    --radius:   6px;
+  }
+
+  html { background: var(--bg); }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'DM Mono', monospace;
+    cursor: none;
+    overflow-x: hidden;
+  }
+
+  /* ── Custom cursor ── */
+  #cursor {
+    position: fixed; z-index: 9999; pointer-events: none;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    transform: translate(-50%,-50%);
+    transition: transform 0.12s ease, opacity 0.2s;
+    mix-blend-mode: difference;
+  }
+  #cursor-ring {
+    position: fixed; z-index: 9998; pointer-events: none;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--accent);
+    transform: translate(-50%,-50%);
+    transition: transform 0.32s cubic-bezier(.17,.67,.4,1.2), opacity 0.2s;
+    mix-blend-mode: difference;
+  }
+  @media (pointer: coarse) { #cursor, #cursor-ring { display: none; } }
+
+  /* ── Intro spacer ── */
+  #intro {
+    min-height: 100dvh;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    padding: 60px 24px;
+    text-align: center;
+    gap: 20px;
+  }
+  #intro .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem; font-weight: 300;
+    letter-spacing: 0.35em; text-transform: uppercase;
+    color: var(--fg-dim);
+  }
+  #intro h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.4rem, 7vw, 5.2rem);
+    font-weight: 200;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    color: var(--fg);
+  }
+  #intro .sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem; font-weight: 300;
+    letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--fg-dim);
+    margin-top: 8px;
+  }
+  .scroll-hint {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    margin-top: 48px;
+    font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--fg-dim);
+  }
+  .scroll-hint .arrow {
+    width: 1px; height: 40px;
+    background: linear-gradient(to bottom, var(--fg-dim), transparent);
+    animation: arrowPulse 1.8s ease-in-out infinite;
+  }
+  @keyframes arrowPulse {
+    0%,100% { opacity: 0.3; transform: scaleY(1); }
+    50%      { opacity: 1;   transform: scaleY(1.15); }
+  }
+
+  /* ── Pinned scroll stage ── */
+  #scroll-root { position: relative; }
+
+  #stage {
+    position: sticky; top: 0;
+    width: 100%; height: 100dvh;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    background: var(--bg);
+  }
+
+  /* ── Stage HUD ── */
+  #stage-hud {
+    position: absolute; top: 0; left: 0; right: 0;
+    z-index: 40;
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 22px 28px 0;
+    pointer-events: none;
+  }
+  .hud-left { display: flex; flex-direction: column; gap: 4px; }
+  .hud-left .label {
+    font-size: 0.58rem; font-weight: 300;
+    letter-spacing: 0.35em; text-transform: uppercase;
+    color: var(--fg-dim);
+  }
+  #project-counter {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem; font-weight: 200;
+    color: var(--accent);
+    letter-spacing: 0.06em;
+  }
+  .hud-right {
+    display: flex; flex-direction: column; align-items: flex-end; gap: 6px;
+  }
+  #progress-bar-wrap {
+    width: 120px; height: 1px;
+    background: var(--line);
+    position: relative;
+  }
+  #progress-bar-fill {
+    position: absolute; top: 0; left: 0;
+    height: 1px; width: 0%;
+    background: var(--accent);
+    transition: width 0.05s linear;
+  }
+  .hud-right .label {
+    font-size: 0.58rem; font-weight: 300;
+    letter-spacing: 0.35em; text-transform: uppercase;
+    color: var(--fg-dim);
+  }
+
+  /* ── Panels container ── */
+  #panels-wrap {
+    flex: 1;
+    display: flex;
+    align-items: stretch;
+    gap: var(--panel-gap);
+    padding: 60px 20px 20px;
+  }
+
+  /* ── Panel slot ── */
+  .panel-slot {
+    flex: 1;
+    position: relative;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--bg-2);
+    min-width: 0;
+  }
+
+  /* Transition mask overlay — covers incoming panel during wipe */
+  .panel-slot::before {
+    content: '';
+    position: absolute; inset: 0; z-index: 20;
+    background: var(--bg);
+    clip-path: inset(0 0 0 0); /* will be animated */
+    pointer-events: none;
+  }
+
+  /* Light seam — travels as mask moves */
+  .panel-slot::after {
+    content: '';
+    position: absolute; top: 0; bottom: 0;
+    width: 2px; z-index: 21;
+    background: linear-gradient(to bottom, transparent 0%, var(--accent) 30%, #fff 50%, var(--accent) 70%, transparent 100%);
+    opacity: 0;
+    left: 0;
+    pointer-events: none;
+  }
+
+  /* ── Before/After comparison inside each slot ── */
+  .ba-comparison {
+    position: absolute; inset: 0;
+    user-select: none;
+    cursor: ew-resize;
+  }
+
+  .ba-comparison img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: contain;
+    object-position: center;
+    display: block;
+    pointer-events: none;
+    will-change: transform;
+  }
+
+  .ba-comparison .img-before { z-index: 1; }
+
+  /* After image clipped to right side of divider */
+  .ba-comparison .img-after {
+    z-index: 2;
+    clip-path: inset(0 0 0 50%); /* default 50%; updated by drag */
+  }
+
+  /* Drag divider line */
+  .ba-divider {
+    position: absolute; top: 0; bottom: 0;
+    width: 2px;
+    left: 50%; transform: translateX(-50%);
+    z-index: 10;
+    background: rgba(255,255,255,0.85);
+    box-shadow: 0 0 12px rgba(0,0,0,0.6);
+    pointer-events: none;
+  }
+
+  /* Drag handle knob */
+  .ba-handle {
+    position: absolute; top: 50%;
+    left: 50%; transform: translate(-50%,-50%);
+    z-index: 11;
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.95);
+    box-shadow: 0 2px 18px rgba(0,0,0,0.5);
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: all;
+    cursor: ew-resize;
+    touch-action: none;
+  }
+  .ba-handle svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+  /* ── Panel caption ── */
+  .panel-caption {
+    position: absolute; bottom: 14px; left: 0; right: 0;
+    z-index: 15;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 3px;
+    pointer-events: none;
+    opacity: 0.85;
+  }
+  .caption-num {
+    font-size: 0.52rem; letter-spacing: 0.35em; text-transform: uppercase;
+    color: var(--fg-dim);
+  }
+  .caption-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem; font-weight: 300;
+    letter-spacing: 0.18em;
+    color: var(--fg);
+    text-align: center;
+    padding: 0 8px;
+    white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+    max-width: 100%;
+  }
+  .caption-ba {
+    font-size: 0.5rem; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--fg-dim);
+  }
+
+  /* ── Click-to-expand zone (entire panel) ── */
+  .panel-expand-btn {
+    position: absolute; inset: 0; z-index: 13;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    pointer-events: all;
+  }
+  /* Expand hint */
+  .panel-expand-hint {
+    position: absolute; top: 12px; right: 12px; z-index: 16;
+    font-size: 0.52rem; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--fg-dim);
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+    background: rgba(6,5,12,0.55);
+    padding: 3px 7px;
+    border-radius: 3px;
+  }
+  .panel-slot:hover .panel-expand-hint { opacity: 1; }
+
+  /* ── Expanded viewer overlay ── */
+  #expanded-viewer {
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(6,5,12,0.96);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.35s ease;
+  }
+  #expanded-viewer.open {
+    opacity: 1; pointer-events: all;
+  }
+  #expanded-viewer .exp-inner {
+    position: relative;
+    width: min(90dvw, calc(90dvh * 9 / 16));
+    aspect-ratio: 9/16;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--bg-2);
+    touch-action: none;
+    cursor: ew-resize;
+  }
+  #expanded-viewer .exp-inner img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+  }
+  #expanded-viewer .exp-inner .img-after {
+    clip-path: inset(0 0 0 50%);
+  }
+  #expanded-viewer .exp-divider {
+    position: absolute; top: 0; bottom: 0;
+    width: 2px; left: 50%; transform: translateX(-50%);
+    background: rgba(255,255,255,0.85);
+    z-index: 10;
+  }
+  #expanded-viewer .exp-handle {
+    position: absolute; top: 50%;
+    left: 50%; transform: translate(-50%,-50%);
+    z-index: 11;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.95);
+    box-shadow: 0 2px 20px rgba(0,0,0,0.5);
+    display: flex; align-items: center; justify-content: center;
+    cursor: ew-resize;
+    touch-action: none;
+  }
+  #expanded-viewer .exp-handle svg { width: 16px; height: 16px; }
+  #expanded-viewer .exp-info {
+    margin-top: 20px;
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+  }
+  #expanded-viewer .exp-num {
+    font-size: 0.58rem; letter-spacing: 0.35em; text-transform: uppercase;
+    color: var(--fg-dim);
+  }
+  #expanded-viewer .exp-arrows {
+    display: flex; gap: 24px; margin-top: 8px;
+  }
+  #expanded-viewer .exp-arrow {
+    background: none; border: 1px solid var(--line);
+    color: var(--fg-dim); cursor: pointer;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem; letter-spacing: 0.25em;
+    padding: 7px 18px; border-radius: 3px;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  #expanded-viewer .exp-arrow:hover { border-color: var(--accent); color: var(--accent); }
+  #exp-close {
+    position: absolute; top: 24px; right: 28px;
+    background: none; border: none; cursor: pointer;
+    color: var(--fg-dim); font-family: 'DM Mono', monospace;
+    font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase;
+    padding: 6px 12px;
+    transition: color 0.2s;
+    z-index: 20;
+  }
+  #exp-close:hover { color: var(--accent); }
+
+  /* ── Transition: reduced-motion ── */
+  @media (prefers-reduced-motion: reduce) {
+    .panel-slot::before,
+    .panel-slot::after,
+    .scroll-hint .arrow { animation: none !important; transition: none !important; }
+  }
+
+  /* ── Responsive: 4 → 3 → 2 → 1 panels ── */
+  @media (max-width: 1100px) {
+    #panels-wrap .panel-slot:nth-child(4) { display: none; }
+  }
+  @media (max-width: 760px) {
+    #panels-wrap .panel-slot:nth-child(3) { display: none; }
+  }
+  @media (max-width: 520px) {
+    #panels-wrap .panel-slot:nth-child(2) { display: none; }
+  }
+
+  /* ── Outro section after scroll ── */
+  #outro {
+    min-height: 60dvh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 80px 24px;
+    text-align: center; gap: 16px;
+  }
+  #outro .label {
+    font-size: 0.62rem; letter-spacing: 0.35em; text-transform: uppercase;
+    color: var(--fg-dim);
+  }
+  #outro a {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem; font-weight: 200;
+    color: var(--accent);
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 2px;
+    transition: border-color 0.2s;
+  }
+  #outro a:hover { border-color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- Intro -->
+<section id="intro">
+  <p class="eyebrow">Jatin Shinde — CGI &amp; VFX</p>
+  <h1>Before &amp; After</h1>
+  <p class="sub">14 retouching &amp; compositing projects</p>
+  <div class="scroll-hint">
+    <div class="arrow"></div>
+    <span>Scroll to explore</span>
+  </div>
+</section>
+
+<!-- Scroll root: must be tall enough for 3 transitions × scrub distance -->
+<div id="scroll-root">
+
+  <!-- Sticky stage -->
+  <div id="stage">
+
+    <!-- HUD -->
+    <div id="stage-hud">
+      <div class="hud-left">
+        <span class="label">Project</span>
+        <span id="project-counter">01 — 04</span>
+      </div>
+      <div class="hud-right">
+        <span class="label">Progress</span>
+        <div id="progress-bar-wrap"><div id="progress-bar-fill"></div></div>
+      </div>
+    </div>
+
+    <!-- 4 panels -->
+    <div id="panels-wrap">
+      <!-- Panel 0 -->
+      <div class="panel-slot" data-slot="0">
+        <div class="ba-comparison" data-index="0" data-divider="50">
+          <img class="img-before" src="" alt="Before" loading="lazy">
+          <img class="img-after"  src="" alt="After"  loading="lazy">
+          <div class="ba-divider"></div>
+          <div class="ba-handle" aria-label="Drag to compare">
+            <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5 3L2 7L5 11" stroke="#06050c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M9 3L12 7L9 11" stroke="#06050c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="panel-caption">
+          <span class="caption-num" data-slot-num>01</span>
+          <span class="caption-ba">Before / After</span>
+        </div>
+        <span class="panel-expand-hint">Expand</span>
+        <button class="panel-expand-btn" data-slot="0" aria-label="Expand comparison"></button>
+      </div>
+
+      <!-- Panel 1 -->
+      <div class="panel-slot" data-slot="1">
+        <div class="ba-comparison" data-index="1" data-divider="50">
+          <img class="img-before" src="" alt="Before" loading="lazy">
+          <img class="img-after"  src="" alt="After"  loading="lazy">
+          <div class="ba-divider"></div>
+          <div class="ba-handle" aria-label="Drag to compare">
+            <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5 3L2 7L5 11" stroke="#06050c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M9 3L12 7L9 11" stroke="#06050c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="panel-caption">
+          <span class="caption-num" data-slot-num>02</span>
+          <span class="caption-ba">Before / After</span>
+        </div>
+        <span class="panel-expand-hint">Expand</span>
+        <button class="panel-expand-btn" data-slot="1" aria-label="Expand comparison"></button>
+      </div>
+
+      <!-- Panel 2 -->
+      <div class="panel-slot" data-slot="2">
+        <div class="ba-comparison" data-index="2" data-divider="50">
+          <img class="img-before" src="" alt="Before" loading="lazy">
+          <img class="img-after"  src="" alt="After"  loading="lazy">
+          <div class="ba-divider"></div>
+          <div class="ba-handle" aria-label="Drag to compare">
+            <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5 3L2 7L5 11" stroke="#06050c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M9 3L12 7L9 11" stroke="#06050c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="panel-caption">
+          <span class="caption-num" data-slot-num>03</span>
+          <span class="caption-ba">Before / After</span>
+        </div>
+        <span class="panel-expand-hint">Expand</span>
+        <button class="panel-expand-btn" data-slot="2" aria-label="Expand comparison"></button>
+      </div>
+
+      <!-- Panel 3 -->
+      <div class="panel-slot" data-slot="3">
+        <div class="ba-comparison" data-index="3" data-divider="50">
+          <img class="img-before" src="" alt="Before" loading="lazy">
+          <img class="img-after"  src="" alt="After"  loading="lazy">
+          <div class="ba-divider"></div>
+          <div class="ba-handle" aria-label="Drag to compare">
+            <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5 3L2 7L5 11" stroke="#06050c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M9 3L12 7L9 11" stroke="#06050c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="panel-caption">
+          <span class="caption-num" data-slot-num>04</span>
+          <span class="caption-ba">Before / After</span>
+        </div>
+        <span class="panel-expand-hint">Expand</span>
+        <button class="panel-expand-btn" data-slot="3" aria-label="Expand comparison"></button>
+      </div>
+    </div><!-- /panels-wrap -->
+  </div><!-- /stage -->
+</div><!-- /scroll-root -->
+
+<!-- Outro -->
+<section id="outro">
+  <p class="label">Portfolio — Jatin Shinde</p>
+  <a href="/">Back to site</a>
+</section>
+
+<!-- Expanded viewer -->
+<div id="expanded-viewer" role="dialog" aria-modal="true" aria-label="Expanded comparison">
+  <button id="exp-close" aria-label="Close">✕ Close</button>
+  <div class="exp-inner">
+    <img class="img-before exp-img-before" src="" alt="Before">
+    <img class="img-after  exp-img-after"  src="" alt="After">
+    <div class="exp-divider" id="exp-divider"></div>
+    <div class="exp-handle" id="exp-handle">
+      <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M5 3L2 7L5 11" stroke="#06050c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M9 3L12 7L9 11" stroke="#06050c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </div>
+  <div class="exp-info">
+    <span class="exp-num" id="exp-num">01 / 14</span>
+    <div class="exp-arrows">
+      <button class="exp-arrow" id="exp-prev">← Prev</button>
+      <button class="exp-arrow" id="exp-next">Next →</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+'use strict';
+
+gsap.registerPlugin(ScrollTrigger);
+
+// ── Config ──────────────────────────────────────────────────────────────────
+const CDN = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/Before%20and%20After';
+const TOTAL_PAIRS = 14;
+
+/** Return CDN URL for pair n (1-indexed), side = "Before"|"After" */
+function pairURL(n, side) {
+  return `${CDN}/${side}%20${n}.webp`;
+}
+
+/**
+ * Sequence groups — 3 transitions, ends on [11,12,13,14].
+ * Each group is [pair1, pair2, pair3, pair4] (1-indexed).
+ * Visible panel count on narrow viewports is handled by CSS hide.
+ */
+const GROUPS = [
+  [1, 2, 3, 4],
+  [5, 6, 7, 8],
+  [9, 10, 11, 12],
+  [11, 12, 13, 14], // final: shows 11–14
+];
+const NUM_TRANSITIONS = GROUPS.length - 1; // 3
+
+// ── DOM refs ─────────────────────────────────────────────────────────────────
+const scrollRoot   = document.getElementById('scroll-root');
+const stage        = document.getElementById('stage');
+const panelsWrap   = document.getElementById('panels-wrap');
+const slots        = Array.from(document.querySelectorAll('.panel-slot'));
+const comparisons  = slots.map(s => s.querySelector('.ba-comparison'));
+const counter      = document.getElementById('project-counter');
+const progressFill = document.getElementById('progress-bar-fill');
+
+// ── State ────────────────────────────────────────────────────────────────────
+// groupIndex: which GROUPS entry is currently displayed (0..3)
+let groupIndex = 0;
+// isDragging[slotIdx]: true while user is dragging that slot's divider
+const isDragging = [false, false, false, false];
+// Cache loaded image pairs: key = pairNum, value = {before:url,after:url}
+const imgCache = new Set();
+
+// ── Image loading ─────────────────────────────────────────────────────────────
+function preloadPair(n) {
+  if (imgCache.has(n)) return;
+  imgCache.add(n);
+  const b = new Image(); b.src = pairURL(n, 'Before');
+  const a = new Image(); a.src = pairURL(n, 'After');
+}
+
+function preloadGroup(gIdx) {
+  GROUPS[gIdx].forEach(preloadPair);
+}
+
+function setGroupImages(gIdx) {
+  const group = GROUPS[gIdx];
+  slots.forEach((slot, si) => {
+    const pairNum = group[si];
+    const comp = comparisons[si];
+    comp.querySelector('.img-before').src = pairURL(pairNum, 'Before');
+    comp.querySelector('.img-after').src  = pairURL(pairNum, 'After');
+    comp.dataset.pairNum = pairNum;
+    // reset divider to 50%
+    if (!isDragging[si]) {
+      applyDivider(comp, 50);
+    }
+    // update caption
+    slot.querySelector('[data-slot-num]').textContent =
+      String(pairNum).padStart(2, '0');
+  });
+}
+
+// ── Divider / drag ───────────────────────────────────────────────────────────
+function applyDivider(comp, pct) {
+  comp.dataset.divider = pct;
+  const after  = comp.querySelector('.img-after');
+  const divEl  = comp.querySelector('.ba-divider');
+  const handle = comp.querySelector('.ba-handle');
+  after.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
+  divEl.style.left  = `${pct}%`;
+  handle.style.left = `${pct}%`;
+}
+
+function initDrag(comp, slotIdx) {
+  const handle = comp.querySelector('.ba-handle');
+
+  function onMove(e) {
+    if (!isDragging[slotIdx]) return;
+    const rect = comp.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const pct = Math.min(100, Math.max(0, ((clientX - rect.left) / rect.width) * 100));
+    applyDivider(comp, pct);
+  }
+
+  function onEnd(e) {
+    if (!isDragging[slotIdx]) return;
+    isDragging[slotIdx] = false;
+    if (e.pointerId !== undefined) handle.releasePointerCapture(e.pointerId);
+    comp.style.cursor = 'ew-resize';
+  }
+
+  // Pointer events (desktop + mobile unified)
+  handle.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    isDragging[slotIdx] = true;
+    handle.setPointerCapture(e.pointerId);
+    comp.style.cursor = 'ew-resize';
+  });
+  handle.addEventListener('pointermove', onMove);
+  handle.addEventListener('pointerup',   onEnd);
+  handle.addEventListener('pointercancel', onEnd);
+
+  // Touch fallback
+  handle.addEventListener('touchstart', (e) => {
+    e.stopPropagation();
+    isDragging[slotIdx] = true;
+  }, { passive: true });
+  comp.addEventListener('touchmove', onMove, { passive: true });
+  comp.addEventListener('touchend',  onEnd);
+}
+
+comparisons.forEach((comp, si) => initDrag(comp, si));
+
+// ── Transition: traveling wipe ───────────────────────────────────────────────
+/**
+ * Wipe in the nextGroup across all 4 slots simultaneously.
+ * Each slot's ::before pseudo uses a CSS variable --mask-right
+ * to animate clip-path from inset(0 100% 0 0) → inset(0 0 0 0).
+ * We fake this by animating a real overlay div instead (pseudos can't be
+ * targeted by GSAP directly, but we create real overlay divs).
+ */
+// We'll create a real overlay element per slot (easier than pseudo manipulation)
+const overlays = slots.map(slot => {
+  const ov = document.createElement('div');
+  ov.style.cssText = `
+    position:absolute;inset:0;z-index:20;
+    background:var(--bg);
+    clip-path:inset(0 0 0 0);
+    pointer-events:none;
+    will-change:clip-path;
+  `;
+  slot.appendChild(ov);
+  return ov;
+});
+
+// Light seam divs (per slot, travels with mask edge)
+const seams = slots.map(slot => {
+  const s = document.createElement('div');
+  s.style.cssText = `
+    position:absolute;top:0;bottom:0;width:2px;z-index:21;
+    background:linear-gradient(to bottom,transparent 0%,rgba(200,184,154,0.9) 30%,#fff 50%,rgba(200,184,154,0.9) 70%,transparent 100%);
+    opacity:0;pointer-events:none;left:0;will-change:left,opacity;
+  `;
+  slot.appendChild(s);
+  return s;
+});
+
+/**
+ * Animate wipe transition from current group → nextIdx.
+ * Returns a GSAP timeline (already plays immediately).
+ * direction: 'forward' (left→right wipe reveals) or 'reverse' (right→left)
+ */
+function wipeTransition(nextIdx, progress) {
+  // progress 0→1: used to set fraction each slot completes the wipe
+  // We phase the slots: each slot starts slightly offset in time
+  // so there's a traveling effect across all 4 panels.
+  const STAGGER  = 0.12; // seconds between slot starts
+  const DURATION = 0.55; // wipe duration per slot
+  const tl = gsap.timeline({
+    defaults: { ease: 'power2.inOut' },
+    onStart: () => {
+      // Swap images underneath the overlays
+      setGroupImages(nextIdx);
+      groupIndex = nextIdx;
+      updateCounter();
+    },
+    onComplete: () => {
+      // Hide seams
+      seams.forEach(s => { s.style.opacity = '0'; });
+    }
+  });
+
+  overlays.forEach((ov, si) => {
+    const delay = si * STAGGER;
+    // Seam travels with mask's left edge
+    tl.to(seams[si], {
+      opacity: 1,
+      duration: 0.05,
+    }, delay);
+    tl.fromTo(ov,
+      { clipPath: 'inset(0 0 0 0)' },   // fully visible (hides images below)
+      {
+        clipPath: 'inset(0 100% 0 0)', // wipes off to the right (reveals new images)
+        duration: DURATION,
+        ease: 'power2.inOut',
+      },
+      delay
+    );
+    // Move seam in sync with mask's right edge
+    tl.fromTo(seams[si],
+      { left: '0%', opacity: 1 },
+      { left: '100%', opacity: 0, duration: DURATION, ease: 'power2.inOut' },
+      delay
+    );
+  });
+
+  return tl;
+}
+
+// ── HUD update ───────────────────────────────────────────────────────────────
+function updateCounter() {
+  const g = GROUPS[groupIndex];
+  const visible = getVisibleSlotCount();
+  const nums = g.slice(0, visible).map(n => String(n).padStart(2,'0'));
+  counter.textContent = nums.join(' — ');
+}
+
+function getVisibleSlotCount() {
+  const w = window.innerWidth;
+  if (w > 1100) return 4;
+  if (w > 760)  return 3;
+  if (w > 520)  return 2;
+  return 1;
+}
+
+// ── ScrollTrigger setup ───────────────────────────────────────────────────────
+// Scroll root height = viewport + 3 transitions × scrub distance
+const SCRUB_PER_TRANSITION = 1200; // px of scroll per transition
+scrollRoot.style.height = `${window.innerHeight + NUM_TRANSITIONS * SCRUB_PER_TRANSITION}px`;
+
+// Transition queuing — prevent multiple firings
+let transitionActive = false;
+let lastGroupFromScroll = 0;
+
+// Reduced-motion check
+let reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const mm = gsap.matchMedia();
+mm.add('(prefers-reduced-motion: reduce)', () => {
+  reducedMotion = true;
+});
+mm.add('(prefers-reduced-motion: no-preference)', () => {
+  reducedMotion = false;
+});
+
+ScrollTrigger.create({
+  trigger: scrollRoot,
+  start: 'top top',
+  end: `+=${NUM_TRANSITIONS * SCRUB_PER_TRANSITION}`,
+  pin: stage,
+  scrub: 1,
+  onUpdate: (self) => {
+    const p = self.progress; // 0..1
+    progressFill.style.width = `${p * 100}%`;
+
+    // Map progress → which group (0..3)
+    // 0..1/3 → group 0→1, 1/3..2/3 → group 1→2, 2/3..1 → group 2→3
+    const targetGroup = Math.min(NUM_TRANSITIONS, Math.floor(p * (NUM_TRANSITIONS + 0.999)));
+
+    if (targetGroup !== lastGroupFromScroll && !transitionActive) {
+      // Check none of the slots are being dragged
+      const anyDragging = isDragging.some(Boolean);
+      if (anyDragging) return;
+
+      transitionActive = true;
+      lastGroupFromScroll = targetGroup;
+
+      if (reducedMotion) {
+        // Instant swap, no animation
+        setGroupImages(targetGroup);
+        groupIndex = targetGroup;
+        updateCounter();
+        overlays.forEach(ov => { ov.style.clipPath = 'inset(0 100% 0 0)'; });
+        seams.forEach(s  => { s.style.opacity = '0'; });
+        transitionActive = false;
+      } else {
+        // Reset overlays to cover state before wipe
+        overlays.forEach(ov => { ov.style.clipPath = 'inset(0 0 0 0)'; });
+        const tl = wipeTransition(targetGroup, p);
+        tl.eventCallback('onComplete', () => { transitionActive = false; });
+      }
+    }
+  },
+});
+
+// ── Preload groups ────────────────────────────────────────────────────────────
+// Load group 0 immediately, rest in background
+preloadGroup(0);
+setTimeout(() => GROUPS.slice(1).forEach((_, i) => preloadGroup(i + 1)), 800);
+
+// ── Initialize ────────────────────────────────────────────────────────────────
+setGroupImages(0);
+updateCounter();
+// Overlays start hidden (images visible)
+overlays.forEach(ov => { ov.style.clipPath = 'inset(0 100% 0 0)'; });
+
+// ── Expanded viewer ───────────────────────────────────────────────────────────
+const viewer      = document.getElementById('expanded-viewer');
+const expImgB     = viewer.querySelector('.exp-img-before');
+const expImgA     = viewer.querySelector('.exp-img-after');
+const expDivider  = document.getElementById('exp-divider');
+const expHandle   = document.getElementById('exp-handle');
+const expNum      = document.getElementById('exp-num');
+const expClose    = document.getElementById('exp-close');
+const expPrev     = document.getElementById('exp-prev');
+const expNext     = document.getElementById('exp-next');
+
+let expandedPair = 1;
+let expDivPct = 50;
+let expDragging = false;
+
+function openViewer(pairNum) {
+  expandedPair = pairNum;
+  expDivPct = 50;
+  expImgB.src = pairURL(pairNum, 'Before');
+  expImgA.src = pairURL(pairNum, 'After');
+  expNum.textContent = `${String(pairNum).padStart(2,'0')} / ${TOTAL_PAIRS}`;
+  applyExpDivider(50);
+  viewer.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  expClose.focus();
+}
+
+function closeViewer() {
+  viewer.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function applyExpDivider(pct) {
+  expDivPct = pct;
+  expImgA.style.clipPath  = `inset(0 ${100 - pct}% 0 0)`;
+  expDivider.style.left   = `${pct}%`;
+  expHandle.style.left    = `${pct}%`;
+}
+
+// Drag inside expanded viewer
+const expInner = viewer.querySelector('.exp-inner');
+expHandle.addEventListener('pointerdown', (e) => {
+  e.stopPropagation();
+  expDragging = true;
+  expHandle.setPointerCapture(e.pointerId);
+});
+expHandle.addEventListener('pointermove', (e) => {
+  if (!expDragging) return;
+  const rect = expInner.getBoundingClientRect();
+  const pct = Math.min(100, Math.max(0, ((e.clientX - rect.left) / rect.width) * 100));
+  applyExpDivider(pct);
+});
+expHandle.addEventListener('pointerup',     () => { expDragging = false; });
+expHandle.addEventListener('pointercancel', () => { expDragging = false; });
+
+expClose.addEventListener('click', closeViewer);
+
+expPrev.addEventListener('click', () => {
+  if (expandedPair > 1) openViewer(expandedPair - 1);
+});
+expNext.addEventListener('click', () => {
+  if (expandedPair < TOTAL_PAIRS) openViewer(expandedPair + 1);
+});
+
+// Keyboard: arrows navigate, Escape closes
+document.addEventListener('keydown', (e) => {
+  if (!viewer.classList.contains('open')) return;
+  if (e.key === 'Escape')      closeViewer();
+  if (e.key === 'ArrowLeft'  && expandedPair > 1)           openViewer(expandedPair - 1);
+  if (e.key === 'ArrowRight' && expandedPair < TOTAL_PAIRS) openViewer(expandedPair + 1);
+});
+
+// Expand buttons
+document.querySelectorAll('.panel-expand-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const si = parseInt(btn.dataset.slot);
+    const comp = comparisons[si];
+    const pairNum = parseInt(comp.dataset.pairNum) || GROUPS[groupIndex][si];
+    openViewer(pairNum);
+  });
+});
+
+// ── Custom cursor ─────────────────────────────────────────────────────────────
+const cursorDot  = document.getElementById('cursor');
+const cursorRing = document.getElementById('cursor-ring');
+let mx = -100, my = -100, rx = -100, ry = -100;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursorDot.style.left  = `${mx}px`;
+  cursorDot.style.top   = `${my}px`;
+});
+
+(function animRing() {
+  rx += (mx - rx) * 0.14;
+  ry += (my - ry) * 0.14;
+  cursorRing.style.left = `${rx}px`;
+  cursorRing.style.top  = `${ry}px`;
+  requestAnimationFrame(animRing);
+})();
+
+// Scale cursor on interactive elements
+document.querySelectorAll('button, a, .ba-handle, .exp-handle').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    gsap.to(cursorDot,  { scale: 0, duration: 0.18 });
+    gsap.to(cursorRing, { scale: 1.8, duration: 0.28 });
+  });
+  el.addEventListener('mouseleave', () => {
+    gsap.to(cursorDot,  { scale: 1, duration: 0.18 });
+    gsap.to(cursorRing, { scale: 1, duration: 0.28 });
+  });
+});
+
+// ── Resize handler ────────────────────────────────────────────────────────────
+window.addEventListener('resize', () => {
+  scrollRoot.style.height = `${window.innerHeight + NUM_TRANSITIONS * SCRUB_PER_TRANSITION}px`;
+  ScrollTrigger.refresh();
+  updateCounter();
+});
+</script>
+</body>
+</html>
