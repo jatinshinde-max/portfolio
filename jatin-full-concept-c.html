@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jatin Shinde — CGI & VFX Artist</title>
+<meta name="description" content="CGI & VFX Artist. 7+ years creating cinematic environments, characters, and visual effects.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,700;0,900;1,100;1,200;1,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0a;
+  --bg-1:#111;
+  --bg-2:#181818;
+  --ink:#f5f5f5;
+  --ink-dim:#aaa;
+  --ink-mute:#555;
+  --ink-ghost:#2a2a2a;
+  --accent:#e02020;
+  --accent-dark:#8a0c0c;
+  --f-display:'Barlow Condensed',sans-serif;
+  --f-mono:'DM Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-display);overflow-x:hidden;cursor:none}
+body.no-scroll{overflow:hidden}
+
+/* CURSOR */
+#cursor{position:fixed;width:6px;height:6px;background:var(--ink);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%)}
+#cursor-ring{position:fixed;width:28px;height:28px;border:1px solid rgba(255,255,255,.25);border-radius:0;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .06s linear}
+body.cursor-link #cursor-ring{width:44px;height:44px;border-color:var(--accent);transform:translate(-50%,-50%) rotate(45deg)}
+
+/* LOADER */
+#loader{position:fixed;inset:0;background:var(--bg);z-index:9990;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;padding:60px}
+.loader-big{font-family:var(--f-display);font-size:clamp(100px,18vw,220px);font-weight:900;line-height:.85;letter-spacing:-.04em;color:var(--ink);text-transform:uppercase;position:absolute;bottom:80px;left:60px;opacity:.04}
+.loader-pct-big{font-family:var(--f-display);font-size:clamp(80px,14vw,160px);font-weight:900;line-height:1;letter-spacing:-.04em;color:var(--ink);margin-bottom:24px}
+.loader-bar-wrap{width:100%;max-width:320px;height:2px;background:#222;position:relative}
+.loader-bar{height:100%;width:0;background:var(--accent);transition:width .25s}
+.loader-label{font-family:var(--f-mono);font-size:10px;letter-spacing:.3em;color:var(--ink-mute);text-transform:uppercase;margin-top:16px}
+
+/* NAV */
+#top-nav{position:fixed;top:0;left:0;right:0;z-index:1000;display:flex;align-items:stretch;justify-content:space-between;border-bottom:1px solid #1e1e1e}
+.nav-brand{padding:0 40px;display:flex;align-items:center;border-right:1px solid #1e1e1e;height:56px}
+.nav-brand-text{font-family:var(--f-display);font-size:22px;font-weight:700;letter-spacing:.02em;text-transform:uppercase}
+.nav-brand-sub{font-family:var(--f-mono);font-size:9px;letter-spacing:.3em;color:var(--ink-mute);margin-left:12px;text-transform:uppercase;align-self:flex-end;margin-bottom:6px}
+.nav-center{display:flex;align-items:center;gap:0}
+.nav-link{padding:0 24px;height:56px;display:flex;align-items:center;font-family:var(--f-mono);font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--ink-mute);text-decoration:none;border-right:1px solid #1e1e1e;transition:color .15s,background .15s}
+.nav-link:hover{color:var(--ink);background:#111}
+.nav-cta{padding:0 32px;height:56px;display:flex;align-items:center;background:var(--accent);font-family:var(--f-mono);font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--ink);text-decoration:none;margin-left:auto;transition:background .15s}
+.nav-cta:hover{background:var(--accent-dark)}
+
+/* HERO */
+#hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;position:relative;overflow:hidden;padding-top:56px}
+.hero-left{padding:80px 60px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;z-index:2;border-right:1px solid #1e1e1e}
+.hero-tag{font-family:var(--f-mono);font-size:9px;letter-spacing:.4em;color:var(--accent);text-transform:uppercase;margin-bottom:24px}
+.hero-name{font-family:var(--f-display);font-size:clamp(80px,12vw,160px);font-weight:900;line-height:.85;letter-spacing:-.03em;text-transform:uppercase;margin-bottom:32px}
+.hero-name em{font-style:italic;font-weight:200;color:var(--ink-dim)}
+.hero-role{font-family:var(--f-display);font-size:clamp(18px,2.5vw,28px);font-weight:300;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:48px}
+.hero-strip{display:flex;gap:40px;border-top:1px solid #1e1e1e;padding-top:32px;margin-top:auto}
+.hero-stat-label{font-family:var(--f-mono);font-size:9px;letter-spacing:.3em;color:var(--ink-mute);text-transform:uppercase;margin-bottom:8px}
+.hero-stat-val{font-family:var(--f-display);font-size:clamp(32px,4vw,48px);font-weight:700;letter-spacing:-.02em;line-height:1}
+.hero-right{position:relative;overflow:hidden}
+#seq1-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.55) contrast(1.1)}
+.hero-right-overlay{position:absolute;inset:0;background:linear-gradient(to right,var(--bg) 0%,transparent 30%)}
+
+/* SECTION HEADERS */
+.sec-header{display:flex;align-items:baseline;gap:0;border-bottom:2px solid var(--ink);padding-bottom:16px;margin-bottom:60px}
+.sec-num{font-family:var(--f-mono);font-size:11px;letter-spacing:.3em;color:var(--accent);min-width:72px;text-transform:uppercase}
+.sec-title{font-family:var(--f-display);font-size:clamp(40px,6vw,80px);font-weight:900;letter-spacing:-.02em;text-transform:uppercase;line-height:1}
+.sec-desc{font-family:var(--f-display);font-size:15px;font-weight:300;color:var(--ink-dim);margin-left:auto;max-width:300px;text-align:right;line-height:1.5;align-self:flex-end}
+
+/* WORLDS */
+#worlds{padding:120px 60px}
+.worlds-strip{display:flex;gap:3px;height:70vh}
+.world-item{flex:1;position:relative;overflow:hidden;cursor:pointer;transition:flex .5s ease}
+.world-item:hover{flex:3}
+.world-item img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.5) saturate(.6);transition:filter .4s}
+.world-item:hover img{filter:brightness(.85) saturate(1)}
+.world-item-label{position:absolute;bottom:0;left:0;right:0;padding:24px 20px;background:linear-gradient(transparent,rgba(10,10,10,.9))}
+.world-num{font-family:var(--f-mono);font-size:9px;letter-spacing:.3em;color:var(--accent);margin-bottom:6px}
+.world-name{font-family:var(--f-display);font-size:clamp(14px,1.5vw,20px);font-weight:700;text-transform:uppercase;letter-spacing:.04em;writing-mode:vertical-rl;transform:rotate(180deg);position:absolute;right:16px;top:24px;color:rgba(255,255,255,.4);transition:color .3s,writing-mode .3s}
+.world-item:hover .world-name{writing-mode:horizontal-tb;transform:none;position:static;font-size:clamp(20px,2.5vw,32px);color:var(--ink)}
+
+/* BEFORE/AFTER */
+#beforeafter{padding:120px 60px;background:var(--bg-1)}
+.ba-filmstrip{display:flex;gap:3px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:8px;cursor:grab}
+.ba-filmstrip:active{cursor:grabbing}
+.ba-filmstrip::-webkit-scrollbar{display:none}
+.ba-strip-cell{flex:0 0 260px;position:relative;aspect-ratio:4/3;overflow:hidden;cursor:pointer;border:1px solid transparent;transition:border-color .2s;background:var(--bg-2)}
+.ba-strip-cell:hover{border-color:var(--accent)}
+.ba-strip-cell .ba-before,.ba-strip-cell .ba-after{position:absolute;inset:0}
+.ba-strip-cell img{width:100%;height:100%;object-fit:cover}
+.ba-strip-cell .ba-after{clip-path:inset(0 50% 0 0)}
+.ba-strip-cell .ba-div{position:absolute;top:0;bottom:0;width:1px;background:var(--accent);left:50%;pointer-events:none;opacity:.5}
+.ba-strip-label{position:absolute;bottom:8px;left:8px;font-family:var(--f-mono);font-size:8px;letter-spacing:.25em;color:var(--ink-mute);background:rgba(10,10,10,.8);padding:3px 7px}
+
+/* BA FULL VIEWER */
+#ba-viewer{position:fixed;inset:0;background:rgba(10,10,10,.98);z-index:2000;display:none;flex-direction:column;align-items:center;justify-content:center}
+#ba-viewer.open{display:flex}
+.bav-inner{position:relative;max-width:860px;width:90vw}
+.bav-stage{position:relative;aspect-ratio:4/3;overflow:hidden;cursor:col-resize;user-select:none}
+.bav-stage .bav-before,.bav-stage .bav-after{position:absolute;inset:0}
+.bav-stage img{width:100%;height:100%;object-fit:cover}
+.bav-after{clip-path:inset(0 50% 0 0)}
+.bav-line{position:absolute;top:0;bottom:0;width:2px;background:var(--accent);left:50%;transform:translateX(-50%)}
+.bav-handle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:36px;height:36px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px}
+.bav-controls{display:flex;align-items:center;justify-content:space-between;margin-top:20px}
+.bav-btn{background:none;border:1px solid #333;color:var(--ink-dim);font-family:var(--f-mono);font-size:10px;letter-spacing:.25em;padding:10px 24px;cursor:pointer;text-transform:uppercase;transition:border-color .2s,color .2s}
+.bav-btn:hover{border-color:var(--accent);color:var(--ink)}
+.bav-ctr{font-family:var(--f-mono);font-size:11px;color:var(--ink-mute)}
+#bav-close{position:absolute;top:20px;right:20px;background:none;border:none;color:var(--ink-dim);font-family:var(--f-mono);font-size:10px;letter-spacing:.3em;cursor:pointer;text-transform:uppercase}
+
+/* COMMERCIALS — FILMSTRIP */
+#commercials{padding:120px 60px}
+.films-featured{display:grid;grid-template-columns:1fr 2fr;gap:3px;margin-bottom:3px;min-height:70vh}
+.film-portrait{position:relative;aspect-ratio:9/16;overflow:hidden;background:var(--bg-2);max-height:80vh}
+.film-portrait video{width:100%;height:100%;object-fit:cover}
+.film-portrait-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,10,10,.9) 0%,transparent 50%)}
+.film-portrait-info{position:absolute;bottom:0;left:0;right:0;padding:28px 24px}
+.film-portrait-num{font-family:var(--f-mono);font-size:9px;letter-spacing:.3em;color:var(--accent);margin-bottom:8px}
+.film-portrait-title{font-family:var(--f-display);font-size:clamp(24px,3vw,40px);font-weight:900;text-transform:uppercase;letter-spacing:-.01em;margin-bottom:6px}
+.film-portrait-meta{font-family:var(--f-mono);font-size:9px;letter-spacing:.2em;color:var(--ink-mute);text-transform:uppercase}
+.film-list{display:flex;flex-direction:column;gap:3px;overflow-y:auto;max-height:80vh}
+.film-row{display:flex;align-items:center;gap:0;background:var(--bg-2);cursor:pointer;border:1px solid transparent;transition:border-color .15s,background .15s;min-height:64px}
+.film-row.active,.film-row:hover{background:var(--bg-1);border-color:#333}
+.film-row.active{border-left:3px solid var(--accent)}
+.film-row-num{font-family:var(--f-mono);font-size:9px;letter-spacing:.2em;color:var(--ink-mute);min-width:44px;text-align:center;border-right:1px solid #222;padding:0 12px;align-self:stretch;display:flex;align-items:center}
+.film-row-title{font-family:var(--f-display);font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:.02em;padding:0 20px;flex:1}
+.film-row-meta{font-family:var(--f-mono);font-size:8px;letter-spacing:.2em;color:var(--ink-mute);padding:0 20px;text-transform:uppercase}
+.film-watch-btn{font-family:var(--f-mono);font-size:9px;letter-spacing:.2em;background:none;border:none;color:var(--accent);cursor:pointer;padding:0 24px;text-transform:uppercase;transition:color .15s;height:100%}
+.film-watch-btn:hover{background:var(--accent);color:var(--bg)}
+
+/* FILM LIGHTBOX */
+#film-lb{position:fixed;inset:0;background:rgba(10,10,10,.98);z-index:2000;display:none;align-items:center;justify-content:center;flex-direction:column}
+#film-lb.open{display:flex}
+#film-lb-video{max-height:82vh;max-width:46vh;width:auto}
+.film-lb-title{font-family:var(--f-display);font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-dim);margin-top:16px}
+#film-lb-close{position:absolute;top:20px;right:20px;background:none;border:1px solid #333;color:var(--ink-dim);font-family:var(--f-mono);font-size:9px;letter-spacing:.3em;padding:8px 16px;cursor:pointer;text-transform:uppercase}
+
+/* COMFYUI */
+#comfyui{padding:120px 60px;background:var(--bg-1)}
+.comfy-row{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-top:0}
+.comfy-item{position:relative;overflow:hidden;aspect-ratio:1;background:var(--bg-2)}
+.comfy-item img{width:100%;height:100%;object-fit:cover;filter:brightness(.7);transition:filter .4s,transform .4s}
+.comfy-item:hover img{filter:brightness(1);transform:scale(1.04)}
+.comfy-item-label{position:absolute;bottom:0;left:0;right:0;padding:20px;background:linear-gradient(transparent,rgba(10,10,10,.9))}
+.comfy-item-label h3{font-family:var(--f-display);font-size:clamp(18px,2vw,26px);font-weight:700;text-transform:uppercase;letter-spacing:.02em;margin-bottom:4px}
+.comfy-item-label p{font-family:var(--f-mono);font-size:9px;letter-spacing:.2em;color:var(--accent);text-transform:uppercase}
+
+/* AI SYSTEMS */
+#ai-systems{padding:120px 60px}
+.ai-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+.ai-card{background:var(--bg-2);padding:40px;border:1px solid transparent;transition:border-color .25s}
+.ai-card:hover{border-color:var(--accent)}
+.ai-card-num{font-family:var(--f-mono);font-size:9px;letter-spacing:.35em;color:var(--accent);margin-bottom:24px;display:block}
+.ai-card h3{font-family:var(--f-display);font-size:clamp(24px,2.5vw,36px);font-weight:900;text-transform:uppercase;letter-spacing:-.01em;line-height:1.05;margin-bottom:20px}
+.ai-card p{font-family:var(--f-display);font-size:14px;font-weight:300;color:var(--ink-dim);line-height:1.65;margin-bottom:24px}
+.ai-tags{display:flex;flex-wrap:wrap;gap:6px}
+.ai-tag{font-family:var(--f-mono);font-size:8px;letter-spacing:.2em;color:var(--ink-mute);border:1px solid #333;padding:3px 8px;text-transform:uppercase}
+
+/* CHARACTER */
+#character{padding:120px 60px;background:var(--bg-1)}
+.char-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:0}
+.char-vid{position:relative;overflow:hidden;background:var(--bg-2)}
+.char-vid video{width:100%;display:block;aspect-ratio:9/16;object-fit:cover}
+.char-3d{background:var(--bg-2);display:flex;flex-direction:column;gap:3px}
+#jon-canvas{flex:1;min-height:300px;display:block;cursor:grab}
+#jon-canvas:active{cursor:grabbing}
+.char-credits{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+.char-credit{background:var(--bg);padding:20px;border-top:2px solid var(--ink-ghost)}
+.char-credit-key{font-family:var(--f-mono);font-size:8px;letter-spacing:.3em;color:var(--ink-mute);text-transform:uppercase;margin-bottom:8px}
+.char-credit-val{font-family:var(--f-display);font-size:clamp(14px,1.5vw,18px);font-weight:700;text-transform:uppercase;letter-spacing:.02em}
+
+/* ABOUT */
+#about{padding:120px 60px}
+.about-layout{display:grid;grid-template-columns:1fr 1fr;gap:80px}
+.about-left{}
+.about-tagline{font-family:var(--f-display);font-size:clamp(40px,6vw,80px);font-weight:900;text-transform:uppercase;letter-spacing:-.02em;line-height:.9;margin-bottom:40px}
+.about-tagline em{font-style:italic;font-weight:200;font-size:.75em;color:var(--ink-dim)}
+.about-body{font-family:var(--f-display);font-size:16px;font-weight:300;color:var(--ink-dim);line-height:1.75;margin-bottom:20px;max-width:60ch}
+.about-right{}
+.about-meta-table{width:100%;border-collapse:collapse;margin-bottom:40px}
+.about-meta-table tr{border-bottom:1px solid #1e1e1e}
+.about-meta-table td{padding:14px 0;font-family:var(--f-display);font-size:14px;font-weight:300}
+.about-meta-table td:first-child{font-family:var(--f-mono);font-size:9px;letter-spacing:.25em;color:var(--ink-mute);text-transform:uppercase;width:40%}
+.tools-list{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.tool-entry{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #1e1e1e}
+.tool-entry-n{font-family:var(--f-mono);font-size:8px;letter-spacing:.2em;color:var(--accent);min-width:28px}
+.tool-entry-name{font-family:var(--f-display);font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.02em}
+
+/* ARCHIVE */
+#archive{padding:80px 60px;background:var(--accent);color:var(--bg)}
+.archive-row{display:flex;align-items:center;justify-content:space-between}
+.archive-left h2{font-family:var(--f-display);font-size:clamp(48px,8vw,100px);font-weight:900;text-transform:uppercase;letter-spacing:-.03em;line-height:.9}
+.archive-left p{font-family:var(--f-display);font-size:16px;font-weight:300;margin-top:20px;max-width:50ch;line-height:1.6;opacity:.75}
+.archive-btn{font-family:var(--f-mono);font-size:10px;letter-spacing:.4em;background:var(--bg);color:var(--ink);border:none;padding:20px 48px;cursor:pointer;text-transform:uppercase;text-decoration:none;display:inline-block;transition:opacity .15s;white-space:nowrap}
+.archive-btn:hover{opacity:.85}
+
+/* CONTACT */
+#contact{padding:120px 60px}
+.contact-heading{font-family:var(--f-display);font-size:clamp(60px,12vw,160px);font-weight:900;text-transform:uppercase;letter-spacing:-.04em;line-height:.85;margin-bottom:80px}
+.contact-heading em{font-style:italic;font-weight:200;color:var(--ink-dim)}
+.contact-cols{display:grid;grid-template-columns:1fr 1fr;gap:80px}
+.contact-links{display:flex;flex-direction:column;gap:0}
+.contact-link-row{display:flex;align-items:center;justify-content:space-between;border-top:1px solid #1e1e1e;padding:20px 0;text-decoration:none;transition:background .15s;padding-left:0;padding-right:0}
+.contact-link-row:hover .cl-name{color:var(--accent)}
+.cl-platform{font-family:var(--f-mono);font-size:9px;letter-spacing:.3em;color:var(--ink-mute);text-transform:uppercase;min-width:120px}
+.cl-name{font-family:var(--f-display);font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:.02em;color:var(--ink);transition:color .15s}
+.cl-arrow{font-size:20px;color:var(--ink-ghost);transition:transform .2s}
+.contact-link-row:hover .cl-arrow{transform:translateX(6px);color:var(--accent)}
+.contact-tagline{font-family:var(--f-display);font-size:clamp(28px,4vw,48px);font-weight:900;text-transform:uppercase;line-height:1.1;color:var(--ink-dim)}
+
+/* FOOTER */
+footer{padding:32px 60px;border-top:1px solid #1e1e1e;display:flex;align-items:center;justify-content:space-between}
+.footer-brand{font-family:var(--f-display);font-size:18px;font-weight:900;text-transform:uppercase;letter-spacing:.02em}
+.footer-copy{font-family:var(--f-mono);font-size:9px;letter-spacing:.2em;color:var(--ink-mute)}
+.footer-links{display:flex;gap:0}
+.footer-links a{font-family:var(--f-mono);font-size:9px;letter-spacing:.25em;color:var(--ink-mute);text-decoration:none;text-transform:uppercase;padding:0 16px;border-left:1px solid #1e1e1e;transition:color .15s}
+.footer-links a:hover{color:var(--ink)}
+
+@media(max-width:768px){
+  #hero{grid-template-columns:1fr}.hero-right{display:none}
+  .worlds-strip{height:50vh}
+  .ba-filmstrip{gap:2px}
+  .ba-strip-cell{flex:0 0 200px}
+  .films-featured{grid-template-columns:1fr;min-height:auto}
+  .film-list{max-height:400px}
+  .comfy-row{grid-template-columns:1fr}
+  .ai-grid{grid-template-columns:1fr}
+  .char-grid{grid-template-columns:1fr}
+  .about-layout{grid-template-columns:1fr}
+  .tools-list{grid-template-columns:1fr}
+  .archive-row{flex-direction:column;gap:40px}
+  .contact-cols{grid-template-columns:1fr;gap:40px}
+  body{cursor:auto}
+  #cursor,#cursor-ring{display:none}
+  #top-nav .nav-center,.nav-cta{display:none}
+}
+</style>
+</head>
+<body class="no-scroll">
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-big">JATIN</div>
+  <div class="loader-pct-big" id="loader-pct">0%</div>
+  <div class="loader-bar-wrap"><div class="loader-bar" id="loader-bar"></div></div>
+  <div class="loader-label">Loading experience</div>
+</div>
+
+<!-- NAV -->
+<nav id="top-nav">
+  <div class="nav-brand">
+    <span class="nav-brand-text">Jatin Shinde</span>
+    <span class="nav-brand-sub">CGI · VFX</span>
+  </div>
+  <div class="nav-center">
+    <a href="#worlds" class="nav-link">Worlds</a>
+    <a href="#commercials" class="nav-link">Work</a>
+    <a href="#about" class="nav-link">About</a>
+  </div>
+  <a href="#contact" class="nav-cta">Contact</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-left">
+    <div class="hero-tag">CGI & VFX Artist — 2026</div>
+    <div class="hero-name">JATIN<br><em>Shinde</em></div>
+    <div class="hero-role">Lead CGI & VFX Artist</div>
+    <div class="hero-strip">
+      <div><div class="hero-stat-label">Experience</div><div class="hero-stat-val">7+<span style="font-size:.4em;font-weight:300;color:var(--ink-dim)"> YRS</span></div></div>
+      <div><div class="hero-stat-label">Tools</div><div class="hero-stat-val">13</div></div>
+      <div><div class="hero-stat-label">Worlds</div><div class="hero-stat-val">5</div></div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <video id="seq1-video" autoplay muted loop playsinline preload="metadata"
+      src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/environment-sequence-01/Sequence1.mp4"></video>
+    <div class="hero-right-overlay"></div>
+  </div>
+</section>
+
+<!-- WORLDS -->
+<section id="worlds">
+  <div class="sec-header">
+    <span class="sec-num">01 —</span>
+    <h2 class="sec-title">UE5 Worlds</h2>
+    <span class="sec-desc">Five cinematic environments built in Unreal Engine 5</span>
+  </div>
+  <div class="worlds-strip" id="worlds-strip"></div>
+</section>
+
+<!-- BEFORE/AFTER -->
+<section id="beforeafter">
+  <div class="sec-header">
+    <span class="sec-num">02 —</span>
+    <h2 class="sec-title">Before & After</h2>
+    <span class="sec-desc">CGI compositing and visual effects transformations</span>
+  </div>
+  <div class="ba-filmstrip" id="ba-filmstrip"></div>
+</section>
+
+<!-- BA VIEWER -->
+<div id="ba-viewer">
+  <button id="bav-close" onclick="bavClose()">Close ✕</button>
+  <div class="bav-inner">
+    <div class="bav-stage" id="bav-stage">
+      <div class="bav-before"><img id="bav-before-img" src="" alt="Before"></div>
+      <div class="bav-after" id="bav-after-el"><img id="bav-after-img" src="" alt="After"></div>
+      <div class="bav-line" id="bav-line"></div>
+      <div class="bav-handle" id="bav-handle">↔</div>
+    </div>
+    <div class="bav-controls">
+      <button class="bav-btn" onclick="bavNav(-1)">← Prev</button>
+      <span class="bav-ctr" id="bav-ctr">01 / 14</span>
+      <button class="bav-btn" onclick="bavNav(1)">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- COMMERCIALS -->
+<section id="commercials">
+  <div class="sec-header">
+    <span class="sec-num">03 —</span>
+    <h2 class="sec-title">Commercial CGI</h2>
+    <span class="sec-desc">11 advertising films — product visualization & VFX</span>
+  </div>
+  <div class="films-featured">
+    <div class="film-portrait">
+      <video id="comm-center-video" autoplay muted loop playsinline preload="metadata"></video>
+      <div class="film-portrait-overlay"></div>
+      <div class="film-portrait-info">
+        <div class="film-portrait-num" id="comm-num">01</div>
+        <div class="film-portrait-title" id="comm-title">Chocolate Bar</div>
+        <div class="film-portrait-meta" id="comm-meta">Product / CGI</div>
+      </div>
+    </div>
+    <div class="film-list" id="film-list"></div>
+  </div>
+</section>
+
+<!-- FILM LIGHTBOX -->
+<div id="film-lb">
+  <button id="film-lb-close" onclick="filmLbClose()">Close ✕</button>
+  <video id="film-lb-video" playsinline controls loop></video>
+  <div class="film-lb-title" id="film-lb-title"></div>
+</div>
+
+<!-- COMFYUI -->
+<section id="comfyui">
+  <div class="sec-header">
+    <span class="sec-num">04 —</span>
+    <h2 class="sec-title">ComfyUI</h2>
+    <span class="sec-desc">Generative AI pipelines integrated with production workflow</span>
+  </div>
+  <div class="comfy-row">
+    <div class="comfy-item">
+      <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/01.webp" alt="Texture Synthesis" loading="lazy">
+      <div class="comfy-item-label"><h3>Texture Synthesis</h3><p>Diffusion · Procedural</p></div>
+    </div>
+    <div class="comfy-item">
+      <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/02.webp" alt="Environment Concept" loading="lazy">
+      <div class="comfy-item-label"><h3>Environment Concept</h3><p>Text-to-Image · Inpaint</p></div>
+    </div>
+    <div class="comfy-item">
+      <img src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/renders/03.webp" alt="Character Concept" loading="lazy">
+      <div class="comfy-item-label"><h3>Character Concept</h3><p>ControlNet · LoRA</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- AI SYSTEMS -->
+<section id="ai-systems">
+  <div class="sec-header">
+    <span class="sec-num">05 —</span>
+    <h2 class="sec-title">Creative AI Systems</h2>
+    <span class="sec-desc">Three proprietary AI pipelines built for production</span>
+  </div>
+  <div class="ai-grid">
+    <div class="ai-card">
+      <span class="ai-card-num">SYS — 01</span>
+      <h3>Scene Intelligence</h3>
+      <p>AI-driven environment composition integrating Stable Diffusion with Unreal Engine procedural generation. Environments are seeded from prompts and evolved through iterative diffusion passes.</p>
+      <div class="ai-tags"><span class="ai-tag">ComfyUI</span><span class="ai-tag">SDXL</span><span class="ai-tag">Unreal Engine 5</span></div>
+    </div>
+    <div class="ai-card">
+      <span class="ai-card-num">SYS — 02</span>
+      <h3>Asset Pipeline</h3>
+      <p>Semi-automated asset processing with AI upscaling, procedural texture generation, and automated LOD generation for real-time environments. Cuts texture prep time significantly.</p>
+      <div class="ai-tags"><span class="ai-tag">Substance 3D</span><span class="ai-tag">AI Upscaling</span><span class="ai-tag">Python</span></div>
+    </div>
+    <div class="ai-card">
+      <span class="ai-card-num">SYS — 03</span>
+      <h3>Motion Engine</h3>
+      <p>ML-enhanced motion retargeting combining mocap data with generative motion synthesis for character animation in Unreal Engine and Blender. Procedural secondary motion.</p>
+      <div class="ai-tags"><span class="ai-tag">Motion Capture</span><span class="ai-tag">Marvelous Designer</span><span class="ai-tag">MetaHuman</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- CHARACTER -->
+<section id="character">
+  <div class="sec-header">
+    <span class="sec-num">06 —</span>
+    <h2 class="sec-title">Character Work</h2>
+    <span class="sec-desc">Digital humans built with the full production pipeline</span>
+  </div>
+  <div class="char-grid">
+    <div class="char-vid">
+      <video autoplay muted loop playsinline preload="metadata"
+        src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/showreel/character-reel.mp4"></video>
+    </div>
+    <div class="char-3d">
+      <canvas id="jon-canvas"></canvas>
+      <div class="char-credits">
+        <div class="char-credit"><div class="char-credit-key">Model</div><div class="char-credit-val">JON</div></div>
+        <div class="char-credit"><div class="char-credit-key">Pipeline</div><div class="char-credit-val">CC4 + UE5</div></div>
+        <div class="char-credit"><div class="char-credit-key">Cloth</div><div class="char-credit-val">Marvelous</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="sec-header">
+    <span class="sec-num">07 —</span>
+    <h2 class="sec-title">About</h2>
+  </div>
+  <div class="about-layout">
+    <div class="about-left">
+      <div class="about-tagline">Vision<br>meets<br><em>execution</em></div>
+      <p class="about-body">With 7+ years in CGI and visual effects, I build worlds that don't exist and make them feel real. From cinematic environments in Unreal Engine 5 to photorealistic product visualization for global brands, my work sits at the intersection of art and engineering.</p>
+      <p class="about-body">I lead graphic designers and video editors, translating complex creative briefs into production-ready visual assets — characters, environments, VFX pipelines, and commercial CGI for advertising and entertainment.</p>
+    </div>
+    <div class="about-right">
+      <table class="about-meta-table">
+        <tr><td>Discipline</td><td>CGI & Visual Effects</td></tr>
+        <tr><td>Experience</td><td>7+ Years</td></tr>
+        <tr><td>Specialty</td><td>Environments · Characters · VFX</td></tr>
+        <tr><td>Engine</td><td>Unreal Engine 5</td></tr>
+        <tr><td>Role</td><td>Lead Artist · Creative Director</td></tr>
+      </table>
+      <div class="tools-list">
+        <div class="tool-entry"><span class="tool-entry-n">01</span><span class="tool-entry-name">After Effects</span></div>
+        <div class="tool-entry"><span class="tool-entry-n">02</span><span class="tool-entry-name">Premiere Pro</span></div>
+        <div class="tool-entry"><span class="tool-entry-n">03</span><span class="tool-entry-name">Photoshop</span></div>
+        <div class="tool-entry"><span class="tool-entry-n">04</span><span class="tool-entry-name">Illustrator</span></div>
+        <div class="tool-entry"><span class="tool-entry-n">05</span><span class="tool-entry-name">Audition</span></div>
+        <div class="tool-entry"><span class="tool-entry-n">06</span><span class="tool-entry-name">Lightroom</span></div>
+        <div class="tool-entry"><span class="tool-entry-n">07</span><span class="tool-entry-name">CorelDRAW</span></div>
+        <div class="tool-entry"><span class="tool-entry-n">08</span><span class="tool-entry-name">Blender</span></div>
+        <div class="tool-entry"><span class="tool-entry-n">09</span><span class="tool-entry-name">Unreal Engine 5</span></div>
+        <div class="tool-entry"><span class="tool-entry-n">10</span><span class="tool-entry-name">Substance 3D Painter</span></div>
+        <div class="tool-entry"><span class="tool-entry-n">11</span><span class="tool-entry-name">Character Creator 4</span></div>
+        <div class="tool-entry"><span class="tool-entry-n">12</span><span class="tool-entry-name">Marvelous Designer</span></div>
+        <div class="tool-entry"><span class="tool-entry-n">13</span><span class="tool-entry-name">DaVinci Resolve</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHIVE -->
+<section id="archive">
+  <div class="archive-row">
+    <div class="archive-left">
+      <h2>Full Archive</h2>
+      <p>Seven years of CGI, VFX, environments, and commercial production — organized by project and year.</p>
+    </div>
+    <a href="#contact" class="archive-btn">Request Access →</a>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-heading">Let's<br>Build<br><em>Together</em></div>
+  <div class="contact-cols">
+    <div class="contact-links">
+      <a href="mailto:jatin@imaginators.studio" class="contact-link-row">
+        <span class="cl-platform">Email</span>
+        <span class="cl-name">jatin@imaginators.studio</span>
+        <span class="cl-arrow">→</span>
+      </a>
+      <a href="https://instagram.com/imaginators.studio" target="_blank" rel="noopener" class="contact-link-row">
+        <span class="cl-platform">Instagram</span>
+        <span class="cl-name">@imaginators.studio</span>
+        <span class="cl-arrow">→</span>
+      </a>
+      <a href="https://youtube.com/@imaginatorsstudio" target="_blank" rel="noopener" class="contact-link-row">
+        <span class="cl-platform">YouTube</span>
+        <span class="cl-name">@imaginatorsstudio</span>
+        <span class="cl-arrow">→</span>
+      </a>
+      <a href="https://linkedin.com/in/jatin-shinde" target="_blank" rel="noopener" class="contact-link-row">
+        <span class="cl-platform">LinkedIn</span>
+        <span class="cl-name">Jatin Shinde</span>
+        <span class="cl-arrow">→</span>
+      </a>
+    </div>
+    <div>
+      <div class="contact-tagline">Cinematic CGI.<br>Real-world impact.<br>7+ years of craft.</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span class="footer-brand">Jatin Shinde</span>
+  <span class="footer-copy">© 2026 — CGI & VFX Artist</span>
+  <div class="footer-links">
+    <a href="https://instagram.com/imaginators.studio" target="_blank" rel="noopener">Instagram</a>
+    <a href="https://youtube.com/@imaginatorsstudio" target="_blank" rel="noopener">YouTube</a>
+    <a href="https://linkedin.com/in/jatin-shinde" target="_blank" rel="noopener">LinkedIn</a>
+  </div>
+</footer>
+
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const CDN = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev';
+
+const WORLDS = [
+  { slug:'world-01', name:'Ashfall',  accent:'#c46428' },
+  { slug:'world-02', name:'Luminara', accent:'#7c5cc4' },
+  { slug:'world-03', name:'Verdant',  accent:'#3a8c52' },
+  { slug:'world-04', name:'Helios',   accent:'#2872c4' },
+  { slug:'world-05', name:'Aurum',    accent:'#c4a028' },
+];
+
+const ADS = [
+  { src:'gallery/ads/chocolate-bar.mp4',                       title:'Chocolate Bar',            meta:'Product / CGI' },
+  { src:'gallery/ads/earbuds.mp4',                             title:'Earbuds',                  meta:'Product / CGI' },
+  { src:'gallery/ads/facewash.mp4',                            title:'Facewash',                 meta:'Product / CGI' },
+  { src:'gallery/ads/pepsi.mp4',                               title:'Pepsi',                    meta:'Advertising / CGI' },
+  { src:'gallery/ads/serum.mp4',                               title:'Serum',                    meta:'Product / CGI' },
+  { src:'gallery/ads/shoe.mp4',                                title:'Shoe',                     meta:'Product / CGI' },
+  { src:'gallery/ads/smart-watch.mp4',                         title:'Smart Watch',              meta:'Product / CGI' },
+  { src:'gallery/ads/911%20Commercial.mp4',                    title:'911 Commercial',           meta:'Advertising / CGI' },
+  { src:'gallery/ads/Moisturizer%20and%20Cleanser%20Ad-1.mp4', title:'Moisturizer & Cleanser',   meta:'Product / CGI' },
+  { src:'gallery/ads/RR%20Ad.mp4',                             title:'RR Ad',                    meta:'Advertising / CGI' },
+  { src:'gallery/ads/Reelvideo-29689.mp4',                     title:'Commercial Reel',          meta:'Motion / CGI' },
+];
+
+/* CURSOR */
+const cur=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+let mx=window.innerWidth/2,my=window.innerHeight/2,rx=mx,ry=my;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px'});
+(function r(){rx+=(mx-rx)*.07;ry+=(my-ry)*.07;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(r)})();
+document.querySelectorAll('a,button,[data-hover]').forEach(el=>{
+  el.addEventListener('mouseenter',()=>document.body.classList.add('cursor-link'));
+  el.addEventListener('mouseleave',()=>document.body.classList.remove('cursor-link'));
+});
+
+/* LOADER */
+let pct=0;
+const bar=document.getElementById('loader-bar'),pctEl=document.getElementById('loader-pct');
+const loadInt=setInterval(()=>{
+  pct=Math.min(pct+Math.random()*7+3,100);
+  bar.style.width=pct+'%';pctEl.textContent=Math.round(pct)+'%';
+  if(pct>=100){clearInterval(loadInt);setTimeout(()=>{const l=document.getElementById('loader');l.style.transition='opacity .5s';l.style.opacity='0';setTimeout(()=>{l.style.display='none';document.body.classList.remove('no-scroll')},500)},300)}
+},100);
+
+/* WORLDS STRIP */
+const ws=document.getElementById('worlds-strip');
+WORLDS.forEach((w,i)=>{
+  const item=document.createElement('div');item.className='world-item';
+  const img=document.createElement('img');img.src=`${CDN}/worlds/${w.slug}/frame_0001.webp`;img.alt=w.name;img.loading='lazy';
+  const lbl=document.createElement('div');lbl.className='world-item-label';
+  lbl.innerHTML=`<div class="world-num">0${i+1}</div>`;
+  const wn=document.createElement('div');wn.className='world-name';wn.textContent=w.name.toUpperCase();
+  item.append(img,lbl,wn);
+  item.style.setProperty('--waccent',w.accent);
+  ws.appendChild(item);
+});
+
+/* BA FILMSTRIP */
+const baFs=document.getElementById('ba-filmstrip');
+let bavState={idx:0,dragging:false};
+for(let i=1;i<=14;i++){
+  const cell=document.createElement('div');cell.className='ba-strip-cell';cell.dataset.idx=i-1;
+  const bef=document.createElement('div');bef.className='ba-before';
+  const bi=document.createElement('img');bi.src=`${CDN}/gallery/Before%20and%20After/Before%20${i}.webp`;bi.alt='Before';bi.loading='lazy';
+  bef.appendChild(bi);
+  const aft=document.createElement('div');aft.className='ba-after';
+  const ai=document.createElement('img');ai.src=`${CDN}/gallery/Before%20and%20After/After%20${i}.webp`;ai.alt='After';ai.loading='lazy';
+  aft.appendChild(ai);
+  const div=document.createElement('div');div.className='ba-div';
+  const lbl=document.createElement('div');lbl.className='ba-strip-label';lbl.textContent=`${String(i).padStart(2,'0')} / 14`;
+  cell.append(bef,aft,div,lbl);
+  cell.addEventListener('mousemove',e=>{
+    const r=cell.getBoundingClientRect();
+    const p=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));
+    aft.style.clipPath=`inset(0 ${(1-p)*100}% 0 0)`;
+    div.style.left=(p*100)+'%';
+  });
+  cell.addEventListener('mouseleave',()=>{aft.style.clipPath='inset(0 50% 0 0)';div.style.left='50%'});
+  cell.addEventListener('click',()=>bavOpen(i-1));
+  baFs.appendChild(cell);
+}
+/* filmstrip drag scroll */
+let fsDown=false,fsX=0,fsSL=0;
+baFs.addEventListener('mousedown',e=>{fsDown=true;fsX=e.pageX-baFs.offsetLeft;fsSL=baFs.scrollLeft});
+window.addEventListener('mouseup',()=>fsDown=false);
+baFs.addEventListener('mousemove',e=>{if(!fsDown)return;e.preventDefault();const x=e.pageX-baFs.offsetLeft;baFs.scrollLeft=fsSL-(x-fsX)});
+
+/* BA VIEWER */
+const bavEl=document.getElementById('ba-viewer');
+const bavBefore=document.getElementById('bav-before-img');
+const bavAfterEl=document.getElementById('bav-after-el');
+const bavLine=document.getElementById('bav-line');
+const bavHandle=document.getElementById('bav-handle');
+const bavCtr=document.getElementById('bav-ctr');
+const bavStage=document.getElementById('bav-stage');
+function bavOpen(idx){bavState.idx=idx;bavLoad();bavEl.classList.add('open');document.body.style.overflow='hidden'}
+function bavLoad(){
+  const i=bavState.idx+1;
+  bavBefore.src=`${CDN}/gallery/Before%20and%20After/Before%20${i}.webp`;
+  document.getElementById('bav-after-img').src=`${CDN}/gallery/Before%20and%20After/After%20${i}.webp`;
+  bavCtr.textContent=`${String(i).padStart(2,'0')} / 14`;
+  bavAfterEl.style.clipPath='inset(0 50% 0 0)';bavLine.style.left='50%';bavHandle.style.left='50%';
+}
+window.bavClose=function(){bavEl.classList.remove('open');document.body.style.overflow=''};
+window.bavNav=function(d){bavState.idx=((bavState.idx+d)+14)%14;bavLoad()};
+let bavDrag=false;
+bavStage.addEventListener('mousedown',()=>bavDrag=true);
+window.addEventListener('mouseup',()=>bavDrag=false);
+bavStage.addEventListener('mousemove',e=>{
+  if(!bavDrag)return;
+  const r=bavStage.getBoundingClientRect();
+  const p=Math.max(0.02,Math.min(.98,(e.clientX-r.left)/r.width));
+  bavAfterEl.style.clipPath=`inset(0 ${(1-p)*100}% 0 0)`;
+  bavLine.style.left=(p*100)+'%';bavHandle.style.left=(p*100)+'%';
+});
+bavStage.addEventListener('touchmove',e=>{
+  const r=bavStage.getBoundingClientRect();
+  const p=Math.max(0.02,Math.min(.98,(e.touches[0].clientX-r.left)/r.width));
+  bavAfterEl.style.clipPath=`inset(0 ${(1-p)*100}% 0 0)`;
+  bavLine.style.left=(p*100)+'%';bavHandle.style.left=(p*100)+'%';
+},{passive:true});
+
+/* COMMERCIALS */
+const commCenter=document.getElementById('comm-center-video');
+const commNumEl=document.getElementById('comm-num');
+const commTitleEl=document.getElementById('comm-title');
+const commMetaEl=document.getElementById('comm-meta');
+const filmList=document.getElementById('film-list');
+let commIdx=0;
+
+function commLoad(i){
+  commIdx=i;
+  const ad=ADS[i];
+  commCenter.src=`${CDN}/${ad.src}`;
+  commCenter.muted=true;commCenter.loop=true;commCenter.load();commCenter.play().catch(()=>{});
+  commNumEl.textContent=String(i+1).padStart(2,'0');
+  commTitleEl.textContent=ad.title;commMetaEl.textContent=ad.meta;
+  document.querySelectorAll('.film-row').forEach((r,idx)=>r.classList.toggle('active',idx===i));
+}
+
+ADS.forEach((ad,i)=>{
+  const row=document.createElement('div');row.className='film-row'+(i===0?' active':'');
+  row.innerHTML=`<span class="film-row-num">${String(i+1).padStart(2,'0')}</span>
+    <span class="film-row-title">${ad.title}</span>
+    <span class="film-row-meta">${ad.meta}</span>
+    <button class="film-watch-btn">Watch ▶</button>`;
+  row.addEventListener('click',()=>commLoad(i));
+  row.querySelector('.film-watch-btn').addEventListener('click',e=>{e.stopPropagation();filmLbOpen(i)});
+  filmList.appendChild(row);
+});
+commLoad(0);
+
+/* FILM LIGHTBOX */
+const filmLb=document.getElementById('film-lb');
+const filmLbVideo=document.getElementById('film-lb-video');
+const filmLbTitle=document.getElementById('film-lb-title');
+function filmLbOpen(i){
+  const ad=ADS[i];
+  filmLbVideo.src=`${CDN}/${ad.src}`;
+  filmLbVideo.muted=false;filmLbVideo.loop=true;filmLbVideo.load();filmLbVideo.play().catch(()=>{});
+  filmLbTitle.textContent=ad.title;
+  filmLb.classList.add('open');document.body.style.overflow='hidden';
+}
+window.filmLbClose=function(){filmLbVideo.pause();filmLbVideo.src='';filmLb.classList.remove('open');document.body.style.overflow=''};
+filmLb.addEventListener('click',e=>{if(e.target===filmLb)filmLbClose()});
+
+/* THREE.JS JON */
+const canvas=document.getElementById('jon-canvas');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(45,1,0.1,100);
+camera.position.set(0,1.2,3.2);
+const controls=new OrbitControls(camera,renderer.domElement);
+controls.target.set(0,.8,0);controls.enableDamping=true;controls.dampingFactor=.07;
+controls.enablePan=false;controls.minDistance=1.5;controls.maxDistance=6;
+controls.autoRotate=true;controls.autoRotateSpeed=1;
+scene.add(new THREE.HemisphereLight(0xffffff,0x333333,1));
+const dl=new THREE.DirectionalLight(0xffffff,1.5);dl.position.set(2,4,3);scene.add(dl);
+const dl2=new THREE.DirectionalLight(0xff2020,0.3);dl2.position.set(-3,0,-2);scene.add(dl2);
+new GLTFLoader().load(`${CDN}/models/JON.glb`,gltf=>{
+  const m=gltf.scene;
+  const box=new THREE.Box3().setFromObject(m);
+  const ctr=box.getCenter(new THREE.Vector3());
+  m.position.sub(ctr);m.position.y+=box.getSize(new THREE.Vector3()).y*.5;
+  scene.add(m);
+});
+function resizeRenderer(){
+  const w=canvas.clientWidth,h=canvas.clientHeight;
+  if(canvas.width!==w||canvas.height!==h){renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
+}
+(function animLoop(){requestAnimationFrame(animLoop);resizeRenderer();controls.update();renderer.render(scene,camera)})();
+</script>
+</body>
+</html>

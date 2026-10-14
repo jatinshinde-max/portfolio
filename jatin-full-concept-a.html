@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<!-- CONCEPT A — THE CINEMATIC DIRECTOR'S CUT -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Jatin Shinde — CGI & VFX Artist</title>
+<meta name="description" content="Jatin Shinde — CGI & VFX Artist. Unreal Engine environments, 3D characters, generative AI pipelines, commercial motion.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,200;0,300;0,400;1,200;1,300&family=DM+Mono:wght@300;400&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>
+/* ── TOKENS ────────────────────────────────────── */
+:root {
+  --bg:#08070f; --bg-1:#0d0c18; --bg-2:#12101f;
+  --ink:rgba(255,255,255,.93); --ink-dim:rgba(255,255,255,.48);
+  --ink-mute:rgba(255,255,255,.18); --ink-ghost:rgba(255,255,255,.06);
+  --accent:#c8a96e; /* warm amber-gold — cinematic warmth */
+  --accent-2:#8c6e3a;
+  --f-disp:'Cormorant Garamond',serif; --f-mono:'DM Mono',monospace;
+  --ease-out:cubic-bezier(.23,1,.32,1); --ease-cin:cubic-bezier(.16,1,.3,1);
+  --frame-w:clamp(1.5rem,5vw,4rem);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:auto;background:var(--bg)}
+body{font-family:var(--f-mono);color:var(--ink);background:var(--bg);overflow-x:hidden;cursor:none}
+img,video{display:block;max-width:100%}
+button{background:none;border:none;cursor:none;color:inherit;font:inherit}
+a{color:inherit;text-decoration:none}
+@media(pointer:coarse){body,button,a{cursor:pointer}}
+
+/* ── FILM GRAIN ─────────────────────────────────── */
+body::after{content:'';position:fixed;inset:0;z-index:9990;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");opacity:.35;mix-blend-mode:overlay;animation:grain 0.8s steps(8) infinite}
+@keyframes grain{0%{transform:translate(0,0)}12%{transform:translate(-2%,-3%)}25%{transform:translate(3%,1%)}37%{transform:translate(-1%,4%)}50%{transform:translate(2%,-2%)}62%{transform:translate(-3%,3%)}75%{transform:translate(1%,-1%)}87%{transform:translate(-2%,2%)}100%{transform:translate(0,0)}}
+
+/* ── FILM PERFORATIONS (decorative left edge) ──── */
+.film-edge{position:fixed;left:0;top:0;bottom:0;width:22px;z-index:400;display:flex;flex-direction:column;gap:8px;padding:8px 0;pointer-events:none;background:var(--bg-2);border-right:1px solid var(--ink-ghost)}
+.film-perf{width:8px;height:12px;margin:0 auto;background:var(--bg);border:1px solid var(--ink-ghost);border-radius:1px;flex-shrink:0}
+@media(max-width:768px){.film-edge{display:none}}
+
+/* ── CURSOR ─────────────────────────────────────── */
+#c-dot{position:fixed;top:0;left:0;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);width:4px;height:4px;border-radius:50%;background:var(--accent)}
+#c-ring{position:fixed;top:0;left:0;pointer-events:none;z-index:9997;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;border:1px solid rgba(200,169,110,.35);transition:width .3s,height .3s}
+body:has(a:hover) #c-ring,body:has(button:hover) #c-ring{width:44px;height:44px}
+@media(pointer:coarse){#c-dot,#c-ring{display:none}}
+
+/* ── LOADER ─────────────────────────────────────── */
+#loader{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2.5rem;transition:opacity 1s var(--ease-out),visibility 1s}
+#loader.out{opacity:0;visibility:hidden;pointer-events:none}
+.l-title{font-family:var(--f-disp);font-weight:200;font-size:clamp(2rem,5vw,3.5rem);letter-spacing:.08em;color:var(--ink-dim);font-style:italic}
+.l-sub{font-family:var(--f-mono);font-size:.6rem;letter-spacing:.4em;text-transform:uppercase;color:var(--ink-mute)}
+.l-bar-wrap{width:min(280px,70vw);display:flex;flex-direction:column;gap:.5rem;align-items:center}
+#l-num{font-family:var(--f-mono);font-size:.75rem;letter-spacing:.2em;color:var(--ink-dim)}
+.l-bar-track{width:100%;height:1px;background:var(--ink-ghost)}
+#l-bar{height:100%;background:var(--accent);width:0%;transition:width .1s linear}
+
+/* ── HUD ─────────────────────────────────────────── */
+#hud{position:fixed;top:0;left:28px;right:0;z-index:500;display:flex;align-items:center;justify-content:space-between;padding:1.5rem var(--frame-w);pointer-events:none}
+.hud-mark{font-family:var(--f-disp);font-weight:200;font-size:1.1rem;letter-spacing:.12em;color:var(--ink-dim);font-style:italic;pointer-events:all;transition:color .3s}
+.hud-mark:hover{color:var(--ink)}
+#hud-nav{display:flex;gap:2.5rem;pointer-events:all}
+#hud-nav a{font-family:var(--f-mono);font-size:.58rem;letter-spacing:.28em;text-transform:uppercase;color:var(--ink-mute);transition:color .3s}
+#hud-nav a:hover{color:var(--ink)}
+@media(max-width:768px){#hud-nav{display:none}#hud{left:0;padding:1.2rem 1.25rem}}
+
+/* ── MOB ─────────────────────────────────────────── */
+#mob-btn{position:fixed;top:1.25rem;right:1.25rem;z-index:1000;display:none;flex-direction:column;gap:5px;padding:.5rem;width:36px}
+#mob-btn span{display:block;height:1px;background:var(--ink);transition:transform .3s,opacity .3s}
+@media(max-width:768px){#mob-btn{display:flex}}
+#mob-nav{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem;opacity:0;pointer-events:none;transition:opacity .4s}
+#mob-nav.open{opacity:1;pointer-events:all}
+#mob-nav a{font-family:var(--f-disp);font-size:clamp(1.6rem,6vw,2.5rem);font-weight:200;font-style:italic;color:var(--ink-dim);transition:color .2s}
+#mob-nav a:hover{color:var(--ink)}
+#mob-close{position:absolute;top:1.5rem;right:1.5rem;font-family:var(--f-mono);font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:var(--ink-dim);padding:.5rem}
+
+/* ── SECTION FRAMING ─────────────────────────────── */
+.s-frame{padding:clamp(5rem,10vh,8rem) var(--frame-w) clamp(3rem,6vh,5rem);margin-left:22px}
+@media(max-width:768px){.s-frame{margin-left:0}}
+.s-eyebrow{font-family:var(--f-mono);font-size:.58rem;letter-spacing:.38em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+.s-title{font-family:var(--f-disp);font-weight:200;font-size:clamp(3rem,7vw,6.5rem);line-height:1.02;letter-spacing:-.01em;color:var(--ink);font-style:italic}
+.s-title em{font-style:normal;color:var(--accent)}
+
+/* ── SEQUENCE 1 ──────────────────────────────────── */
+#seq1-wrap{position:relative;height:400vh;margin-left:22px}
+@media(max-width:768px){#seq1-wrap{margin-left:0}}
+#seq1-sticky{position:sticky;top:0;height:100vh;overflow:hidden;background:var(--bg)}
+#seq1-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#seq1-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(8,7,15,.4) 0%,transparent 35%,transparent 55%,rgba(8,7,15,.95) 100%);z-index:2}
+#seq1-id{position:absolute;bottom:clamp(3.5rem,9vh,7rem);left:var(--frame-w);z-index:3}
+.seq1-reel-num{font-family:var(--f-mono);font-size:.55rem;letter-spacing:.4em;text-transform:uppercase;color:var(--accent);margin-bottom:.5rem}
+.seq1-name{font-family:var(--f-disp);font-weight:200;font-size:clamp(4rem,10vw,9rem);line-height:.95;letter-spacing:-.03em;color:var(--ink)}
+.seq1-name em{font-style:italic;color:var(--accent)}
+.seq1-role{font-family:var(--f-mono);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-dim);margin-top:1.5rem}
+.seq1-hint{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);z-index:3;font-family:var(--f-mono);font-size:.58rem;letter-spacing:.28em;text-transform:uppercase;color:var(--ink-mute);display:flex;flex-direction:column;align-items:center;gap:.5rem}
+.seq1-hint-line{width:1px;height:36px;background:linear-gradient(to bottom,transparent,var(--ink-mute));animation:hintPulse 2s ease-in-out infinite}
+@keyframes hintPulse{0%,100%{opacity:.3}50%{opacity:.9}}
+.seq1-pg{position:absolute;bottom:0;left:0;width:100%;height:2px;z-index:4}
+#seq1-pgbar{width:0;height:100%;background:var(--accent);transform-origin:left}
+
+/* ── WORLDS ──────────────────────────────────────── */
+#worlds-section{position:relative;height:100vh;overflow:hidden;background:var(--bg);margin-left:22px}
+@media(max-width:768px){#worlds-section{margin-left:0}}
+#worlds-section .world-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .6s;z-index:1}
+#worlds-section .world-bg.active{opacity:1}
+#worlds-vignette{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 40%,rgba(8,7,15,.6) 100%);z-index:2;pointer-events:none}
+#world-info{position:absolute;bottom:clamp(3rem,7vh,5.5rem);left:var(--frame-w);z-index:5}
+.wi-frac{font-family:var(--f-mono);font-size:.6rem;letter-spacing:.28em;color:var(--accent);margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem}
+.wi-sep{width:20px;height:1px;background:var(--accent);opacity:.4}
+.wi-name{font-family:var(--f-disp);font-weight:200;font-size:clamp(2.5rem,6vw,5rem);letter-spacing:-.02em;color:var(--ink);font-style:italic;line-height:1}
+.wi-tag{font-family:var(--f-mono);font-size:.55rem;letter-spacing:.32em;text-transform:uppercase;color:var(--ink-mute);margin-top:.6rem}
+#world-index{position:absolute;right:var(--frame-w);top:50%;transform:translateY(-50%);z-index:5;display:flex;flex-direction:column;gap:.5rem}
+.wi-btn{font-family:var(--f-mono);font-size:.55rem;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-mute);padding:.4rem .7rem;border:1px solid transparent;transition:all .25s;text-align:right;display:flex;align-items:center;gap:.6rem;flex-direction:row-reverse}
+.wi-btn.active{color:var(--accent);border-color:rgba(200,169,110,.3)}
+.wi-btn:hover{color:var(--ink)}
+.wi-btn-bar{width:20px;height:1px;background:currentColor;transition:width .25s}
+.wi-btn.active .wi-btn-bar{width:32px}
+@media(max-width:768px){#world-index{right:1.25rem}}
+
+/* ── BEFORE / AFTER ──────────────────────────────── */
+#before-after{background:var(--bg-1);margin-left:22px}
+@media(max-width:768px){#before-after{margin-left:0}}
+.ba-header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:2rem;padding:clamp(4rem,8vh,7rem) var(--frame-w) 2rem}
+.ba-header-right{font-family:var(--f-mono);font-size:.6rem;letter-spacing:.2em;color:var(--ink-mute);max-width:36ch;line-height:1.7}
+.ba-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1px;background:var(--bg-2);padding:0;overflow:hidden}
+.ba-cell{position:relative;aspect-ratio:16/9;overflow:hidden;background:var(--bg-1);cursor:none}
+.ba-cell:hover .ba-cell-div{left:45%}
+.ba-cell-before,.ba-cell-after{position:absolute;inset:0;object-fit:cover;width:100%;height:100%}
+.ba-cell-after{clip-path:inset(0 0 0 50%);transition:clip-path 0s}
+.ba-cell-div{position:absolute;top:0;bottom:0;left:50%;width:1px;background:var(--accent);z-index:3;transition:left .4s var(--ease-out)}
+.ba-cell-labels{position:absolute;inset:0;z-index:4;display:flex;justify-content:space-between;align-items:flex-end;padding:.5rem .65rem;pointer-events:none;background:linear-gradient(to top,rgba(8,7,15,.7) 0%,transparent 50%)}
+.ba-cell-lb,.ba-cell-la{font-family:var(--f-mono);font-size:.42rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.5)}
+.ba-cell-num{position:absolute;top:.4rem;right:.4rem;font-family:var(--f-mono);font-size:.4rem;letter-spacing:.18em;color:rgba(200,169,110,.5);z-index:5}
+
+/* FOCUS VIEWER */
+#ba-focus{position:fixed;inset:0;z-index:3000;background:rgba(8,7,15,.97);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+#ba-focus.open{opacity:1;pointer-events:all}
+.ba-focus-inner{position:relative;width:min(85vw,900px);display:flex;flex-direction:column;gap:1.25rem}
+.ba-focus-viewer{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;background:var(--bg-2)}
+.ba-focus-before,.ba-focus-after{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ba-focus-after{clip-path:inset(0 0 0 50%)}
+.ba-focus-line{position:absolute;top:0;bottom:0;left:50%;width:1px;background:var(--accent);z-index:3;cursor:ew-resize;touch-action:none}
+.ba-focus-handle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:32px;height:32px;border-radius:50%;border:1px solid var(--accent);background:rgba(8,7,15,.6);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:4;cursor:ew-resize}
+.ba-focus-handle svg{width:12px;height:12px;stroke:var(--accent);fill:none;stroke-width:1.5}
+.ba-focus-lb{position:absolute;bottom:.5rem;left:.75rem;font-family:var(--f-mono);font-size:.48rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(200,169,110,.6);z-index:5}
+.ba-focus-la{position:absolute;bottom:.5rem;right:.75rem;font-family:var(--f-mono);font-size:.48rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(200,169,110,.6);z-index:5}
+.ba-focus-nav{display:flex;align-items:center;justify-content:space-between}
+.ba-focus-btns{display:flex;gap:.75rem}
+.ba-focus-btn{font-family:var(--f-mono);font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;padding:.5rem 1rem;border:1px solid var(--ink-ghost);color:var(--ink-dim);transition:all .2s}
+.ba-focus-btn:hover{border-color:var(--accent);color:var(--accent)}
+.ba-focus-counter{font-family:var(--f-mono);font-size:.58rem;letter-spacing:.18em;color:var(--ink-mute)}
+.ba-focus-close{font-family:var(--f-mono);font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-mute);transition:color .2s}
+.ba-focus-close:hover{color:var(--accent)}
+
+/* ── COMMERCIAL CGI ──────────────────────────────── */
+#ads{padding:clamp(5rem,10vh,8rem) var(--frame-w) clamp(3rem,5vh,4rem);background:var(--bg);margin-left:22px}
+@media(max-width:768px){#ads{margin-left:0;padding:4rem 1.25rem 2.5rem}}
+.comm-layout{display:grid;grid-template-columns:1fr 280px;gap:3rem;margin-top:3rem;align-items:start}
+@media(max-width:960px){.comm-layout{grid-template-columns:1fr}}
+/* Featured player */
+.comm-player{position:relative;aspect-ratio:9/16;overflow:hidden;background:var(--bg-1);max-width:380px}
+.comm-player video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.comm-player-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,7,15,.85) 0%,transparent 40%);z-index:2;pointer-events:none}
+.comm-player-num{position:absolute;top:.75rem;left:.75rem;font-family:var(--f-mono);font-size:.48rem;letter-spacing:.22em;color:rgba(200,169,110,.5);z-index:3}
+.comm-player-info{position:absolute;bottom:1.25rem;left:1rem;right:1rem;z-index:3}
+.comm-player-title{font-family:var(--f-disp);font-weight:200;font-size:1.5rem;letter-spacing:-.01em;color:var(--ink);font-style:italic;line-height:1.1}
+.comm-player-meta{font-family:var(--f-mono);font-size:.5rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-top:.3rem}
+/* Filmstrip sidebar */
+.comm-strip{display:flex;flex-direction:column;gap:.5rem;overflow-y:auto;max-height:80vh;scrollbar-width:none;padding-right:.25rem}
+.comm-strip::-webkit-scrollbar{display:none}
+.comm-item{display:flex;gap:.75rem;align-items:center;padding:.6rem;border:1px solid transparent;transition:border-color .2s;cursor:none}
+.comm-item.active{border-color:rgba(200,169,110,.3)}
+.comm-item:hover{border-color:var(--ink-ghost)}
+.comm-item-thumb{width:40px;height:70px;flex-shrink:0;overflow:hidden;background:var(--bg-2);position:relative}
+.comm-item-thumb video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.comm-item-num{font-family:var(--f-mono);font-size:.42rem;letter-spacing:.18em;color:var(--accent)}
+.comm-item-name{font-family:var(--f-disp);font-weight:200;font-size:.9rem;font-style:italic;color:var(--ink-dim)}
+.comm-item.active .comm-item-name{color:var(--ink)}
+/* Controls */
+.comm-controls{display:flex;flex-direction:column;gap:.5rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--ink-ghost)}
+.comm-ctrl-btn{font-family:var(--f-mono);font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;padding:.55rem 1rem;border:1px solid var(--ink-ghost);color:var(--ink-dim);width:100%;text-align:left;transition:all .2s}
+.comm-ctrl-btn:hover{border-color:var(--accent);color:var(--accent)}
+.comm-ctrl-watch{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.comm-ctrl-watch:hover{background:rgba(200,169,110,.8);color:var(--bg)}
+
+/* LIGHTBOX */
+#comm-lb{position:fixed;inset:0;z-index:4000;background:rgba(8,7,15,.97);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+#comm-lb.open{opacity:1;pointer-events:all}
+#comm-lb-inner{position:relative;display:flex;flex-direction:column;align-items:center;gap:1rem}
+#comm-lb-video{max-height:88vh;width:auto;max-width:85vw;display:block}
+#comm-lb-title{font-family:var(--f-mono);font-size:.58rem;letter-spacing:.25em;text-transform:uppercase;color:var(--ink-dim)}
+#comm-lb-close{position:absolute;top:-2.5rem;right:0;font-family:var(--f-mono);font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-mute);transition:color .2s}
+#comm-lb-close:hover{color:var(--accent)}
+
+/* ── COMFYUI ──────────────────────────────────────── */
+#genai{margin-left:22px}
+@media(max-width:768px){#genai{margin-left:0}}
+.wf-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1px;background:var(--ink-ghost);margin-top:2.5rem}
+.wf-card{background:var(--bg-1);padding:2rem;display:flex;flex-direction:column;gap:1.5rem}
+.wf-label{font-family:var(--f-mono);font-size:.5rem;letter-spacing:.32em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
+.wf-title{font-family:var(--f-disp);font-weight:200;font-size:1.5rem;font-style:italic;color:var(--ink);line-height:1.1}
+.wf-model{font-family:var(--f-mono);font-size:.5rem;letter-spacing:.18em;color:var(--ink-mute);margin-top:.2rem}
+.wf-nodes{display:flex;flex-direction:column;gap:.35rem}
+.wf-node{font-family:var(--f-mono);font-size:.58rem;letter-spacing:.1em;color:var(--ink-mute);padding:.3rem .5rem;border-left:1px solid var(--ink-ghost)}
+.wf-node.key{border-left-color:var(--accent);color:var(--ink-dim)}
+.wf-output-label{font-family:var(--f-mono);font-size:.48rem;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
+.wf-output-val{font-family:var(--f-mono);font-size:.58rem;line-height:1.65;color:var(--ink-dim)}
+.wf-note{padding:1.5rem var(--frame-w);font-family:var(--f-mono);font-size:.6rem;line-height:1.7;color:var(--ink-mute);background:var(--bg-2);margin-left:22px}
+@media(max-width:768px){.wf-note{margin-left:0}}
+
+/* ── AI SYSTEMS ───────────────────────────────────── */
+#ai-systems{margin-left:22px}
+@media(max-width:768px){#ai-systems{margin-left:0}}
+.ais-tabs{display:flex;gap:0;border-bottom:1px solid var(--ink-ghost);margin:2.5rem 0 0;padding:0 var(--frame-w)}
+.ais-tab{font-family:var(--f-mono);font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;padding:.85rem 1.25rem;color:var(--ink-mute);border-bottom:1px solid transparent;margin-bottom:-1px;transition:all .2s}
+.ais-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.ais-tab:hover{color:var(--ink-dim)}
+.ais-panel{display:none;padding:2.5rem var(--frame-w) 0;animation:fadeIn .4s}
+.ais-panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.ais-panel-grid{display:grid;grid-template-columns:1fr 1.6fr;gap:3rem;align-items:start}
+@media(max-width:900px){.ais-panel-grid{grid-template-columns:1fr}}
+.ais-pnum{font-family:var(--f-mono);font-size:.5rem;letter-spacing:.3em;color:var(--accent);margin-bottom:.5rem}
+.ais-ptitle{font-family:var(--f-disp);font-weight:200;font-size:clamp(1.3rem,2.5vw,2rem);font-style:italic;color:var(--ink);line-height:1.1}
+.ais-ptype{font-family:var(--f-mono);font-size:.5rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-mute);margin-top:.35rem}
+.ais-pdesc{font-family:var(--f-mono);font-size:.65rem;line-height:1.8;color:var(--ink-dim);margin:1.25rem 0;max-width:46ch}
+.ais-caps{display:flex;flex-direction:column;gap:.4rem}
+.ais-cap{font-family:var(--f-mono);font-size:.58rem;color:var(--ink-mute);padding-left:.75rem;border-left:1px solid var(--accent);opacity:.7;line-height:1.5}
+/* Demo frame */
+.ais-demo-frame{background:var(--bg-2);border:1px solid var(--ink-ghost);padding:1.5rem;position:relative}
+.ais-demo-badge{position:absolute;top:.5rem;right:.5rem;font-family:var(--f-mono);font-size:.42rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-mute);background:var(--bg);padding:.2rem .5rem;border:1px solid var(--ink-ghost)}
+.ps-brief{margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--ink-ghost)}
+.ps-brief-label{font-family:var(--f-mono);font-size:.5rem;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);margin-bottom:.5rem}
+.ps-brief-text{font-family:var(--f-mono);font-size:.62rem;line-height:1.75;color:var(--ink-dim);font-style:italic}
+.ps-posts{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+@media(max-width:600px){.ps-posts{grid-template-columns:1fr}}
+.ps-post{background:var(--bg-1);padding:1rem;border:1px solid var(--ink-ghost)}
+.ps-post-plat{font-family:var(--f-mono);font-size:.42rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:.5rem}
+.ps-post-copy{font-family:var(--f-mono);font-size:.6rem;line-height:1.7;color:var(--ink-dim);margin-bottom:.5rem}
+.ps-post-tags{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.5rem}
+.ps-tag{font-family:var(--f-mono);font-size:.42rem;letter-spacing:.12em;color:var(--ink-mute);background:var(--bg-2);padding:.15rem .4rem}
+.ps-post-dir-label{font-family:var(--f-mono);font-size:.42rem;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:.2rem}
+.ps-post-dir-text{font-family:var(--f-mono);font-size:.55rem;line-height:1.6;color:var(--ink-mute)}
+/* Story pipeline */
+.sp-treatment{margin-bottom:1.5rem;padding:1rem;background:var(--bg-1);border-left:2px solid var(--accent)}
+.sp-treatment-label{font-family:var(--f-mono);font-size:.48rem;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
+.sp-treatment-text{font-family:var(--f-mono);font-size:.62rem;line-height:1.75;color:var(--ink-dim);font-style:italic}
+.sp-scene{display:grid;grid-template-columns:auto 1fr auto;gap:.75rem;align-items:start;padding:.75rem 0;border-bottom:1px solid var(--ink-ghost)}
+.sp-scene:last-child{border-bottom:none}
+.sp-sc-num{font-family:var(--f-mono);font-size:.48rem;letter-spacing:.2em;color:var(--accent);white-space:nowrap}
+.sp-sc-title{font-family:var(--f-disp);font-weight:200;font-size:.95rem;font-style:italic;color:var(--ink);margin-bottom:.2rem}
+.sp-sc-desc{font-family:var(--f-mono);font-size:.58rem;line-height:1.6;color:var(--ink-dim)}
+.sp-sc-meta{display:flex;flex-direction:column;gap:.15rem;align-items:flex-end;font-family:var(--f-mono);font-size:.42rem;letter-spacing:.1em;color:var(--ink-mute);white-space:nowrap}
+/* Storyboard */
+.sb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.75rem}
+.sb-panel{background:var(--bg-1);border:1px solid var(--ink-ghost);aspect-ratio:16/9;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.sb-panel-img{flex:1;background:linear-gradient(135deg,var(--bg-2) 0%,var(--bg) 100%);display:flex;align-items:center;justify-content:center}
+.sb-panel-caption{padding:.4rem .5rem;border-top:1px solid var(--ink-ghost)}
+.sb-panel-sc{font-family:var(--f-mono);font-size:.42rem;letter-spacing:.18em;color:var(--accent);display:block}
+.sb-panel-desc{font-family:var(--f-mono);font-size:.5rem;color:var(--ink-mute);line-height:1.4;margin-top:.15rem}
+
+/* ── CHARACTER / SHOWREEL ─────────────────────────── */
+#showreel{margin-left:22px;background:var(--bg)}
+@media(max-width:768px){#showreel{margin-left:0}}
+.char-film{position:relative;aspect-ratio:21/9;overflow:hidden;background:var(--bg)}
+@media(max-width:768px){.char-film{aspect-ratio:unset;min-height:85vh}}
+.char-film video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.char-film-vignette{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(8,7,15,.5) 0%,transparent 25%,transparent 50%,rgba(8,7,15,.96) 100%);pointer-events:none;z-index:2}
+.char-film-ui{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:space-between;padding:clamp(2rem,4vw,3.5rem);z-index:5}
+.char-film-eyebrow{font-family:var(--f-mono);font-size:.55rem;letter-spacing:.32em;text-transform:uppercase;color:var(--accent);margin-bottom:.75rem;display:block}
+.char-film-title{font-family:var(--f-disp);font-weight:200;font-size:clamp(2rem,4.5vw,3.8rem);letter-spacing:-.02em;color:var(--ink);font-style:italic;line-height:1.05}
+.char-play-btn{display:flex;align-items:center;gap:.6rem;font-family:var(--f-mono);font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-dim);padding:.45rem 1rem;border:1px solid rgba(255,255,255,.18);background:rgba(8,7,15,.35);backdrop-filter:blur(8px);margin-top:1rem;transition:border-color .25s,color .25s}
+.char-play-btn:hover{border-color:var(--accent);color:var(--accent)}
+.char-pipe{display:flex;flex-direction:column;align-items:flex-end;gap:.35rem}
+.char-step{font-family:var(--f-mono);font-size:.5rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-mute)}
+
+/* 3D viewer */
+.char-jon-wrap{padding:0 var(--frame-w) clamp(4rem,8vh,7rem)}
+.mdl-split{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;margin-top:3rem}
+@media(max-width:900px){.mdl-split{grid-template-columns:1fr;gap:2rem}}
+#model-viewer{position:relative;background:var(--bg-2);border:1px solid var(--ink-ghost)}
+#mdl-canvas{width:100%;aspect-ratio:1;display:block}
+#mdl-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;background:var(--bg-2)}
+.mdl-load-bar{width:160px;height:1px;background:var(--ink-ghost);overflow:hidden}
+#mdl-load-fill{height:100%;background:var(--accent);width:0%;transition:width .3s}
+#mdl-fallback{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:var(--bg-2)}
+.mdl-eyebrow{font-family:var(--f-mono);font-size:.55rem;letter-spacing:.32em;text-transform:uppercase;color:var(--accent);margin-bottom:.75rem}
+.mdl-headline{font-family:var(--f-disp);font-weight:200;font-size:clamp(1.8rem,3.5vw,3rem);font-style:italic;color:var(--ink);line-height:1.05;letter-spacing:-.02em;margin-bottom:1.25rem}
+.mdl-desc{font-family:var(--f-mono);font-size:.62rem;line-height:1.75;color:var(--ink-dim);max-width:44ch;margin-bottom:1.5rem}
+.mdl-controls{display:flex;gap:.5rem;flex-wrap:wrap}
+.mdl-btn{font-family:var(--f-mono);font-size:.55rem;letter-spacing:.18em;text-transform:uppercase;padding:.5rem 1rem;border:1px solid var(--ink-ghost);color:var(--ink-mute);transition:all .2s}
+.mdl-btn.active{border-color:var(--accent);color:var(--accent)}
+.mdl-btn:hover{color:var(--ink);border-color:var(--ink-ghost)}
+
+/* ── ABOUT ────────────────────────────────────────── */
+#about{padding:clamp(5rem,10vh,8rem) var(--frame-w);background:var(--bg-1);margin-left:22px}
+@media(max-width:768px){#about{margin-left:0;padding:4rem 1.25rem}}
+.about-hero-row{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:2rem;margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--ink-ghost)}
+.about-statement{font-family:var(--f-disp);font-weight:200;font-size:clamp(2.5rem,6vw,5.5rem);line-height:.98;letter-spacing:-.02em;color:var(--ink);font-style:italic}
+.about-side{display:flex;flex-direction:column;gap:.5rem;align-items:flex-end}
+.about-side-name{font-family:var(--f-mono);font-size:.58rem;letter-spacing:.28em;text-transform:uppercase;color:var(--ink-dim)}
+.about-side-num{font-family:var(--f-disp);font-weight:200;font-size:4rem;font-style:italic;color:var(--accent);line-height:1}
+.about-side-label{font-family:var(--f-mono);font-size:.5rem;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-mute)}
+.about-bio-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;margin-bottom:4rem}
+@media(max-width:900px){.about-bio-grid{grid-template-columns:1fr;gap:2.5rem}}
+.about-col-label{font-family:var(--f-mono);font-size:.52rem;letter-spacing:.32em;text-transform:uppercase;color:var(--accent);margin-bottom:1.25rem;padding-bottom:.75rem;border-bottom:1px solid var(--ink-ghost)}
+.about-bio p{font-family:var(--f-mono);font-size:.65rem;line-height:1.85;color:var(--ink-dim);margin-bottom:.85rem}
+.about-bio strong{color:var(--ink)}
+.about-ctas{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1.75rem}
+.about-cta{font-family:var(--f-mono);font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;padding:.65rem 1.25rem;border:1px solid var(--ink-ghost);color:var(--ink-dim);transition:all .25s}
+.about-cta:hover{border-color:var(--accent);color:var(--accent)}
+.about-cta.filled{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.about-cta.filled:hover{opacity:.85}
+.about-disc-item{display:flex;gap:.75rem;align-items:baseline;padding:.4rem 0;border-bottom:1px solid var(--ink-ghost)}
+.about-disc-num{font-family:var(--f-mono);font-size:.45rem;letter-spacing:.2em;color:var(--accent);flex-shrink:0}
+.about-disc-name{font-family:var(--f-mono);font-size:.62rem;color:var(--ink-dim)}
+.about-sw-section{border-top:1px solid var(--ink-ghost);padding-top:3rem}
+.about-sw-label{font-family:var(--f-mono);font-size:.52rem;letter-spacing:.32em;text-transform:uppercase;color:var(--accent);margin-bottom:1.5rem}
+.about-sw-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem}
+@media(max-width:768px){.about-sw-grid{grid-template-columns:1fr 1fr}}
+.about-sw-cat-label{font-family:var(--f-mono);font-size:.48rem;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:.75rem}
+.about-sw-list{display:flex;flex-direction:column;gap:.35rem}
+.about-sw-item{font-family:var(--f-mono);font-size:.6rem;color:var(--ink-dim);padding:.2rem 0}
+
+/* ── ARCHIVE LINK ────────────────────────────────── */
+.archive-cta-section{padding:clamp(3.5rem,7vh,5.5rem) var(--frame-w);background:var(--bg-2);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:2rem;margin-left:22px}
+@media(max-width:768px){.archive-cta-section{margin-left:0}}
+.archive-eyebrow{font-family:var(--f-mono);font-size:.52rem;letter-spacing:.32em;text-transform:uppercase;color:var(--accent);margin-bottom:.75rem}
+.archive-headline{font-family:var(--f-disp);font-weight:200;font-size:clamp(1.5rem,3vw,2.5rem);font-style:italic;letter-spacing:-.01em;color:var(--ink);line-height:1.1;max-width:22ch}
+.archive-desc{font-family:var(--f-mono);font-size:.62rem;line-height:1.75;color:var(--ink-dim);max-width:50ch;margin-top:.85rem}
+.archive-link{font-family:var(--f-mono);font-size:.62rem;letter-spacing:.28em;text-transform:uppercase;padding:1rem 2rem;border:1px solid var(--ink-mute);color:var(--ink-dim);white-space:nowrap;transition:all .3s}
+.archive-link:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ── CONTACT ─────────────────────────────────────── */
+#contact{padding:clamp(7rem,14vh,11rem) var(--frame-w);background:var(--bg);text-align:center;position:relative;overflow:hidden;margin-left:22px}
+@media(max-width:768px){#contact{margin-left:0;padding:5rem 1.25rem}}
+.c-bg-js{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--f-disp);font-weight:200;font-size:clamp(18rem,35vw,32rem);color:rgba(200,169,110,.025);pointer-events:none;z-index:0;white-space:nowrap;font-style:italic;line-height:1}
+.c-headline{font-family:var(--f-disp);font-weight:200;font-size:clamp(3rem,7vw,6.5rem);line-height:.98;letter-spacing:-.02em;color:var(--ink);font-style:italic;position:relative;z-index:1;margin-bottom:.75rem}
+.c-sub{font-family:var(--f-mono);font-size:.6rem;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);margin-bottom:2.5rem;position:relative;z-index:1}
+.c-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;position:relative;z-index:1}
+.c-btn{font-family:var(--f-mono);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;padding:.85rem 1.75rem;border:1px solid var(--ink-ghost);color:var(--ink-dim);transition:all .3s}
+.c-btn:hover{border-color:var(--accent);color:var(--accent)}
+.c-btn.primary{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.c-btn.primary:hover{opacity:.85}
+
+/* ── FOOTER ──────────────────────────────────────── */
+footer{padding:2rem var(--frame-w);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;border-top:1px solid var(--ink-ghost);background:var(--bg);margin-left:22px}
+@media(max-width:768px){footer{margin-left:0;padding:2rem 1.25rem}}
+.footer-copy{font-family:var(--f-mono);font-size:.52rem;letter-spacing:.18em;color:var(--ink-mute)}
+.footer-socials{display:flex;gap:1.5rem}
+.footer-socials a{font-family:var(--f-mono);font-size:.52rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-mute);transition:color .25s}
+.footer-socials a:hover{color:var(--accent)}
+
+/* ── REVEAL ANIMATION ────────────────────────────── */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .8s var(--ease-out),transform .8s var(--ease-out)}
+.reveal.visible{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<!-- PERFORATIONS -->
+<div class="film-edge" aria-hidden="true" id="film-edge"></div>
+
+<!-- CURSOR -->
+<div id="c-dot"></div>
+<div id="c-ring"></div>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="l-title">Jatin Shinde</div>
+  <div class="l-sub">Loading</div>
+  <div class="l-bar-wrap">
+    <div id="l-num">000</div>
+    <div class="l-bar-track"><div id="l-bar"></div></div>
+  </div>
+</div>
+
+<!-- HUD -->
+<div id="hud">
+  <a href="#" class="hud-mark">Jatin Shinde</a>
+  <nav id="hud-nav">
+    <a href="#worlds-section">Worlds</a>
+    <a href="#before-after">Before / After</a>
+    <a href="#ads">Commercial</a>
+    <a href="#genai">ComfyUI</a>
+    <a href="#ai-systems">AI Systems</a>
+    <a href="#showreel">Character</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+  </nav>
+</div>
+
+<!-- MOB -->
+<button id="mob-btn" aria-label="Menu"><span></span><span></span><span></span></button>
+<nav id="mob-nav">
+  <button id="mob-close">Close</button>
+  <a href="#worlds-section">Worlds</a>
+  <a href="#before-after">Before / After</a>
+  <a href="#ads">Commercial</a>
+  <a href="#genai">ComfyUI</a>
+  <a href="#ai-systems">AI Systems</a>
+  <a href="#showreel">Character</a>
+  <a href="#about">About</a>
+  <a href="#contact">Contact</a>
+</nav>
+
+<!-- A. SEQUENCE 1 -->
+<div id="seq1-wrap">
+  <div id="seq1-sticky">
+    <video id="seq1-video" preload="auto" muted playsinline
+      src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/environment-sequence-01/Sequence1.mp4"
+      aria-label="Cinematic environment sequence"></video>
+    <div id="seq1-overlay"></div>
+    <div id="seq1-id">
+      <div class="seq1-reel-num">001 · CGI &amp; VFX</div>
+      <div class="seq1-name">Jatin<br><em>Shinde</em></div>
+      <div class="seq1-role">Unreal Engine · 3D · Generative AI</div>
+    </div>
+    <div class="seq1-hint">
+      <span>Scroll</span>
+      <div class="seq1-hint-line"></div>
+    </div>
+    <div class="seq1-pg"><div id="seq1-pgbar"></div></div>
+  </div>
+</div>
+
+<!-- B. FIVE WORLDS -->
+<section id="worlds-section" aria-label="Five Worlds — UE5 Environments">
+  <img class="world-bg active loading" id="bg-0" alt="Ashfall" draggable="false">
+  <img class="world-bg" id="bg-1" alt="Luminara" draggable="false">
+  <img class="world-bg" id="bg-2" alt="Verdant" draggable="false">
+  <img class="world-bg" id="bg-3" alt="Helios" draggable="false">
+  <img class="world-bg" id="bg-4" alt="Aurum" draggable="false">
+  <div id="worlds-vignette"></div>
+  <div id="world-info">
+    <div class="wi-frac">
+      <span id="wi-cur">01</span>
+      <span class="wi-sep"></span>
+      <span>05</span>
+    </div>
+    <div class="wi-name" id="wi-name">Ashfall</div>
+    <div class="wi-tag">Environment · Unreal Engine 5</div>
+  </div>
+  <nav id="world-index" aria-label="Select world">
+    <button class="wi-btn active" data-w="0"><span class="wi-btn-name">Ashfall</span><span class="wi-btn-bar"></span></button>
+    <button class="wi-btn" data-w="1"><span class="wi-btn-name">Luminara</span><span class="wi-btn-bar"></span></button>
+    <button class="wi-btn" data-w="2"><span class="wi-btn-name">Verdant</span><span class="wi-btn-bar"></span></button>
+    <button class="wi-btn" data-w="3"><span class="wi-btn-name">Helios</span><span class="wi-btn-bar"></span></button>
+    <button class="wi-btn" data-w="4"><span class="wi-btn-name">Aurum</span><span class="wi-btn-bar"></span></button>
+  </nav>
+</section>
+
+<!-- C. BEFORE / AFTER -->
+<section id="before-after" aria-label="Before and After comparisons">
+  <div class="ba-header">
+    <div>
+      <div class="s-eyebrow">Before / After</div>
+      <h2 class="s-title reveal">The<br>transformation.</h2>
+    </div>
+    <div class="ba-header-right reveal">VFX breakdowns — raw render against the finished, graded, composited result. Drag the divider to compare. 14 pairs.</div>
+  </div>
+  <div class="ba-grid" id="ba-grid"></div>
+</section>
+<div id="ba-focus" role="dialog">
+  <div class="ba-focus-inner">
+    <button class="ba-focus-close" id="ba-focus-close">Close ✕</button>
+    <div class="ba-focus-viewer" id="ba-focus-viewer">
+      <img class="ba-focus-before" id="ba-focus-before" src="" alt="Before">
+      <img class="ba-focus-after" id="ba-focus-after" src="" alt="After">
+      <div class="ba-focus-line" id="ba-focus-line"></div>
+      <div class="ba-focus-handle" id="ba-focus-handle">
+        <svg viewBox="0 0 16 16"><path d="M5 3l-4 5 4 5M11 3l4 5-4 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <span class="ba-focus-lb">Before</span>
+      <span class="ba-focus-la">After</span>
+    </div>
+    <div class="ba-focus-nav">
+      <div class="ba-focus-btns">
+        <button class="ba-focus-btn" id="ba-focus-prev">← Prev</button>
+        <button class="ba-focus-btn" id="ba-focus-next">Next →</button>
+      </div>
+      <div class="ba-focus-counter" id="ba-focus-counter">01 / 14</div>
+    </div>
+  </div>
+</div>
+
+<!-- D. COMMERCIAL CGI -->
+<section id="ads" aria-label="Commercial CGI">
+  <div class="s-eyebrow">Commercial CGI</div>
+  <h2 class="s-title reveal">Product.<br>Advertising.<br>Motion.</h2>
+  <div class="comm-layout">
+    <div>
+      <div class="comm-player" id="comm-player">
+        <video id="comm-center-video" muted loop playsinline preload="metadata"></video>
+        <div class="comm-player-overlay"></div>
+        <span class="comm-player-num" id="comm-player-num">01</span>
+        <div class="comm-player-info">
+          <div class="comm-player-title" id="comm-player-title">—</div>
+          <div class="comm-player-meta" id="comm-player-meta">—</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="comm-strip" id="comm-strip"></div>
+      <div class="comm-controls">
+        <button class="comm-ctrl-btn" id="comm-prev">← Previous</button>
+        <button class="comm-ctrl-btn" id="comm-next">Next →</button>
+        <button class="comm-ctrl-btn comm-ctrl-watch" id="ads-watch-btn">Watch with Sound ▶</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LIGHTBOX -->
+<div id="comm-lb" role="dialog" aria-label="Commercial film fullscreen">
+  <div id="comm-lb-inner">
+    <video id="comm-lb-video" playsinline controls loop></video>
+    <div id="comm-lb-title"></div>
+    <button id="comm-lb-close">Close ✕</button>
+  </div>
+</div>
+
+<!-- E. COMFYUI -->
+<section id="genai" class="s-frame" aria-label="ComfyUI Workflows">
+  <div class="s-eyebrow">ComfyUI Workflows</div>
+  <h2 class="s-title reveal">Node graphs.<br>Production <em>workflows.</em></h2>
+  <div class="wf-grid reveal">
+    <div class="wf-card">
+      <div><div class="wf-label">Workflow 01</div><div class="wf-title">Wan InfiniteTalk</div><div class="wf-model">Wan 2.1 · Talking Head Video</div></div>
+      <div class="wf-nodes">
+        <div class="wf-node key">LoadImage — reference portrait</div>
+        <div class="wf-node key">WanVideoSampler — core generation</div>
+        <div class="wf-node">CLIPTextEncode — motion prompt</div>
+        <div class="wf-node">FaceDetector — landmark extraction</div>
+        <div class="wf-node key">InfiniteTalkNode — loop stitching</div>
+        <div class="wf-node">VideoComposite — frame assembly</div>
+        <div class="wf-node">VHS_VideoCombine — export</div>
+      </div>
+      <div class="wf-output"><div class="wf-output-label">Output</div><div class="wf-output-val">Seamlessly looping portrait video with synchronized facial animation. Photorealistic motion from a single reference image.</div></div>
+    </div>
+    <div class="wf-card">
+      <div><div class="wf-label">Workflow 02</div><div class="wf-title">Pixal3D / Trellis2</div><div class="wf-model">Trellis2 · Image → 3D Mesh</div></div>
+      <div class="wf-nodes">
+        <div class="wf-node key">LoadImage — product/asset reference</div>
+        <div class="wf-node">ImagePreprocess — background removal</div>
+        <div class="wf-node key">Trellis2ModelLoader — SLAT model</div>
+        <div class="wf-node key">ImageTo3DMesh — reconstruction</div>
+        <div class="wf-node">Pixal3DRefine — mesh cleanup</div>
+        <div class="wf-node">GLBExporter — Blender-ready</div>
+        <div class="wf-node">PreviewMesh — viewport check</div>
+      </div>
+      <div class="wf-output"><div class="wf-output-label">Output</div><div class="wf-output-val">GLB mesh with UV-mapped texture. Production-ready for Blender, UE5, or real-time rendering.</div></div>
+    </div>
+    <div class="wf-card">
+      <div><div class="wf-label">Workflow 03</div><div class="wf-title">MiniMax H3 Long Video</div><div class="wf-model">MiniMax H3 · Cinematic Video Gen</div></div>
+      <div class="wf-nodes">
+        <div class="wf-node key">CLIPTextEncode — scene description</div>
+        <div class="wf-node">LoadImage — optional keyframe</div>
+        <div class="wf-node key">MiniMaxH3Sampler — video synthesis</div>
+        <div class="wf-node">VideoExtend — sequence chaining</div>
+        <div class="wf-node key">ConsistencyController — v10 custom</div>
+        <div class="wf-node">FrameInterpolator — smooth motion</div>
+        <div class="wf-node">VHS_VideoCombine — final export</div>
+      </div>
+      <div class="wf-output"><div class="wf-output-label">Output</div><div class="wf-output-val">Extended cinematic sequences up to 60s+. ConsistencyController maintains visual coherence across chained clips.</div></div>
+    </div>
+  </div>
+  <p class="wf-note">These workflows represent a mixture of custom-built graphs and adapted community workflows. Final rendered outputs will be added when available.</p>
+</section>
+
+<!-- F. AI SYSTEMS -->
+<section id="ai-systems" class="s-frame" aria-label="AI Creative Systems">
+  <div class="s-eyebrow">AI Creative Systems</div>
+  <h2 class="s-title reveal">Production tools<br>I <em>built.</em></h2>
+  <p style="font-family:var(--f-mono);font-size:.65rem;line-height:1.8;color:var(--ink-dim);max-width:60ch;margin-top:1.25rem" class="reveal">Three custom systems built on top of GPT APIs — each automating a distinct stage of creative production. All demo content below is fictional and illustrative.</p>
+  <div class="ais-tabs">
+    <button class="ais-tab active" data-ais="1">01 — Post Studio</button>
+    <button class="ais-tab" data-ais="2">02 — Story Pipeline</button>
+    <button class="ais-tab" data-ais="3">03 — Storyboard</button>
+  </div>
+  <div class="ais-panel active" id="ais-p1">
+    <div class="ais-panel-grid">
+      <div>
+        <div class="ais-pnum">01 / 03</div>
+        <div class="ais-ptitle">AI Creative Production Studio</div>
+        <div class="ais-ptype">GPT-Powered · Content Automation</div>
+        <p class="ais-pdesc">A structured content generation system for social media and advertising campaigns. Input a brief, receive platform-ready copy across all formats simultaneously.</p>
+        <div class="ais-caps">
+          <span class="ais-cap">Multi-platform batch output (IG / LinkedIn / TikTok / YouTube)</span>
+          <span class="ais-cap">Brand voice and tone consistency across formats</span>
+          <span class="ais-cap">Campaign concept → post-ready copy in one pass</span>
+          <span class="ais-cap">Structured JSON output for downstream automation</span>
+        </div>
+      </div>
+      <div class="ais-demo-frame">
+        <div class="ais-demo-badge">Fictional demo — LUMEX skincare</div>
+        <div class="ps-brief"><div class="ps-brief-label">Input brief</div><div class="ps-brief-text">"LUMEX Hydration Serum launch — minimal aesthetic, 18–35 audience. Emphasise clinical results, clean ingredients. Tone: precise, calm, premium."</div></div>
+        <div class="ps-posts">
+          <div class="ps-post"><span class="ps-post-plat">Instagram</span><div class="ps-post-copy">Your skin remembers everything.<br>Give it what it deserves.<br><br>LUMEX Hydration Serum.</div><div class="ps-post-tags"><span class="ps-tag">#LUMEXSkin</span><span class="ps-tag">#CleanBeauty</span></div><div class="ps-post-dir"><div class="ps-post-dir-label">Visual direction</div><div class="ps-post-dir-text">Macro serum drop on pale skin. Natural window light. Off-white background.</div></div></div>
+          <div class="ps-post"><span class="ps-post-plat">LinkedIn</span><div class="ps-post-copy">We spent 18 months reformulating.<br><br>94% improvement in moisture retention at day 30. No fragrance. No filler.</div><div class="ps-post-tags"><span class="ps-tag">#SkinScience</span><span class="ps-tag">#BeautyInnovation</span></div><div class="ps-post-dir"><div class="ps-post-dir-label">Visual direction</div><div class="ps-post-dir-text">Split-frame: ingredient close-up / clinical result graph.</div></div></div>
+          <div class="ps-post"><span class="ps-post-plat">TikTok</span><div class="ps-post-copy">I stopped using 6 products.<br><br>Here's what happened in 30 days ↓</div><div class="ps-post-tags"><span class="ps-tag">#SkincareRoutine</span><span class="ps-tag">#GlowUp</span></div><div class="ps-post-dir"><div class="ps-post-dir-label">Visual direction</div><div class="ps-post-dir-text">Before/after split screen. Morning light. 15s.</div></div></div>
+          <div class="ps-post"><span class="ps-post-plat">YouTube</span><div class="ps-post-copy">LUMEX: 30-day skin transformation. No filters. No retouching. Real results.</div><div class="ps-post-tags"><span class="ps-tag">#LongformReview</span></div><div class="ps-post-dir"><div class="ps-post-dir-label">Visual direction</div><div class="ps-post-dir-text">Documentary tone. Neutral studio. 8–12 min.</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ais-panel" id="ais-p2">
+    <div class="ais-panel-grid">
+      <div>
+        <div class="ais-pnum">02 / 03</div>
+        <div class="ais-ptitle">AI Story &amp; Cinematic Preproduction Pipeline</div>
+        <div class="ais-ptype">GPT-Chained · Preproduction Automation</div>
+        <p class="ais-pdesc">A chained GPT pipeline that converts a concept into a full preproduction package — story treatment, scene breakdown, and shot list with camera specifications.</p>
+        <div class="ais-caps">
+          <span class="ais-cap">Concept → treatment → scene cards → shot list in sequence</span>
+          <span class="ais-cap">Shot list includes angle, lens, movement, and duration</span>
+          <span class="ais-cap">Maintains narrative consistency across all chained calls</span>
+          <span class="ais-cap">Structured data output ready for storyboard pipeline input</span>
+        </div>
+      </div>
+      <div class="ais-demo-frame">
+        <div class="ais-demo-badge">Fictional demo — "Signal" short film</div>
+        <div class="sp-treatment"><div class="sp-treatment-label">Treatment — 90s short</div><div class="sp-treatment-text">"A solitary maintenance technician aboard a deep-space relay station detects an anomalous signal — mathematical, deliberate. She must decide: amplify or destroy it."</div></div>
+        <div id="sp-scenes">
+          <div class="sp-scene"><div class="sp-sc-num">SC 01</div><div class="sp-sc-body"><div class="sp-sc-title">Cold open — station exterior</div><div class="sp-sc-desc">Establishing. Station drifting against star field. Engine hum.</div></div><div class="sp-sc-meta"><span>00:00–00:08</span><span>Wide / 24mm</span><span>Locked</span></div></div>
+          <div class="sp-scene"><div class="sp-sc-num">SC 02</div><div class="sp-sc-body"><div class="sp-sc-title">Interior — console room</div><div class="sp-sc-desc">MARA runs diagnostic. Alert triggers. Her expression shifts.</div></div><div class="sp-sc-meta"><span>00:08–00:22</span><span>Med / 50mm</span><span>Slow push</span></div></div>
+          <div class="sp-scene"><div class="sp-sc-num">SC 03</div><div class="sp-sc-body"><div class="sp-sc-title">Signal visualisation</div><div class="sp-sc-desc">Pattern renders on screen — unmistakably geometric. Mara leans in.</div></div><div class="sp-sc-meta"><span>00:22–00:38</span><span>Close / 85mm</span><span>Handheld</span></div></div>
+          <div class="sp-scene"><div class="sp-sc-num">SC 04</div><div class="sp-sc-body"><div class="sp-sc-title">The decision</div><div class="sp-sc-desc">Face in monitor glow. Reaches for amplify switch. Holds. Cut to black.</div></div><div class="sp-sc-meta"><span>00:38–00:52</span><span>ECU / 135mm</span><span>Locked</span></div></div>
+          <div class="sp-scene"><div class="sp-sc-num">SC 05</div><div class="sp-sc-body"><div class="sp-sc-title">Aftermath</div><div class="sp-sc-desc">Station exterior. One antenna slowly rotates toward source. Title: SIGNAL.</div></div><div class="sp-sc-meta"><span>00:52–01:30</span><span>Wide / 24mm</span><span>Slow pull</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ais-panel" id="ais-p3">
+    <div class="ais-panel-grid">
+      <div>
+        <div class="ais-pnum">03 / 03</div>
+        <div class="ais-ptitle">AI Storyboard Production Pipeline</div>
+        <div class="ais-ptype">GPT + Image Gen · Batch Storyboarding</div>
+        <p class="ais-pdesc">Takes the shot list from the Story Pipeline and generates visual panel descriptions per shot, then sends each to an image model in batch. Complete storyboard in one automated run.</p>
+        <div class="ais-caps">
+          <span class="ais-cap">Shot list → visual description → generated panel in sequence</span>
+          <span class="ais-cap">Consistent character design and lighting across all panels</span>
+          <span class="ais-cap">Batch processing — full storyboard in one automated run</span>
+          <span class="ais-cap">Exports numbered sequence for editorial and director review</span>
+        </div>
+      </div>
+      <div class="ais-demo-frame">
+        <div class="ais-demo-badge">Illustrative layout — panels represent AI output structure</div>
+        <div class="sb-grid" id="sb-grid"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- G. CHARACTER & 3D -->
+<section id="showreel" aria-label="Character and 3D">
+  <div class="char-film">
+    <video preload="none" playsinline muted loop
+      src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/showreel/character-reel.mp4"
+      id="char-video"></video>
+    <div class="char-film-vignette"></div>
+    <div class="char-film-ui">
+      <div>
+        <span class="char-film-eyebrow">Character &amp; 3D</span>
+        <h2 class="char-film-title">Built from<br>the ground up.</h2>
+        <button class="char-play-btn" id="char-play-btn">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 2a6 6 0 0 1 0 12A6 6 0 0 1 8 2zm-1 4v4l4-2-4-2z"/></svg>
+          Unmute reel
+        </button>
+      </div>
+      <div class="char-pipe">
+        <span class="char-step">Character Creator 4</span>
+        <span class="char-step">Substance 3D Painter</span>
+        <span class="char-step">Marvelous Designer</span>
+        <span class="char-step">Unreal Engine 5</span>
+      </div>
+    </div>
+  </div>
+  <div class="char-jon-wrap">
+    <div class="mdl-split">
+      <div id="model-viewer">
+        <canvas id="mdl-canvas"></canvas>
+        <div id="mdl-loading">
+          <span style="font-family:var(--f-mono);font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-dim)">Loading model</span>
+          <div class="mdl-load-bar"><div id="mdl-load-fill"></div></div>
+        </div>
+        <div id="mdl-fallback"></div>
+      </div>
+      <div class="mdl-info">
+        <div class="mdl-eyebrow">Interactive 3D</div>
+        <div class="mdl-headline">JON —<br>real-time character</div>
+        <p class="mdl-desc">Built in Character Creator 4, textured in Substance 3D Painter, rigged and animated for real-time. Drag to orbit — switch animations below.</p>
+        <div class="mdl-controls">
+          <button class="mdl-btn active" data-mdl="idle">Idle</button>
+          <button class="mdl-btn" data-mdl="wave">Wave</button>
+          <button class="mdl-btn" data-mdl="stand">Stand</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- H. ABOUT -->
+<section id="about" aria-label="About Jatin Shinde">
+  <div class="about-hero-row">
+    <h2 class="about-statement reveal">Building<br>cinematic worlds.</h2>
+    <div class="about-side">
+      <div class="about-side-name">Jatin Shinde</div>
+      <div class="about-side-num">7+</div>
+      <div class="about-side-label">Years of production</div>
+    </div>
+  </div>
+  <div class="about-bio-grid">
+    <div>
+      <div class="about-col-label">Biography</div>
+      <div class="about-bio">
+        <p>CGI &amp; VFX artist working at the intersection of technical craft and directorial vision. <strong>7+ years</strong> across environment design, character work, commercial production, and video post.</p>
+        <p>Specialist in Unreal Engine 5 — constructing large-scale cinematic worlds with production-grade lighting, material design, and real-time rendering. Works from concept through delivery: 3D, rigging, animation, compositing, final output.</p>
+        <p>Also builds <strong>generative AI pipelines</strong> — ComfyUI workflows, ControlNet and IP-Adapter chains integrated into production.</p>
+      </div>
+      <div class="about-ctas">
+        <a href="mailto:jatinshinde118@gmail.com" class="about-cta filled">Start a project</a>
+        <a href="https://www.linkedin.com/in/jatin-shinde-202b671a9" target="_blank" rel="noopener" class="about-cta">LinkedIn →</a>
+      </div>
+    </div>
+    <div>
+      <div class="about-col-label">Disciplines</div>
+      <div id="about-disc"></div>
+    </div>
+  </div>
+  <div class="about-sw-section">
+    <div class="about-sw-label">Tools &amp; Software</div>
+    <div class="about-sw-grid">
+      <div>
+        <div class="about-sw-cat-label">3D &amp; Real-time</div>
+        <div class="about-sw-list">
+          <span class="about-sw-item">Unreal Engine 5</span>
+          <span class="about-sw-item">Blender</span>
+          <span class="about-sw-item">Character Creator 4</span>
+          <span class="about-sw-item">Marvelous Designer</span>
+          <span class="about-sw-item">Substance 3D Painter</span>
+        </div>
+      </div>
+      <div>
+        <div class="about-sw-cat-label">Video &amp; Design</div>
+        <div class="about-sw-list">
+          <span class="about-sw-item">After Effects</span>
+          <span class="about-sw-item">Premiere Pro</span>
+          <span class="about-sw-item">DaVinci Resolve</span>
+          <span class="about-sw-item">Photoshop</span>
+          <span class="about-sw-item">Illustrator</span>
+          <span class="about-sw-item">Audition</span>
+          <span class="about-sw-item">Lightroom</span>
+          <span class="about-sw-item">CorelDRAW</span>
+        </div>
+      </div>
+      <div>
+        <div class="about-sw-cat-label">AI &amp; Generative</div>
+        <div class="about-sw-list">
+          <span class="about-sw-item">ComfyUI</span>
+          <span class="about-sw-item">ControlNet</span>
+          <span class="about-sw-item">IP-Adapter</span>
+          <span class="about-sw-item">Wan 2.1</span>
+          <span class="about-sw-item">MiniMax H3</span>
+          <span class="about-sw-item">Trellis2</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHIVE LINK -->
+<div class="archive-cta-section">
+  <div>
+    <div class="archive-eyebrow">Complete Archive</div>
+    <div class="archive-headline">A Fraction of the Work.<br><em style="font-family:var(--f-disp)">Years of Creation.</em></div>
+    <p class="archive-desc">A curated selection from thousands of visual explorations, 3D projects, environments, commercial productions, and creative experiments developed across more than seven years.</p>
+  </div>
+  <a href="/archive" class="archive-link">View Archive →</a>
+</div>
+
+<!-- I. CONTACT -->
+<section id="contact" aria-label="Contact">
+  <div class="c-bg-js" aria-hidden="true">JS</div>
+  <h2 class="c-headline">Let's make<br>something real.</h2>
+  <p class="c-sub">Open to projects &amp; collaborations</p>
+  <div class="c-btns">
+    <a href="mailto:jatinshinde118@gmail.com" class="c-btn primary">jatinshinde118@gmail.com</a>
+    <a href="https://www.linkedin.com/in/jatin-shinde-202b671a9" target="_blank" rel="noopener" class="c-btn">LinkedIn</a>
+  </div>
+</section>
+
+<footer>
+  <span class="footer-copy">© 2026 Jatin Shinde</span>
+  <div class="footer-socials">
+    <a href="https://www.instagram.com/imaginators.studio" target="_blank" rel="noopener">Instagram</a>
+    <a href="https://www.youtube.com/@imaginatorsstudio" target="_blank" rel="noopener">YouTube</a>
+    <a href="https://www.linkedin.com/in/jatin-shinde-202b671a9" target="_blank" rel="noopener">LinkedIn</a>
+  </div>
+</footer>
+
+<script type="module">
+const CDN = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev';
+
+// ── FILM PERFORATIONS ──────────────────────────────
+const filmEdge = document.getElementById('film-edge');
+if (filmEdge) {
+  const count = Math.ceil(window.innerHeight / 20);
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement('div');
+    p.className = 'film-perf';
+    filmEdge.appendChild(p);
+  }
+}
+
+// ── CURSOR ────────────────────────────────────────
+const cDot = document.getElementById('c-dot');
+const cRing = document.getElementById('c-ring');
+let rx = 0, ry = 0;
+document.addEventListener('mousemove', e => {
+  cDot.style.left = e.clientX + 'px';
+  cDot.style.top = e.clientY + 'px';
+  rx += (e.clientX - rx) * 0.12;
+  ry += (e.clientY - ry) * 0.12;
+  cRing.style.left = rx + 'px';
+  cRing.style.top = ry + 'px';
+});
+function animCursor() {
+  rx += (parseFloat(cDot.style.left) - rx) * 0.15;
+  ry += (parseFloat(cDot.style.top) - ry) * 0.15;
+  cRing.style.left = rx + 'px';
+  cRing.style.top = ry + 'px';
+  requestAnimationFrame(animCursor);
+}
+animCursor();
+
+// ── MOB NAV ───────────────────────────────────────
+document.getElementById('mob-btn').addEventListener('click', () => {
+  document.getElementById('mob-nav').classList.add('open');
+});
+document.getElementById('mob-close').addEventListener('click', () => {
+  document.getElementById('mob-nav').classList.remove('open');
+});
+document.querySelectorAll('#mob-nav a').forEach(a => {
+  a.addEventListener('click', () => document.getElementById('mob-nav').classList.remove('open'));
+});
+
+// ── LOADER ────────────────────────────────────────
+const lNum = document.getElementById('l-num');
+const lBar = document.getElementById('l-bar');
+let loadPct = 0;
+const loadInterval = setInterval(() => {
+  loadPct = Math.min(loadPct + Math.random() * 8, 95);
+  lNum.textContent = String(Math.round(loadPct)).padStart(3, '0');
+  lBar.style.width = loadPct + '%';
+}, 100);
+window.addEventListener('load', () => {
+  clearInterval(loadInterval);
+  loadPct = 100;
+  lNum.textContent = '100';
+  lBar.style.width = '100%';
+  setTimeout(() => document.getElementById('loader').classList.add('out'), 500);
+});
+
+// ── SEQUENCE 1 ────────────────────────────────────
+const seq1Video = document.getElementById('seq1-video');
+const seq1PgBar = document.getElementById('seq1-pgbar');
+const seq1Hint = document.querySelector('.seq1-hint');
+seq1Video.play().catch(() => {});
+window.addEventListener('scroll', () => {
+  const wrap = document.getElementById('seq1-wrap');
+  const rect = wrap.getBoundingClientRect();
+  const pct = Math.max(0, Math.min(1, -rect.top / (rect.height - window.innerHeight)));
+  seq1PgBar.style.width = (pct * 100) + '%';
+  if (seq1Hint) seq1Hint.style.opacity = pct > 0.02 ? '0' : '1';
+  if (seq1Video.duration) seq1Video.currentTime = seq1Video.duration * pct;
+});
+
+// ── WORLDS ────────────────────────────────────────
+const WORLDS = [
+  { slug:'world-01', name:'Ashfall',  accent:'#c46428', poster:'frame_0001.webp' },
+  { slug:'world-02', name:'Luminara', accent:'#7c5cc4', poster:'frame_0002.webp' },
+  { slug:'world-03', name:'Verdant',  accent:'#3a8c52', poster:'frame_0061.webp' },
+  { slug:'world-04', name:'Helios',   accent:'#2872c4', poster:'frame_0004.webp' },
+  { slug:'world-05', name:'Aurum',    accent:'#c4a028', poster:'frame_0001.webp' },
+];
+const bgImgs = Array.from({length:5}, (_,i) => document.getElementById('bg-'+i));
+const wiName = document.getElementById('wi-name');
+const wiCur = document.getElementById('wi-cur');
+const wiBtns = document.querySelectorAll('.wi-btn');
+let currentWorld = 0;
+const posterLoaded = new Set();
+
+function loadWorldPoster(wi) {
+  if (posterLoaded.has(wi)) return;
+  posterLoaded.add(wi);
+  bgImgs[wi].src = `${CDN}/worlds/${WORLDS[wi].slug}/frame_0001.webp`;
+}
+
+function switchWorld(wi) {
+  if (wi === currentWorld) return;
+  bgImgs[currentWorld].classList.remove('active');
+  currentWorld = wi;
+  loadWorldPoster(wi);
+  bgImgs[wi].classList.add('active');
+  wiName.textContent = WORLDS[wi].name;
+  wiCur.textContent = String(wi + 1).padStart(2, '0');
+  wiBtns.forEach((b, i) => b.classList.toggle('active', i === wi));
+}
+
+loadWorldPoster(0);
+wiBtns.forEach((btn, i) => {
+  btn.addEventListener('click', () => switchWorld(i));
+});
+// Auto-cycle
+let worldTimer = setInterval(() => switchWorld((currentWorld + 1) % 5), 4000);
+document.getElementById('worlds-section').addEventListener('click', () => {
+  clearInterval(worldTimer);
+  worldTimer = null;
+});
+
+// ── BEFORE / AFTER ────────────────────────────────
+const BA_CDN = `${CDN}/gallery/Before%20and%20After/`;
+const baGrid = document.getElementById('ba-grid');
+
+for (let n = 1; n <= 14; n++) {
+  const cell = document.createElement('div');
+  cell.className = 'ba-cell';
+  cell.innerHTML = `
+    <img class="ba-cell-before" src="${BA_CDN}Before%20${n}.webp" alt="Before ${n}" loading="lazy">
+    <img class="ba-cell-after" src="${BA_CDN}After%20${n}.webp" alt="After ${n}" loading="lazy">
+    <div class="ba-cell-div" data-n="${n}"></div>
+    <div class="ba-cell-labels"><span class="ba-cell-lb">Before</span><span class="ba-cell-la">After</span></div>
+    <span class="ba-cell-num">${String(n).padStart(2,'0')}</span>
+  `;
+  cell.addEventListener('click', () => openBAFocus(n));
+  let isDragging = false;
+  cell.addEventListener('pointerdown', e => {
+    isDragging = false;
+  });
+  cell.addEventListener('pointermove', e => {
+    isDragging = true;
+    const rect = cell.getBoundingClientRect();
+    const pct = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+    cell.querySelector('.ba-cell-after').style.clipPath = `inset(0 0 0 ${pct}%)`;
+    cell.querySelector('.ba-cell-div').style.left = pct + '%';
+  });
+  baGrid.appendChild(cell);
+}
+
+// BA Focus viewer
+let baFocusIdx = 1;
+const baFocusBefore = document.getElementById('ba-focus-before');
+const baFocusAfter = document.getElementById('ba-focus-after');
+const baFocusLine = document.getElementById('ba-focus-line');
+const baFocusHandle = document.getElementById('ba-focus-handle');
+const baFocusCounter = document.getElementById('ba-focus-counter');
+
+function openBAFocus(n) {
+  baFocusIdx = n;
+  baFocusBefore.src = `${BA_CDN}Before%20${n}.webp`;
+  baFocusAfter.src = `${BA_CDN}After%20${n}.webp`;
+  baFocusAfter.style.clipPath = 'inset(0 0 0 50%)';
+  baFocusLine.style.left = '50%';
+  baFocusHandle.style.left = '50%';
+  baFocusCounter.textContent = `${String(n).padStart(2,'0')} / 14`;
+  document.getElementById('ba-focus').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+let isDraggingFocus = false;
+const baFocusViewer = document.getElementById('ba-focus-viewer');
+baFocusViewer.addEventListener('pointerdown', e => {
+  isDraggingFocus = true;
+  baFocusViewer.setPointerCapture(e.pointerId);
+});
+baFocusViewer.addEventListener('pointermove', e => {
+  if (!isDraggingFocus) return;
+  const rect = baFocusViewer.getBoundingClientRect();
+  const pct = Math.max(2, Math.min(98, ((e.clientX - rect.left) / rect.width) * 100));
+  baFocusAfter.style.clipPath = `inset(0 0 0 ${pct}%)`;
+  baFocusLine.style.left = pct + '%';
+  baFocusHandle.style.left = pct + '%';
+});
+baFocusViewer.addEventListener('pointerup', () => { isDraggingFocus = false; });
+
+document.getElementById('ba-focus-prev').addEventListener('click', () => {
+  if (baFocusIdx > 1) openBAFocus(baFocusIdx - 1);
+});
+document.getElementById('ba-focus-next').addEventListener('click', () => {
+  if (baFocusIdx < 14) openBAFocus(baFocusIdx + 1);
+});
+document.getElementById('ba-focus-close').addEventListener('click', () => {
+  document.getElementById('ba-focus').classList.remove('open');
+  document.body.style.overflow = '';
+});
+
+// ── COMMERCIAL CGI ────────────────────────────────
+const ADS = [
+  { src:'gallery/ads/chocolate-bar.mp4',                   title:'Chocolate Bar',            meta:'Product / CGI' },
+  { src:'gallery/ads/earbuds.mp4',                         title:'Earbuds',                  meta:'Product / CGI' },
+  { src:'gallery/ads/facewash.mp4',                        title:'Facewash',                 meta:'Product / CGI' },
+  { src:'gallery/ads/pepsi.mp4',                           title:'Pepsi',                    meta:'Advertising / CGI' },
+  { src:'gallery/ads/serum.mp4',                           title:'Serum',                    meta:'Product / CGI' },
+  { src:'gallery/ads/shoe.mp4',                            title:'Shoe',                     meta:'Product / CGI' },
+  { src:'gallery/ads/smart-watch.mp4',                     title:'Smart Watch',              meta:'Product / CGI' },
+  { src:'gallery/ads/911%20Commercial.mp4',                title:'911 Commercial',           meta:'Advertising / CGI' },
+  { src:'gallery/ads/Moisturizer%20and%20Cleanser%20Ad-1.mp4', title:'Moisturizer & Cleanser', meta:'Product / CGI' },
+  { src:'gallery/ads/RR%20Ad.mp4',                         title:'RR Ad',                    meta:'Advertising / CGI' },
+  { src:'gallery/ads/Reelvideo-29689.mp4',                 title:'Commercial Reel',          meta:'Motion / CGI' },
+];
+
+const commCenterVideo = document.getElementById('comm-center-video');
+const commPlayerNum = document.getElementById('comm-player-num');
+const commPlayerTitle = document.getElementById('comm-player-title');
+const commPlayerMeta = document.getElementById('comm-player-meta');
+const commStrip = document.getElementById('comm-strip');
+const commLb = document.getElementById('comm-lb');
+const commLbVideo = document.getElementById('comm-lb-video');
+let commIdx = 0;
+
+// Build filmstrip
+ADS.forEach((ad, i) => {
+  const item = document.createElement('div');
+  item.className = 'comm-item' + (i === 0 ? ' active' : '');
+  item.innerHTML = `
+    <div class="comm-item-thumb">
+      <video muted playsinline preload="metadata" src="${CDN}/${ad.src}"></video>
+    </div>
+    <div>
+      <div class="comm-item-num">${String(i+1).padStart(2,'0')}</div>
+      <div class="comm-item-name">${ad.title}</div>
+    </div>
+  `;
+  item.addEventListener('click', () => { commIdx = i; adsUpdate(); });
+  // Seek thumb to ~0.5s for poster frame
+  const vid = item.querySelector('video');
+  vid.addEventListener('loadedmetadata', () => { vid.currentTime = 0.5; }, {once:true});
+  commStrip.appendChild(item);
+});
+
+function adsUpdate() {
+  const ad = ADS[commIdx];
+  commCenterVideo.src = `${CDN}/${ad.src}`;
+  commCenterVideo.muted = true;
+  commCenterVideo.loop = true;
+  commCenterVideo.preload = 'metadata';
+  commCenterVideo.load();
+  commCenterVideo.play().catch(() => {});
+  commPlayerNum.textContent = String(commIdx + 1).padStart(2, '0');
+  commPlayerTitle.textContent = ad.title;
+  commPlayerMeta.textContent = ad.meta;
+  document.querySelectorAll('.comm-item').forEach((el, i) => el.classList.toggle('active', i === commIdx));
+}
+
+document.getElementById('comm-prev').addEventListener('click', () => {
+  commIdx = (commIdx - 1 + ADS.length) % ADS.length;
+  adsUpdate();
+});
+document.getElementById('comm-next').addEventListener('click', () => {
+  commIdx = (commIdx + 1) % ADS.length;
+  adsUpdate();
+});
+
+// Watch with sound — FIXED: muted=false before play
+document.getElementById('ads-watch-btn').addEventListener('click', () => {
+  const ad = ADS[commIdx];
+  commLbVideo.src = `${CDN}/${ad.src}`;
+  commLbVideo.muted = false;
+  commLbVideo.loop = true;
+  commLbVideo.load();
+  commLbVideo.play().catch(() => {});
+  const titleEl = document.getElementById('comm-lb-title');
+  if (titleEl) titleEl.textContent = `${ad.title} — ${ad.meta}`;
+  commLb.classList.add('open');
+  document.body.style.overflow = 'hidden';
+});
+
+document.getElementById('comm-lb-close').addEventListener('click', () => {
+  commLbVideo.pause();
+  commLbVideo.src = '';
+  commLb.classList.remove('open');
+  document.body.style.overflow = '';
+});
+
+commLb.addEventListener('click', e => {
+  if (e.target === commLb) {
+    commLbVideo.pause();
+    commLbVideo.src = '';
+    commLb.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+});
+
+adsUpdate();
+
+// ── AI SYSTEMS TABS ───────────────────────────────
+document.querySelectorAll('.ais-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.ais-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.ais-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    const n = tab.dataset.ais;
+    document.getElementById(`ais-p${n}`).classList.add('active');
+  });
+});
+
+// Storyboard panels
+const sbData = [
+  {sc:'SC 01',desc:'Station exterior. Star field. Locked wide.'},
+  {sc:'SC 02',desc:'Console room. Med shot. Push in on Mara.'},
+  {sc:'SC 03',desc:'Signal on screen. Close-up. Handheld.'},
+  {sc:'SC 04',desc:'Decision. ECU face. Monitor glow.'},
+  {sc:'SC 05',desc:'Aftermath. Antenna rotates. Slow pull.'},
+  {sc:'SC 06',desc:'Signal wave. Graphic overlay. Abstract.'},
+];
+const sbGrid = document.getElementById('sb-grid');
+sbData.forEach(d => {
+  const panel = document.createElement('div');
+  panel.className = 'sb-panel';
+  panel.innerHTML = `
+    <div class="sb-panel-img">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="4" fill="rgba(200,169,110,0.08)"/>
+        <rect x="6" y="10" width="20" height="14" rx="2" stroke="rgba(200,169,110,0.4)" stroke-width="1"/>
+        <circle cx="12" cy="17" r="2" fill="rgba(200,169,110,0.3)"/>
+        <path d="M10 21l4-4 3 3 5-5" stroke="rgba(200,169,110,0.4)" stroke-width="1" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="sb-panel-caption">
+      <span class="sb-panel-sc">${d.sc}</span>
+      <div class="sb-panel-desc">${d.desc}</div>
+    </div>
+  `;
+  sbGrid.appendChild(panel);
+});
+
+// ── CHARACTER SECTION ─────────────────────────────
+const charVideo = document.getElementById('char-video');
+const charIO = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) charVideo.play().catch(() => {});
+    else charVideo.pause();
+  });
+}, {threshold: 0.3});
+charIO.observe(charVideo.closest('.char-film'));
+
+document.getElementById('char-play-btn').addEventListener('click', () => {
+  charVideo.muted = !charVideo.muted;
+  document.getElementById('char-play-btn').textContent = charVideo.muted ? '▶ Unmute reel' : '🔇 Mute reel';
+});
+
+// ── ABOUT DISCIPLINES ─────────────────────────────
+const DISCS = [
+  'CGI & VFX', 'Unreal Engine 5 environment art',
+  '3D generalist — modeling, rigging, animation', 'Character design & rigging',
+  'Lighting, materials & rendering', 'Commercial CGI & motion graphics',
+  'Video editing, post-production & color grading', 'ComfyUI & generative AI workflows',
+  'Creative direction',
+];
+const discEl = document.getElementById('about-disc');
+if (discEl) {
+  discEl.innerHTML = DISCS.map((d, i) =>
+    `<div class="about-disc-item"><span class="about-disc-num">${String(i+1).padStart(2,'0')}</span><span class="about-disc-name">${d}</span></div>`
+  ).join('');
+}
+
+// ── THREE.JS MODEL VIEWER ──────────────────────────
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const mdlCanvas = document.getElementById('mdl-canvas');
+const mdlLoading = document.getElementById('mdl-loading');
+const mdlFill = document.getElementById('mdl-load-fill');
+const mdlFallback = document.getElementById('mdl-fallback');
+const renderer = new THREE.WebGLRenderer({ canvas: mdlCanvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(mdlCanvas.offsetWidth, mdlCanvas.offsetHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+camera.position.set(0, 1.5, 3.5);
+
+const controls = new OrbitControls(camera, mdlCanvas);
+controls.enableDamping = true;
+controls.target.set(0, 1, 0);
+controls.minDistance = 1.5;
+controls.maxDistance = 6;
+
+const hemi = new THREE.HemisphereLight(0xffffff, 0x08070f, 1.2);
+scene.add(hemi);
+const dir = new THREE.DirectionalLight(0xc8a96e, 1.8);
+dir.position.set(2, 4, 3);
+scene.add(dir);
+
+const loader = new GLTFLoader();
+let mixer = null;
+let currentClip = null;
+
+loader.load(`${CDN}/models/JON.glb`,
+  gltf => {
+    scene.add(gltf.scene);
+    mdlLoading.style.display = 'none';
+    if (gltf.animations.length) {
+      mixer = new THREE.AnimationMixer(gltf.scene);
+      currentClip = mixer.clipAction(gltf.animations[0]);
+      currentClip.play();
+    }
+    const box = new THREE.Box3().setFromObject(gltf.scene);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    gltf.scene.position.sub(center);
+    camera.position.set(0, size.y * 0.5, size.y * 2);
+    controls.target.set(0, 0, 0);
+    controls.update();
+  },
+  xhr => { mdlFill.style.width = (xhr.loaded / xhr.total * 100) + '%'; },
+  () => { mdlLoading.style.display = 'none'; mdlFallback.style.display = 'flex'; }
+);
+
+document.querySelectorAll('.mdl-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mdl-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+const clock = new THREE.Clock();
+(function animate() {
+  requestAnimationFrame(animate);
+  if (mixer) mixer.update(clock.getDelta());
+  controls.update();
+  renderer.render(scene, camera);
+})();
+
+new ResizeObserver(() => {
+  renderer.setSize(mdlCanvas.offsetWidth, mdlCanvas.offsetHeight);
+  camera.aspect = mdlCanvas.offsetWidth / mdlCanvas.offsetHeight || 1;
+  camera.updateProjectionMatrix();
+}).observe(mdlCanvas);
+
+// ── REVEAL ANIMATIONS ─────────────────────────────
+const revealIO = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) e.target.classList.add('visible');
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => revealIO.observe(el));
+
+</script>
+</body>
+</html>

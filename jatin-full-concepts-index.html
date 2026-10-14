@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jatin Shinde — Concept Comparison</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&family=Inter+Tight:wght@100;200;300;400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#07080f;color:#f0f2f8;font-family:'Inter Tight',sans-serif;min-height:100vh}
+header{padding:40px 60px;border-bottom:1px solid #1a1c28;display:flex;align-items:center;justify-content:space-between}
+.h-title{font-size:13px;font-weight:200;letter-spacing:.15em;text-transform:uppercase;color:#6a6f88}
+.h-name{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.3em;color:#2563eb;text-transform:uppercase}
+main{padding:60px}
+.page-title{font-size:clamp(32px,5vw,64px);font-weight:100;letter-spacing:-.03em;margin-bottom:12px}
+.page-sub{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.25em;color:#555d78;text-transform:uppercase;margin-bottom:60px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:3px}
+.card{background:#0b0d16;border:1px solid #1a1c28;overflow:hidden;position:relative}
+.card:hover{border-color:#2563eb}
+.card-badge{position:absolute;top:16px;left:16px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.3em;padding:5px 12px;text-transform:uppercase;z-index:2}
+.badge-a{background:#c8a96e;color:#08070f}
+.badge-b{background:#2563eb;color:#f0f2f8}
+.badge-c{background:#e02020;color:#f0f2f8}
+.badge-base{background:#2a2c3a;color:#8a8fa8}
+.card-preview{aspect-ratio:16/9;background:#10121e;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.card-preview-inner{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+.preview-a{background:linear-gradient(135deg,#08070f 0%,#1a1408 60%,#2a1c08 100%)}
+.preview-b{background:linear-gradient(135deg,#07080f 0%,#080c1a 60%,#0a1024 100%)}
+.preview-c{background:linear-gradient(135deg,#0a0a0a 0%,#140a0a 60%,#1a0808 100%)}
+.preview-base{background:linear-gradient(135deg,#07080f 0%,#0b0a14 100%)}
+.preview-label{font-family:'Inter Tight',sans-serif;font-size:clamp(32px,5vw,52px);font-weight:100;letter-spacing:-.04em;opacity:.12}
+.preview-label-a{color:#c8a96e;font-style:italic;font-weight:200}
+.preview-label-b{color:#2563eb;font-weight:100}
+.preview-label-c{color:#e02020;font-weight:900;letter-spacing:-.02em;text-transform:uppercase}
+.preview-label-base{color:#f0f2f8}
+.card-body{padding:28px}
+.card-concept{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.3em;text-transform:uppercase;margin-bottom:10px}
+.concept-a{color:#c8a96e}.concept-b{color:#2563eb}.concept-c{color:#e02020}.concept-base{color:#555d78}
+.card-title{font-size:clamp(18px,2.5vw,24px);font-weight:200;letter-spacing:-.01em;margin-bottom:8px}
+.card-desc{font-size:13px;font-weight:200;color:#555d78;line-height:1.65;margin-bottom:24px}
+.card-specs{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid #1a1c28;padding-top:20px;margin-bottom:24px}
+.spec-item{padding:10px 0}
+.spec-item:nth-child(odd){padding-right:12px;border-right:1px solid #1a1c28}
+.spec-item:nth-child(even){padding-left:12px}
+.spec-key{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.25em;color:#353844;text-transform:uppercase;margin-bottom:4px}
+.spec-val{font-size:12px;font-weight:300;color:#8a8fa8}
+.card-link{display:block;width:100%;padding:14px;text-align:center;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;text-decoration:none;transition:background .2s,color .2s}
+.link-a{background:rgba(200,169,110,.08);color:#c8a96e;border:1px solid rgba(200,169,110,.2)}
+.link-a:hover{background:#c8a96e;color:#08070f}
+.link-b{background:rgba(37,99,235,.08);color:#2563eb;border:1px solid rgba(37,99,235,.2)}
+.link-b:hover{background:#2563eb;color:#f0f2f8}
+.link-c{background:rgba(224,32,32,.08);color:#e02020;border:1px solid rgba(224,32,32,.2)}
+.link-c:hover{background:#e02020;color:#f0f2f8}
+.link-base{background:rgba(240,242,248,.04);color:#8a8fa8;border:1px solid rgba(240,242,248,.08)}
+.link-base:hover{background:rgba(240,242,248,.1);color:#f0f2f8}
+.notice{margin-top:48px;padding:20px 28px;background:#0b0d16;border:1px solid #1a1c28;border-left:2px solid #2563eb}
+.notice-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.3em;color:#2563eb;text-transform:uppercase;margin-bottom:8px}
+.notice p{font-size:13px;font-weight:200;color:#555d78;line-height:1.65}
+footer{padding:32px 60px;border-top:1px solid #1a1c28;display:flex;justify-content:space-between;align-items:center;margin-top:60px}
+.footer-t{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.25em;color:#353844;text-transform:uppercase}
+</style>
+</head>
+<body>
+<header>
+  <span class="h-title">Portfolio — Concept Review</span>
+  <span class="h-name">Jatin Shinde · 2026</span>
+</header>
+<main>
+  <h1 class="page-title">Three Concepts</h1>
+  <p class="page-sub">Complete Portfolio Website Designs — Select for Review</p>
+  <div class="grid">
+
+    <!-- CONCEPT A -->
+    <div class="card">
+      <span class="card-badge badge-a">Concept A</span>
+      <div class="card-preview">
+        <div class="card-preview-inner preview-a">
+          <span class="preview-label preview-label-a">Cinematic</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-concept concept-a">Concept A</div>
+        <h2 class="card-title">The Cinematic Director's Cut</h2>
+        <p class="card-desc">Serif-led editorial aesthetic. Cormorant Garamond at 200–300 weight with film perforation strip and grain overlay. Amber-gold accent. Featured portrait player + filmstrip sidebar for commercial CGI.</p>
+        <div class="card-specs">
+          <div class="spec-item"><div class="spec-key">Typography</div><div class="spec-val">Cormorant Garamond</div></div>
+          <div class="spec-item"><div class="spec-key">Accent</div><div class="spec-val">#c8a96e — Amber Gold</div></div>
+          <div class="spec-item"><div class="spec-key">Commercial</div><div class="spec-val">Portrait + Filmstrip</div></div>
+          <div class="spec-item"><div class="spec-key">B/A</div><div class="spec-val">Grid + Modal Viewer</div></div>
+          <div class="spec-item"><div class="spec-key">Character</div><div class="spec-val">Split + 3D Model</div></div>
+          <div class="spec-item"><div class="spec-key">Vibe</div><div class="spec-val">Cinematic / Serif</div></div>
+        </div>
+        <a href="jatin-full-concept-a.html" class="card-link link-a">Open Concept A →</a>
+      </div>
+    </div>
+
+    <!-- CONCEPT B -->
+    <div class="card">
+      <span class="card-badge badge-b">Concept B</span>
+      <div class="card-preview">
+        <div class="card-preview-inner preview-b">
+          <span class="preview-label preview-label-b">Exhibition</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-concept concept-b">Concept B</div>
+        <h2 class="card-title">The Interactive Digital Exhibition</h2>
+        <p class="card-desc">Museum/gallery aesthetic with grid-line background texture and numbered exhibit navigation. Inter Tight at 100 weight. Cold electric blue accent. Atlas poster grid shows all 11 commercial films simultaneously.</p>
+        <div class="card-specs">
+          <div class="spec-item"><div class="spec-key">Typography</div><div class="spec-val">Inter Tight 100–300</div></div>
+          <div class="spec-item"><div class="spec-key">Accent</div><div class="spec-val">#2563eb — Electric Blue</div></div>
+          <div class="spec-item"><div class="spec-key">Commercial</div><div class="spec-val">Atlas Poster Grid</div></div>
+          <div class="spec-item"><div class="spec-key">B/A</div><div class="spec-val">14-Cell Grid + Modal</div></div>
+          <div class="spec-item"><div class="spec-key">Character</div><div class="spec-val">Grid + Spec Table</div></div>
+          <div class="spec-item"><div class="spec-key">Vibe</div><div class="spec-val">Exhibition / Gallery</div></div>
+        </div>
+        <a href="jatin-full-concept-b.html" class="card-link link-b">Open Concept B →</a>
+      </div>
+    </div>
+
+    <!-- CONCEPT C -->
+    <div class="card">
+      <span class="card-badge badge-c">Concept C</span>
+      <div class="card-preview">
+        <div class="card-preview-inner preview-c">
+          <span class="preview-label preview-label-c">Archive</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-concept concept-c">Concept C</div>
+        <h2 class="card-title">The Artist's Visual Archive</h2>
+        <p class="card-desc">Brutalist / typography-forward. Barlow Condensed at 900 weight for structural headers. Sharp vermillion-red accent. Horizontal filmstrip scroll for B/A. Featured portrait player + row list for commercials.</p>
+        <div class="card-specs">
+          <div class="spec-item"><div class="spec-key">Typography</div><div class="spec-val">Barlow Condensed 900</div></div>
+          <div class="spec-item"><div class="spec-key">Accent</div><div class="spec-val">#e02020 — Vermillion</div></div>
+          <div class="spec-item"><div class="spec-key">Commercial</div><div class="spec-val">Portrait + Row List</div></div>
+          <div class="spec-item"><div class="spec-key">B/A</div><div class="spec-val">Horizontal Filmstrip</div></div>
+          <div class="spec-item"><div class="spec-key">Character</div><div class="spec-val">Split + 3D Model</div></div>
+          <div class="spec-item"><div class="spec-key">Vibe</div><div class="spec-val">Brutalist / Bold</div></div>
+        </div>
+        <a href="jatin-full-concept-c.html" class="card-link link-c">Open Concept C →</a>
+      </div>
+    </div>
+
+    <!-- BASELINE -->
+    <div class="card">
+      <span class="card-badge badge-base">Baseline</span>
+      <div class="card-preview">
+        <div class="card-preview-inner preview-base">
+          <span class="preview-label preview-label-base" style="font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.3em;font-weight:300">v5.html</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-concept concept-base">Production Baseline</div>
+        <h2 class="card-title">v5 — Current Production File</h2>
+        <p class="card-desc">The current production baseline. Barlow Condensed / Barlow font system, R2 CDN assets, Lenis smooth scroll with GSAP ScrollTrigger, world-based frame scrubbing, all sections live.</p>
+        <div class="card-specs">
+          <div class="spec-item"><div class="spec-key">File</div><div class="spec-val">v5.html — DO NOT MODIFY</div></div>
+          <div class="spec-item"><div class="spec-key">Status</div><div class="spec-val">Production Baseline</div></div>
+          <div class="spec-item"><div class="spec-key">Lines</div><div class="spec-val">1929</div></div>
+          <div class="spec-item"><div class="spec-key">Branch</div><div class="spec-val">claude/busy-volta-5rtmib</div></div>
+        </div>
+        <a href="v5.html" class="card-link link-base">Open v5 Baseline →</a>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="notice">
+    <div class="notice-label">Review Instructions</div>
+    <p>All three concepts contain every required section: cinematic opening, 5 UE5 worlds, 14 B/A pairs, 11 commercial films (no car-commercials, correct filenames), ComfyUI, 3 AI systems, character work + JON 3D model, about (7+ years, 13 tools), archive, contact, footer. Video loop and audio playback fixes applied in all three. v5.html is unchanged.</p>
+  </div>
+</main>
+<footer>
+  <span class="footer-t">Jatin Shinde — Portfolio Concepts 2026</span>
+  <span class="footer-t">Branch: claude/busy-volta-5rtmib</span>
+</footer>
+</body>
+</html>
