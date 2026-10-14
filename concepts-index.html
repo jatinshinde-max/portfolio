@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Concepts Index — Jatin Shinde Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@200;300;400;600&family=Barlow:wght@300;400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#04040e;
+  --bg-1:#0c0b1a;
+  --bg-2:#14132a;
+  --ink:#ece9ff;
+  --ink-mute:rgba(236,233,255,0.5);
+  --ink-ghost:rgba(236,233,255,0.12);
+  --accent-ads:#ffd580;
+  --accent-about:#b8f5e0;
+  --accent-ba:#f0a0c8;
+  --f-display:'Barlow Condensed',sans-serif;
+  --f-body:'Barlow',sans-serif;
+  --f-mono:'DM Mono',monospace;
+}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);overflow-x:hidden;cursor:none;min-height:100vh}
+
+/* Cursor */
+#cursor{position:fixed;z-index:9999;pointer-events:none}
+.c-dot{position:absolute;width:5px;height:5px;background:var(--ink);border-radius:50%;transform:translate(-50%,-50%);mix-blend-mode:difference}
+.c-ring{position:absolute;width:34px;height:34px;border:1px solid rgba(236,233,255,0.2);border-radius:50%;transform:translate(-50%,-50%);transition:width 0.2s,height 0.2s,border-color 0.2s}
+
+/* Site header */
+.site-header{padding:3rem 3rem 2rem;border-bottom:1px solid var(--ink-ghost)}
+.sh-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3rem}
+.sh-back{font-family:var(--f-mono);font-size:0.6rem;letter-spacing:0.3em;color:var(--ink-mute);text-decoration:none;transition:color 0.2s}
+.sh-back:hover{color:var(--ink)}
+.sh-meta{font-family:var(--f-mono);font-size:0.6rem;letter-spacing:0.2em;color:var(--ink-ghost)}
+
+.sh-title{font-family:var(--f-display);font-weight:200;font-size:clamp(3.5rem,7vw,7rem);letter-spacing:-0.025em;line-height:0.92;opacity:0;animation:up 0.9s ease 0.2s forwards}
+.sh-subtitle{font-family:var(--f-mono);font-size:0.65rem;letter-spacing:0.3em;color:var(--ink-mute);margin-top:1.5rem;opacity:0;animation:up 0.8s ease 0.5s forwards}
+.sh-note{font-size:0.82rem;color:var(--ink-ghost);margin-top:1rem;max-width:520px;line-height:1.6;opacity:0;animation:up 0.8s ease 0.7s forwards}
+.sh-note strong{color:var(--ink-mute);font-weight:400}
+
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ── CONCEPT GROUPS ── */
+.concepts-wrap{padding:4rem 3rem 8rem;display:flex;flex-direction:column;gap:5rem}
+
+.concept-group{}
+.cg-header{display:flex;justify-content:space-between;align-items:baseline;padding-bottom:1.5rem;border-bottom:1px solid var(--ink-ghost);margin-bottom:2rem}
+.cg-title{font-family:var(--f-display);font-weight:300;font-size:1.3rem;letter-spacing:0.08em;text-transform:uppercase}
+.cg-count{font-family:var(--f-mono);font-size:0.55rem;letter-spacing:0.25em;color:var(--ink-ghost)}
+
+/* Concept cards row */
+.cg-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--ink-ghost)}
+
+/* Individual concept card */
+.concept-card{background:var(--bg);display:flex;flex-direction:column;text-decoration:none;color:inherit;position:relative;overflow:hidden;transition:background 0.3s}
+.concept-card:hover{background:var(--bg-1)}
+.cc-top{padding:2rem 2rem 1.5rem;flex:1;display:flex;flex-direction:column;gap:1rem}
+.cc-letter{font-family:var(--f-display);font-weight:100;font-size:4.5rem;line-height:1;letter-spacing:-0.04em;opacity:0.2;transition:opacity 0.3s}
+.concept-card:hover .cc-letter{opacity:0.4}
+.cc-dir{font-family:var(--f-mono);font-size:0.52rem;letter-spacing:0.28em;color:var(--ink-ghost);margin-top:-0.5rem}
+.cc-name{font-family:var(--f-display);font-weight:300;font-size:1.5rem;letter-spacing:0.02em;line-height:1.1;transition:color 0.2s}
+.cc-desc{font-size:0.8rem;color:var(--ink-ghost);line-height:1.65;transition:color 0.2s}
+.concept-card:hover .cc-desc{color:var(--ink-mute)}
+.cc-features{display:flex;flex-wrap:wrap;gap:0.35rem;margin-top:auto;padding-top:1rem}
+.cc-feat{font-family:var(--f-mono);font-size:0.45rem;letter-spacing:0.2em;padding:0.2rem 0.5rem;border:1px solid var(--ink-ghost);color:var(--ink-ghost);transition:border-color 0.2s,color 0.2s}
+.concept-card:hover .cc-feat{border-color:rgba(236,233,255,0.2);color:var(--ink-mute)}
+.cc-bottom{padding:1.2rem 2rem;border-top:1px solid var(--ink-ghost);display:flex;justify-content:space-between;align-items:center}
+.cc-link{font-family:var(--f-mono);font-size:0.55rem;letter-spacing:0.25em;transition:color 0.2s}
+.concept-card:hover .cc-link{color:var(--ink)}
+.cc-arrow{font-size:0.8rem;opacity:0;transform:translateX(-6px);transition:opacity 0.2s,transform 0.2s}
+.concept-card:hover .cc-arrow{opacity:1;transform:none}
+
+/* Accent lines per group */
+.cg-ads .cc-letter,.cg-ads .cc-link{color:var(--accent-ads)}
+.cg-ads .concept-card:hover{box-shadow:inset 0 0 0 1px rgba(255,213,128,0.15)}
+.cg-about .cc-letter,.cg-about .cc-link{color:var(--accent-about)}
+.cg-about .concept-card:hover{box-shadow:inset 0 0 0 1px rgba(184,245,224,0.15)}
+
+/* Preview card */
+.preview-card{background:var(--bg-2);border:1px solid var(--ink-ghost);display:flex;flex-direction:column;gap:1rem;padding:2rem;text-decoration:none;color:inherit;transition:background 0.3s,border-color 0.3s;margin-top:5rem}
+.preview-card:hover{background:var(--bg-1);border-color:rgba(240,160,200,0.3)}
+.pc-label{font-family:var(--f-mono);font-size:0.55rem;letter-spacing:0.3em;color:var(--accent-ba)}
+.pc-title{font-family:var(--f-display);font-weight:200;font-size:2rem;letter-spacing:-0.01em}
+.pc-desc{font-size:0.82rem;color:var(--ink-ghost);line-height:1.65}
+.pc-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:1rem;border-top:1px solid var(--ink-ghost)}
+.pc-cta{font-family:var(--f-mono);font-size:0.55rem;letter-spacing:0.25em;color:var(--accent-ba)}
+
+/* Instructions panel */
+.instructions{background:var(--bg-1);border:1px solid var(--ink-ghost);padding:2rem;margin-top:4rem}
+.inst-label{font-family:var(--f-mono);font-size:0.5rem;letter-spacing:0.35em;color:var(--ink-ghost);margin-bottom:1rem}
+.inst-text{font-size:0.82rem;color:var(--ink-mute);line-height:1.75}
+.inst-text code{font-family:var(--f-mono);font-size:0.78rem;color:var(--accent-ads)}
+
+@media(max-width:900px){
+  .cg-row{grid-template-columns:1fr}
+  .site-header,.concepts-wrap{padding-left:1.5rem;padding-right:1.5rem}
+}
+</style>
+</head>
+<body>
+<div id="cursor"><div class="c-dot"></div><div class="c-ring"></div></div>
+
+<header class="site-header">
+  <div class="sh-top">
+    <a href="portfolio-full-preview-v5-corrected.html" class="sh-back">← Full Preview (v5-corrected)</a>
+    <span class="sh-meta">Jatin Shinde · Portfolio Design Concepts</span>
+  </div>
+  <h1 class="sh-title">Design<br>Concepts</h1>
+  <p class="sh-subtitle">6 prototypes across 2 sections · Phase 2 &amp; 3</p>
+  <p class="sh-note">These are <strong>standalone concept prototypes</strong> — not integrated into production. Review each direction, select a preferred approach per section, and confirm before any integration into <code>v5.html</code>.</p>
+</header>
+
+<div class="concepts-wrap">
+
+  <!-- Commercial CGI Group -->
+  <div class="concept-group cg-ads">
+    <div class="cg-header">
+      <span class="cg-title" style="color:var(--accent-ads)">Commercial CGI &amp; Motion</span>
+      <span class="cg-count">3 Directions</span>
+    </div>
+    <div class="cg-row">
+      <a href="concept-ads-a.html" class="concept-card">
+        <div class="cc-top">
+          <div class="cc-letter">A</div>
+          <div class="cc-dir">Direction A</div>
+          <div class="cc-name">Cinematic<br>Film Atlas</div>
+          <div class="cc-desc">Editorial newspaper-style grid. Films catalogued like a director's atlas — numbered entries, tall 9:16 portrait frames in rows, click-to-view modal.</div>
+          <div class="cc-features">
+            <span class="cc-feat">Atlas Grid</span>
+            <span class="cc-feat">Row Navigation</span>
+            <span class="cc-feat">Film Numbers</span>
+            <span class="cc-feat">Modal Viewer</span>
+            <span class="cc-feat">GSAP Reveals</span>
+          </div>
+        </div>
+        <div class="cc-bottom">
+          <span class="cc-link">Open Prototype</span>
+          <span class="cc-arrow">→</span>
+        </div>
+      </a>
+      <a href="concept-ads-b.html" class="concept-card">
+        <div class="cc-top">
+          <div class="cc-letter">B</div>
+          <div class="cc-dir">Direction B</div>
+          <div class="cc-name">Living<br>Film Wall</div>
+          <div class="cc-desc">Masonry wall of portrait video cards. Every film breathes on hover — plays in-place. Staggered staggered reveal, grain overlay, prev/next modal navigation.</div>
+          <div class="cc-features">
+            <span class="cc-feat">Masonry Grid</span>
+            <span class="cc-feat">Hover Play</span>
+            <span class="cc-feat">Film Grain</span>
+            <span class="cc-feat">Prev/Next Modal</span>
+            <span class="cc-feat">Stagger Reveal</span>
+          </div>
+        </div>
+        <div class="cc-bottom">
+          <span class="cc-link">Open Prototype</span>
+          <span class="cc-arrow">→</span>
+        </div>
+      </a>
+      <a href="concept-ads-c.html" class="concept-card">
+        <div class="cc-top">
+          <div class="cc-letter">C</div>
+          <div class="cc-dir">Direction C</div>
+          <div class="cc-name">Director's<br>Screening Room</div>
+          <div class="cc-desc">Theater-dark UX. One featured film on a large screen with progress bar and mute control. Filmstrip reel below for navigation. Production credits list.</div>
+          <div class="cc-features">
+            <span class="cc-feat">Featured Player</span>
+            <span class="cc-feat">Filmstrip Reel</span>
+            <span class="cc-feat">Sprocket Holes</span>
+            <span class="cc-feat">Auto-advance</span>
+            <span class="cc-feat">Credits Roll</span>
+          </div>
+        </div>
+        <div class="cc-bottom">
+          <span class="cc-link">Open Prototype</span>
+          <span class="cc-arrow">→</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- About Group -->
+  <div class="concept-group cg-about">
+    <div class="cg-header">
+      <span class="cg-title" style="color:var(--accent-about)">About Jatin Shinde</span>
+      <span class="cg-count">3 Directions</span>
+    </div>
+    <div class="cg-row">
+      <a href="concept-about-a.html" class="concept-card">
+        <div class="cc-top">
+          <div class="cc-letter">A</div>
+          <div class="cc-dir">Direction A</div>
+          <div class="cc-name">Artist's Visual<br>Manifesto</div>
+          <div class="cc-desc">Grand statement typography. "I build worlds from nothing." Identity stats, tool arsenal grid with animated reveals, 3-column manifesto Q&amp;A.</div>
+          <div class="cc-features">
+            <span class="cc-feat">100-weight Statement</span>
+            <span class="cc-feat">Stats Grid</span>
+            <span class="cc-feat">Tool Arsenal</span>
+            <span class="cc-feat">Manifesto Blocks</span>
+          </div>
+        </div>
+        <div class="cc-bottom">
+          <span class="cc-link">Open Prototype</span>
+          <span class="cc-arrow">→</span>
+        </div>
+      </a>
+      <a href="concept-about-b.html" class="concept-card">
+        <div class="cc-top">
+          <div class="cc-letter">B</div>
+          <div class="cc-dir">Direction B</div>
+          <div class="cc-name">Inside the<br>Creative Process</div>
+          <div class="cc-desc">Process-first narrative. 5 production steps with tool tags. Pipeline node diagram from brief to delivery. Full software table. Dual-column cover split.</div>
+          <div class="cc-features">
+            <span class="cc-feat">Process Steps</span>
+            <span class="cc-feat">Pipeline Diagram</span>
+            <span class="cc-feat">Tool Table</span>
+            <span class="cc-feat">Cover Split</span>
+          </div>
+        </div>
+        <div class="cc-bottom">
+          <span class="cc-link">Open Prototype</span>
+          <span class="cc-arrow">→</span>
+        </div>
+      </a>
+      <a href="concept-about-c.html" class="concept-card">
+        <div class="cc-top">
+          <div class="cc-letter">C</div>
+          <div class="cc-dir">Direction C</div>
+          <div class="cc-name">Digital Artist<br>Dossier</div>
+          <div class="cc-desc">Structured dossier with sticky sidebar navigation. Competency bars, software table with category tags, and principles list. Data-dense, professional.</div>
+          <div class="cc-features">
+            <span class="cc-feat">Sticky Sidebar</span>
+            <span class="cc-feat">Competency Bars</span>
+            <span class="cc-feat">Software Table</span>
+            <span class="cc-feat">Animated Bars</span>
+          </div>
+        </div>
+        <div class="cc-bottom">
+          <span class="cc-link">Open Prototype</span>
+          <span class="cc-arrow">→</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Full Preview Link -->
+  <a href="portfolio-full-preview-v5-corrected.html" class="preview-card">
+    <div class="pc-label">Current Preview</div>
+    <div class="pc-title">Full Site Preview — v5 Corrected</div>
+    <div class="pc-desc">The complete portfolio built from the correct v5.html baseline, with the new Before/After scroll-pin group system. This is the reference for all integration work.</div>
+    <div class="pc-bottom">
+      <span class="pc-cta">Open Full Preview →</span>
+      <span style="font-family:var(--f-mono);font-size:0.5rem;letter-spacing:0.2em;color:var(--ink-ghost)">SHA: 3387743d</span>
+    </div>
+  </a>
+
+  <!-- Instructions -->
+  <div class="instructions">
+    <div class="inst-label">Integration Instructions</div>
+    <div class="inst-text">
+      These prototypes are <strong>read-only concept evaluations</strong>. Do not integrate any direction until a choice is confirmed. When ready, specify:<br><br>
+      <code>"Integrate Ads Direction [A/B/C] and About Direction [A/B/C] into v5.html"</code><br><br>
+      All videos are served from the Cloudflare R2 CDN. The 11 commercial films include URL-encoded filenames for titles with spaces (911 Commercial, Moisturizer and Cleanser Ad-1, RR Ad). Car-commercial.mp4 and car-commercial-2.mp4 are excluded from all prototypes per brief.
+    </div>
+  </div>
+
+</div>
+
+<script>
+const cdot=document.querySelector('.c-dot'),cring=document.querySelector('.c-ring');
+let mx=0,my=0,tx=0,ty=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cdot.style.transform=`translate(${mx}px,${my}px) translate(-50%,-50%)`});
+(function a(){tx+=(mx-tx)*0.1;ty+=(my-ty)*0.1;cring.style.transform=`translate(${tx}px,${ty}px) translate(-50%,-50%)`;requestAnimationFrame(a)})();
+</script>
+</body>
+</html>

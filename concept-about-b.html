@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About — Concept B: Inside the Creative Process</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@200;300;400;600&family=Barlow:wght@300;400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#030309;
+  --bg-1:#0b0a17;
+  --bg-2:#141222;
+  --ink:#f0edff;
+  --ink-mute:rgba(240,237,255,0.5);
+  --ink-ghost:rgba(240,237,255,0.12);
+  --accent:#ffd580;
+  --accent2:#a0d4ff;
+  --f-display:'Barlow Condensed',sans-serif;
+  --f-body:'Barlow',sans-serif;
+  --f-mono:'DM Mono',monospace;
+}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);overflow-x:hidden;cursor:none}
+
+/* Cursor */
+#cursor{position:fixed;z-index:9999;pointer-events:none}
+.c-dot{position:absolute;width:6px;height:6px;background:var(--ink);border-radius:50%;transform:translate(-50%,-50%)}
+.c-ring{position:absolute;width:38px;height:38px;border:1px solid rgba(255,213,128,0.3);border-radius:50%;transform:translate(-50%,-50%);transition:width 0.2s,height 0.2s}
+
+/* Hdr */
+.hdr{position:fixed;top:0;left:0;right:0;z-index:100;padding:1.8rem 3rem;display:flex;justify-content:space-between}
+.hdr a,.hdr span{font-family:var(--f-mono);font-size:0.6rem;letter-spacing:0.3em;color:var(--ink-mute);text-decoration:none}
+
+/* ── COVER ── */
+.cover{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--ink-ghost)}
+.cover-left{display:flex;flex-direction:column;justify-content:flex-end;padding:8rem 3rem 4rem;border-right:1px solid var(--ink-ghost);position:relative;overflow:hidden}
+.cover-left::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 20% 80%,rgba(255,213,128,0.06),transparent)}
+.cover-tag{font-family:var(--f-mono);font-size:0.55rem;letter-spacing:0.35em;color:var(--accent);margin-bottom:2rem;opacity:0;animation:fade 0.8s ease 0.3s forwards}
+.cover-name{font-family:var(--f-display);font-weight:200;font-size:clamp(4rem,7vw,8rem);letter-spacing:-0.025em;line-height:0.93;opacity:0;animation:fade 0.9s ease 0.5s forwards}
+.cover-role{font-family:var(--f-mono);font-size:0.65rem;letter-spacing:0.3em;color:var(--ink-mute);margin-top:2rem;opacity:0;animation:fade 0.8s ease 0.8s forwards}
+
+.cover-right{display:flex;flex-direction:column;justify-content:flex-end;padding:8rem 3rem 4rem;position:relative}
+.cover-right::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 80% 20%,rgba(160,212,255,0.05),transparent)}
+.cover-bio{font-size:0.92rem;color:var(--ink-mute);line-height:1.8;max-width:380px;margin-bottom:3rem;opacity:0;animation:fade 0.8s ease 0.9s forwards}
+.cover-yrs{font-family:var(--f-display);font-weight:200;font-size:5rem;letter-spacing:-0.04em;color:var(--ink-ghost);opacity:0;animation:fade 0.8s ease 1.1s forwards;line-height:1}
+.cover-yrs-label{font-family:var(--f-mono);font-size:0.55rem;letter-spacing:0.3em;color:var(--ink-ghost)}
+
+@keyframes fade{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+/* ── PROCESS STEPS ── */
+.process{padding:6rem 3rem}
+.process-heading{font-family:var(--f-display);font-weight:200;font-size:clamp(2rem,4vw,4.5rem);letter-spacing:-0.02em;margin-bottom:4rem}
+.process-steps{display:flex;flex-direction:column;gap:0}
+.step{display:grid;grid-template-columns:80px 1fr 1fr;gap:0;border-top:1px solid var(--ink-ghost);padding:2.5rem 0;position:relative;overflow:hidden;transition:background 0.3s}
+.step::before{content:'';position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(to right,rgba(255,213,128,0.05),transparent);transition:width 0.6s ease}
+.step:hover::before{width:100%}
+.step-num{font-family:var(--f-mono);font-size:0.55rem;letter-spacing:0.3em;color:var(--accent);align-self:flex-start;padding-top:0.15rem}
+.step-title{font-family:var(--f-display);font-weight:300;font-size:1.5rem;letter-spacing:0.02em;padding-right:2rem}
+.step-body{font-size:0.85rem;color:var(--ink-mute);line-height:1.75}
+.step-tools{margin-top:1rem;display:flex;flex-wrap:wrap;gap:0.4rem}
+.step-tool{font-family:var(--f-mono);font-size:0.48rem;letter-spacing:0.2em;padding:0.25rem 0.6rem;border:1px solid var(--ink-ghost);color:var(--ink-ghost);transition:border-color 0.2s,color 0.2s}
+.step:hover .step-tool{border-color:rgba(255,213,128,0.3);color:var(--ink-mute)}
+
+/* ── PIPELINE DIAGRAM ── */
+.pipeline{padding:6rem 3rem;border-top:1px solid var(--ink-ghost)}
+.pipeline-heading{font-family:var(--f-display);font-weight:200;font-size:clamp(2rem,3.5vw,3.5rem);letter-spacing:-0.02em;margin-bottom:4rem}
+.pipeline-track{position:relative;padding:2rem 0}
+.pipe-line{position:absolute;top:50%;left:40px;right:40px;height:1px;background:linear-gradient(to right,var(--accent),var(--accent2));transform:translateY(-50%);opacity:0.3}
+.pipe-nodes{display:flex;justify-content:space-between;position:relative;z-index:2}
+.pipe-node{display:flex;flex-direction:column;align-items:center;gap:0.8rem;flex:1;cursor:default}
+.pipe-dot{width:10px;height:10px;border-radius:50%;background:var(--bg);border:1px solid var(--accent);position:relative;transition:transform 0.3s}
+.pipe-node:hover .pipe-dot{transform:scale(1.8);background:var(--accent)}
+.pipe-node:nth-child(even) .pipe-dot{border-color:var(--accent2)}
+.pipe-node:nth-child(even):hover .pipe-dot{background:var(--accent2)}
+.pipe-label{font-family:var(--f-mono);font-size:0.5rem;letter-spacing:0.2em;color:var(--ink-mute);text-align:center;max-width:80px}
+
+/* ── TOOLKIT TABLE ── */
+.toolkit{padding:5rem 3rem 8rem;border-top:1px solid var(--ink-ghost)}
+.toolkit-heading{font-family:var(--f-display);font-weight:200;font-size:clamp(2rem,3.5vw,3.5rem);letter-spacing:-0.02em;margin-bottom:3rem}
+.toolkit-table{width:100%;border-collapse:collapse}
+.toolkit-table thead tr{border-bottom:1px solid var(--ink-ghost)}
+.toolkit-table th{text-align:left;padding:0.6rem 1rem;font-family:var(--f-mono);font-size:0.5rem;letter-spacing:0.3em;color:var(--ink-ghost);font-weight:300}
+.toolkit-table tbody tr{border-bottom:1px solid var(--ink-ghost);transition:background 0.2s}
+.toolkit-table tbody tr:hover{background:rgba(255,213,128,0.04)}
+.toolkit-table td{padding:1rem;font-size:0.85rem;color:var(--ink-mute)}
+.toolkit-table td:first-child{font-family:var(--f-display);font-weight:300;font-size:1.1rem;color:var(--ink);letter-spacing:0.02em}
+.tk-cat{font-family:var(--f-mono);font-size:0.48rem;letter-spacing:0.18em;padding:0.2rem 0.5rem;border:1px solid var(--ink-ghost)}
+
+/* Footer */
+.pg-footer{padding:3rem;border-top:1px solid var(--ink-ghost);display:flex;justify-content:space-between;align-items:center}
+.pg-back{font-family:var(--f-mono);font-size:0.6rem;letter-spacing:0.28em;color:var(--ink-mute);text-decoration:none;transition:color 0.2s}
+.pg-back:hover{color:var(--accent)}
+.pg-cpt{font-family:var(--f-mono);font-size:0.58rem;letter-spacing:0.2em;color:var(--ink-ghost)}
+
+.reveal{opacity:0;transform:translateY(18px);transition:opacity 0.7s ease,transform 0.7s ease}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:900px){
+  .cover{grid-template-columns:1fr;min-height:auto}
+  .cover-left{border-right:none;border-bottom:1px solid var(--ink-ghost)}
+  .step{grid-template-columns:60px 1fr;grid-template-rows:auto auto}
+  .step-body{grid-column:2}
+  .pipe-label{font-size:0.42rem}
+}
+@media(max-width:600px){
+  .hdr,.process,.pipeline,.toolkit,.pg-footer{padding-left:1.5rem;padding-right:1.5rem}
+  .cover-left,.cover-right{padding:6rem 1.5rem 3rem}
+}
+</style>
+</head>
+<body>
+<div id="cursor"><div class="c-dot"></div><div class="c-ring"></div></div>
+<header class="hdr">
+  <a href="concepts-index.html">← Back</a>
+  <span>Concept B — Inside the Creative Process</span>
+</header>
+
+<!-- Cover -->
+<section class="cover">
+  <div class="cover-left">
+    <p class="cover-tag">Concept B / 03 · About</p>
+    <h1 class="cover-name">Jatin<br>Shinde</h1>
+    <p class="cover-role">CGI Artist · VFX Director · Creative Lead</p>
+  </div>
+  <div class="cover-right">
+    <p class="cover-bio">I build cinematic environments and commercial CGI — leading designers and editors from concept through delivery, with 7+ years across realtime engines, 3D pipelines, and motion graphics.</p>
+    <div>
+      <div class="cover-yrs">7+</div>
+      <div class="cover-yrs-label">Years in production</div>
+    </div>
+  </div>
+</section>
+
+<!-- Process -->
+<section class="process">
+  <h2 class="process-heading reveal">How I Work</h2>
+  <div class="process-steps">
+    <div class="step reveal">
+      <div class="step-num">01</div>
+      <div class="step-title">Brief &amp; Creative Direction</div>
+      <div class="step-body">
+        Every project starts with a single question: what should this make the viewer feel? I translate brand objectives into a creative language — color, movement, atmosphere — before a single polygon is placed.
+        <div class="step-tools">
+          <span class="step-tool">Moodboards</span>
+          <span class="step-tool">Ps</span>
+          <span class="step-tool">Ai</span>
+        </div>
+      </div>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">02</div>
+      <div class="step-title">3D Modelling &amp; Scene Assembly</div>
+      <div class="step-body">
+        Assets are modelled in Blender or Character Creator, textured in Substance, and assembled in Unreal Engine 5 where lighting happens in real time. No waiting on render farms.
+        <div class="step-tools">
+          <span class="step-tool">Blender</span>
+          <span class="step-tool">Character Creator 4</span>
+          <span class="step-tool">Substance 3D Painter</span>
+          <span class="step-tool">Marvelous Designer</span>
+        </div>
+      </div>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">03</div>
+      <div class="step-title">Lighting &amp; Camera</div>
+      <div class="step-body">
+        UE5's Lumen gives me cinematic global illumination live. I direct the camera the way a DP would — considering focal length, depth of field, and the emotional weight of the shot.
+        <div class="step-tools">
+          <span class="step-tool">Unreal Engine 5</span>
+          <span class="step-tool">Lumen GI</span>
+        </div>
+      </div>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">04</div>
+      <div class="step-title">Compositing &amp; VFX</div>
+      <div class="step-body">
+        Rendered sequences come into After Effects for compositing, colour work, and VFX layers. Motion blur, lens distortion, film grain — the details that make CGI feel physical.
+        <div class="step-tools">
+          <span class="step-tool">After Effects</span>
+          <span class="step-tool">Photoshop</span>
+        </div>
+      </div>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">05</div>
+      <div class="step-title">Edit, Grade &amp; Deliver</div>
+      <div class="step-body">
+        Final assembly and colour grade in Premiere Pro or DaVinci Resolve. Sound design in Audition. Delivery optimised per platform — vertical for social, wide for broadcast.
+        <div class="step-tools">
+          <span class="step-tool">Premiere Pro</span>
+          <span class="step-tool">DaVinci Resolve</span>
+          <span class="step-tool">Audition</span>
+          <span class="step-tool">Lightroom</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pipeline diagram -->
+<section class="pipeline">
+  <h2 class="pipeline-heading reveal">Production Pipeline</h2>
+  <div class="pipeline-track reveal">
+    <div class="pipe-line"></div>
+    <div class="pipe-nodes">
+      <div class="pipe-node"><div class="pipe-dot"></div><div class="pipe-label">Brief</div></div>
+      <div class="pipe-node"><div class="pipe-dot"></div><div class="pipe-label">Concept &amp; Direction</div></div>
+      <div class="pipe-node"><div class="pipe-dot"></div><div class="pipe-label">3D Build</div></div>
+      <div class="pipe-node"><div class="pipe-dot"></div><div class="pipe-label">Texturing</div></div>
+      <div class="pipe-node"><div class="pipe-dot"></div><div class="pipe-label">Lighting</div></div>
+      <div class="pipe-node"><div class="pipe-dot"></div><div class="pipe-label">Render</div></div>
+      <div class="pipe-node"><div class="pipe-dot"></div><div class="pipe-label">Compositing</div></div>
+      <div class="pipe-node"><div class="pipe-dot"></div><div class="pipe-label">Grade</div></div>
+      <div class="pipe-node"><div class="pipe-dot"></div><div class="pipe-label">Delivery</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Toolkit table -->
+<section class="toolkit">
+  <h2 class="toolkit-heading reveal">Toolkit</h2>
+  <table class="toolkit-table reveal">
+    <thead><tr><th>Tool</th><th>Application</th><th>Category</th></tr></thead>
+    <tbody id="toolkit-body"></tbody>
+  </table>
+</section>
+
+<footer class="pg-footer">
+  <a href="concepts-index.html" class="pg-back">← All Concepts</a>
+  <span class="pg-cpt">Concept B · Inside the Creative Process · About Jatin Shinde</span>
+</footer>
+
+<script>
+const TOOLS=[
+  ['Adobe After Effects','Motion graphics, VFX, compositing','VFX'],
+  ['Adobe Premiere Pro','Non-linear video editing','Edit'],
+  ['Adobe Photoshop','Compositing, retouching, texture maps','2D'],
+  ['Adobe Illustrator','Vector art, print, motion graphics','2D'],
+  ['Adobe Audition','Sound design, audio mix, podcast','Audio'],
+  ['Adobe Lightroom','Photography, RAW grading','Photo'],
+  ['CorelDRAW','Design, publication, vector','2D'],
+  ['Blender','3D modelling, animation, rendering','3D'],
+  ['Unreal Engine 5','Realtime CG environments, arch-viz','Realtime'],
+  ['Substance 3D Painter','PBR texturing, material authoring','Texture'],
+  ['Character Creator 4','Digital human pipeline, rigging','Character'],
+  ['Marvelous Designer','Cloth simulation, wardrobe','Simulation'],
+  ['DaVinci Resolve','Color grading, finishing, delivery','Grade'],
+];
+
+const tbody = document.getElementById('toolkit-body');
+TOOLS.forEach(t=>{
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td>${t[0]}</td><td>${t[1]}</td><td><span class="tk-cat">${t[2]}</span></td>`;
+  tbody.appendChild(tr);
+});
+
+// Cursor
+const cdot=document.querySelector('.c-dot'),cring=document.querySelector('.c-ring');
+let mx=0,my=0,tx=0,ty=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cdot.style.transform=`translate(${mx}px,${my}px) translate(-50%,-50%)`});
+(function a(){tx+=(mx-tx)*0.1;ty+=(my-ty)*0.1;cring.style.transform=`translate(${tx}px,${ty}px) translate(-50%,-50%)`;requestAnimationFrame(a)})();
+
+// Reveal
+const io=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>

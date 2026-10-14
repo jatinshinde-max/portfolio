@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commercial CGI — Concept A: Cinematic Film Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@200;300;400;500;600&family=Barlow:wght@300;400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#06050c;
+  --bg-1:#0d0c15;
+  --bg-2:#141320;
+  --ink:#f0eef8;
+  --ink-mute:rgba(240,238,248,0.55);
+  --ink-ghost:rgba(240,238,248,0.18);
+  --accent:#e8c97a;
+  --accent-dim:rgba(232,201,122,0.12);
+  --f-display:'Barlow Condensed',sans-serif;
+  --f-body:'Barlow',sans-serif;
+  --f-mono:'DM Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);overflow-x:hidden;cursor:none}
+
+/* Custom cursor */
+#cursor{position:fixed;top:0;left:0;pointer-events:none;z-index:9999;mix-blend-mode:difference}
+#cur-dot{width:6px;height:6px;background:var(--ink);border-radius:50%;transform:translate(-50%,-50%)}
+#cur-ring{position:absolute;top:50%;left:50%;width:36px;height:36px;border:1px solid rgba(240,238,248,0.5);border-radius:50%;transform:translate(-50%,-50%);transition:width 0.2s,height 0.2s,opacity 0.2s}
+body:hover #cur-ring{opacity:1}
+
+/* ── HEADER ── */
+.site-header{position:fixed;top:0;left:0;right:0;z-index:100;padding:2rem 3rem;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none}
+.site-header a{pointer-events:all}
+.hdr-label{font-family:var(--f-mono);font-size:0.65rem;letter-spacing:0.3em;color:var(--ink-mute);text-transform:uppercase;text-decoration:none}
+.hdr-label span{color:var(--accent)}
+
+/* ── HERO ── */
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 3rem 5rem;position:relative;overflow:hidden}
+.hero-rule{position:absolute;top:0;left:0;right:0;bottom:0;background:
+  linear-gradient(to bottom, rgba(6,5,12,0.3) 0%, transparent 40%, transparent 60%, rgba(6,5,12,0.85) 100%);
+  pointer-events:none}
+.hero-grid-lines{position:absolute;inset:0;background-image:linear-gradient(rgba(232,201,122,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(232,201,122,0.04) 1px,transparent 1px);background-size:80px 80px;pointer-events:none}
+.hero-num{font-family:var(--f-mono);font-size:0.6rem;letter-spacing:0.35em;color:var(--accent);margin-bottom:1.5rem;opacity:0;transform:translateY(12px);transition:all 0.8s ease 0.2s}
+.hero h1{font-family:var(--f-display);font-weight:200;font-size:clamp(4rem,9vw,9rem);line-height:0.95;letter-spacing:-0.02em;color:var(--ink);opacity:0;transform:translateY(20px);transition:all 0.9s ease 0.3s}
+.hero h1 em{font-style:italic;color:var(--accent);font-weight:300}
+.hero-sub{margin-top:2rem;font-size:0.75rem;font-family:var(--f-mono);letter-spacing:0.28em;color:var(--ink-mute);opacity:0;transition:all 0.8s ease 0.6s}
+.hero-scroll{position:absolute;right:3rem;bottom:5rem;font-family:var(--f-mono);font-size:0.6rem;letter-spacing:0.3em;color:var(--ink-ghost);writing-mode:vertical-rl;display:flex;align-items:center;gap:1rem}
+.hero-scroll::after{content:'';width:1px;height:60px;background:linear-gradient(to bottom,var(--accent),transparent);display:block}
+body.loaded .hero-num,.body.loaded .hero h1,body.loaded .hero-sub{opacity:1;transform:none}
+
+/* ── ATLAS SECTION ── */
+.atlas{padding:6rem 0 10rem;position:relative}
+.atlas-header{padding:0 3rem 4rem;display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--ink-ghost)}
+.atlas-title{font-family:var(--f-display);font-weight:300;font-size:1.1rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--ink-mute)}
+.atlas-count{font-family:var(--f-mono);font-size:0.65rem;color:var(--accent);letter-spacing:0.2em}
+
+/* Film Atlas Grid */
+.atlas-grid{padding:0 3rem;margin-top:0.5rem}
+.atlas-row{display:grid;grid-template-columns:80px 1fr 1fr 1fr 1fr;align-items:stretch;border-bottom:1px solid var(--ink-ghost);min-height:1px}
+.atlas-row-header{grid-column:1/-1;display:grid;grid-template-columns:80px 1fr 1fr 1fr 1fr;padding:0.6rem 0;font-family:var(--f-mono);font-size:0.55rem;letter-spacing:0.3em;color:var(--ink-ghost);text-transform:uppercase;border-bottom:1px solid var(--ink-ghost)}
+
+/* Film Entry */
+.film-entry{position:relative;display:block;text-decoration:none;color:inherit;cursor:none;overflow:hidden;border-right:1px solid var(--ink-ghost)}
+.film-entry:first-child{border-left:1px solid var(--ink-ghost)}
+.film-inner{padding:0;position:relative;aspect-ratio:9/16;overflow:hidden}
+.film-video{width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.7s cubic-bezier(0.16,1,0.3,1);filter:brightness(0.55) saturate(0.7)}
+.film-entry:hover .film-video{transform:scale(1.04);filter:brightness(0.8) saturate(1)}
+.film-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(6,5,12,0.92) 0%,rgba(6,5,12,0.1) 60%,transparent 100%);pointer-events:none}
+.film-meta{position:absolute;bottom:0;left:0;right:0;padding:1.2rem 1rem;z-index:2}
+.film-index{font-family:var(--f-mono);font-size:0.55rem;letter-spacing:0.3em;color:var(--accent);margin-bottom:0.4rem;display:block}
+.film-name{font-family:var(--f-display);font-weight:400;font-size:1.05rem;letter-spacing:0.05em;line-height:1.1;display:block}
+.film-tag{font-family:var(--f-mono);font-size:0.5rem;letter-spacing:0.25em;color:var(--ink-mute);text-transform:uppercase;margin-top:0.3rem;display:block;opacity:0;transform:translateY(4px);transition:all 0.3s ease}
+.film-entry:hover .film-tag{opacity:1;transform:none}
+.film-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);width:48px;height:48px;border:1px solid rgba(240,238,248,0.6);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1),opacity 0.3s;opacity:0}
+.film-play svg{width:14px;height:14px;fill:var(--ink);margin-left:3px}
+.film-entry:hover .film-play{transform:translate(-50%,-50%) scale(1);opacity:1}
+
+/* Row numbering */
+.row-num{display:flex;align-items:flex-start;padding:1rem 0 1rem 0;font-family:var(--f-mono);font-size:0.6rem;color:var(--ink-ghost);letter-spacing:0.2em;writing-mode:vertical-rl;transform:rotate(180deg)}
+
+/* Featured row (first 4 tall) */
+.atlas-featured{display:grid;grid-template-columns:80px repeat(4,1fr);border-bottom:1px solid var(--ink-ghost)}
+.atlas-featured .film-inner{aspect-ratio:9/16}
+
+/* Second row (4 standard) */
+.atlas-standard{display:grid;grid-template-columns:80px repeat(4,1fr);border-bottom:1px solid var(--ink-ghost)}
+
+/* Third row (3 + featured) */
+.atlas-third{display:grid;grid-template-columns:80px 1fr 1fr 1fr 2fr;border-bottom:1px solid var(--ink-ghost)}
+.atlas-third .film-entry:last-child .film-inner{aspect-ratio:unset;height:100%;min-height:220px}
+
+/* ── MODAL VIEWER ── */
+#modal{position:fixed;inset:0;z-index:500;display:none;align-items:center;justify-content:center;background:rgba(6,5,12,0.95);backdrop-filter:blur(12px)}
+#modal.active{display:flex}
+#modal-video{max-height:90vh;max-width:90vw;aspect-ratio:9/16;object-fit:cover;border-radius:2px;box-shadow:0 0 120px rgba(0,0,0,0.8)}
+#modal-close{position:absolute;top:2.5rem;right:2.5rem;background:none;border:1px solid var(--ink-ghost);color:var(--ink);padding:0.5rem 1rem;font-family:var(--f-mono);font-size:0.6rem;letter-spacing:0.25em;cursor:none;transition:border-color 0.2s}
+#modal-close:hover{border-color:var(--accent)}
+#modal-title{position:absolute;bottom:2.5rem;left:3rem;font-family:var(--f-display);font-weight:200;font-size:1.8rem;letter-spacing:0.05em}
+#modal-index{position:absolute;bottom:2.5rem;right:3rem;font-family:var(--f-mono);font-size:0.6rem;letter-spacing:0.3em;color:var(--accent)}
+
+/* ── FOOTER ── */
+.section-footer{padding:4rem 3rem;border-top:1px solid var(--ink-ghost);display:flex;justify-content:space-between;align-items:center}
+.footer-back{font-family:var(--f-mono);font-size:0.6rem;letter-spacing:0.3em;color:var(--ink-mute);text-decoration:none;transition:color 0.2s}
+.footer-back:hover{color:var(--accent)}
+.footer-concept{font-family:var(--f-mono);font-size:0.6rem;letter-spacing:0.2em;color:var(--ink-ghost)}
+
+/* ── ANIMATIONS ── */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity 0.7s ease,transform 0.7s ease}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:768px){
+  .site-header{padding:1.5rem 1.5rem}
+  .hero{padding:0 1.5rem 4rem}
+  .hero h1{font-size:clamp(3rem,10vw,6rem)}
+  .atlas-header,.atlas-grid{padding:0 1.5rem}
+  .atlas-featured,.atlas-standard,.atlas-third{grid-template-columns:40px repeat(2,1fr)}
+  .film-entry:nth-child(n+4){display:none}
+  .atlas-row-header{display:none}
+  .section-footer{padding:3rem 1.5rem;flex-direction:column;gap:1rem;text-align:center}
+}
+</style>
+</head>
+<body>
+<div id="cursor"><div id="cur-dot"></div><div id="cur-ring"></div></div>
+
+<header class="site-header">
+  <a href="concepts-index.html" class="hdr-label">← Back to Index</a>
+  <span class="hdr-label">Concept <span>A</span> — Cinematic Film Atlas</span>
+</header>
+
+<section class="hero">
+  <div class="hero-grid-lines"></div>
+  <div class="hero-rule"></div>
+  <p class="hero-num">CONCEPT A / 03</p>
+  <h1>Commercial<br><em>CGI</em> &amp;<br>Motion</h1>
+  <p class="hero-sub">Selected commercial productions — 2021–2025</p>
+  <div class="hero-scroll">Scroll</div>
+</section>
+
+<section class="atlas">
+  <div class="atlas-header reveal">
+    <span class="atlas-title">Film Atlas</span>
+    <span class="atlas-count">11 productions</span>
+  </div>
+
+  <div class="atlas-grid">
+    <div class="atlas-row-header reveal">
+      <div></div>
+      <div>Film I</div>
+      <div>Film II</div>
+      <div>Film III</div>
+      <div>Film IV</div>
+    </div>
+
+    <!-- Row 1: Films 1–4 -->
+    <div class="atlas-featured reveal">
+      <div class="row-num">01 — 04</div>
+      <a class="film-entry" data-src="gallery/ads/chocolate-bar.mp4" data-name="Chocolate Bar" data-i="01">
+        <div class="film-inner">
+          <video class="film-video" src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/chocolate-bar.mp4" muted loop preload="none" playsinline></video>
+          <div class="film-overlay"></div>
+          <div class="film-play"><svg viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg></div>
+          <div class="film-meta">
+            <span class="film-index">No.01</span>
+            <span class="film-name">Chocolate Bar</span>
+            <span class="film-tag">Product · CGI · 2025</span>
+          </div>
+        </div>
+      </a>
+      <a class="film-entry" data-src="gallery/ads/earbuds.mp4" data-name="Earbuds" data-i="02">
+        <div class="film-inner">
+          <video class="film-video" src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/earbuds.mp4" muted loop preload="none" playsinline></video>
+          <div class="film-overlay"></div>
+          <div class="film-play"><svg viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg></div>
+          <div class="film-meta">
+            <span class="film-index">No.02</span>
+            <span class="film-name">Earbuds</span>
+            <span class="film-tag">Consumer Electronics · 2024</span>
+          </div>
+        </div>
+      </a>
+      <a class="film-entry" data-src="gallery/ads/facewash.mp4" data-name="Face Wash" data-i="03">
+        <div class="film-inner">
+          <video class="film-video" src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/facewash.mp4" muted loop preload="none" playsinline></video>
+          <div class="film-overlay"></div>
+          <div class="film-play"><svg viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg></div>
+          <div class="film-meta">
+            <span class="film-index">No.03</span>
+            <span class="film-name">Face Wash</span>
+            <span class="film-tag">Beauty · Skincare · 2024</span>
+          </div>
+        </div>
+      </a>
+      <a class="film-entry" data-src="gallery/ads/pepsi.mp4" data-name="Pepsi" data-i="04">
+        <div class="film-inner">
+          <video class="film-video" src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/pepsi.mp4" muted loop preload="none" playsinline></video>
+          <div class="film-overlay"></div>
+          <div class="film-play"><svg viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg></div>
+          <div class="film-meta">
+            <span class="film-index">No.04</span>
+            <span class="film-name">Pepsi</span>
+            <span class="film-tag">Beverage · FMCG · 2024</span>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <!-- Row 2: Films 5–8 -->
+    <div class="atlas-standard reveal">
+      <div class="row-num">05 — 08</div>
+      <a class="film-entry" data-src="gallery/ads/serum.mp4" data-name="Serum" data-i="05">
+        <div class="film-inner">
+          <video class="film-video" src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/serum.mp4" muted loop preload="none" playsinline></video>
+          <div class="film-overlay"></div>
+          <div class="film-play"><svg viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg></div>
+          <div class="film-meta">
+            <span class="film-index">No.05</span>
+            <span class="film-name">Serum</span>
+            <span class="film-tag">Beauty · Luxury · 2024</span>
+          </div>
+        </div>
+      </a>
+      <a class="film-entry" data-src="gallery/ads/shoe.mp4" data-name="Shoe" data-i="06">
+        <div class="film-inner">
+          <video class="film-video" src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/shoe.mp4" muted loop preload="none" playsinline></video>
+          <div class="film-overlay"></div>
+          <div class="film-play"><svg viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg></div>
+          <div class="film-meta">
+            <span class="film-index">No.06</span>
+            <span class="film-name">Shoe</span>
+            <span class="film-tag">Fashion · CGI · 2023</span>
+          </div>
+        </div>
+      </a>
+      <a class="film-entry" data-src="gallery/ads/smart-watch.mp4" data-name="Smart Watch" data-i="07">
+        <div class="film-inner">
+          <video class="film-video" src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/smart-watch.mp4" muted loop preload="none" playsinline></video>
+          <div class="film-overlay"></div>
+          <div class="film-play"><svg viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg></div>
+          <div class="film-meta">
+            <span class="film-index">No.07</span>
+            <span class="film-name">Smart Watch</span>
+            <span class="film-tag">Consumer Tech · 2024</span>
+          </div>
+        </div>
+      </a>
+      <a class="film-entry" data-src="gallery/ads/911%20Commercial.mp4" data-name="911 Commercial" data-i="08">
+        <div class="film-inner">
+          <video class="film-video" src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/911%20Commercial.mp4" muted loop preload="none" playsinline></video>
+          <div class="film-overlay"></div>
+          <div class="film-play"><svg viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg></div>
+          <div class="film-meta">
+            <span class="film-index">No.08</span>
+            <span class="film-name">911 Commercial</span>
+            <span class="film-tag">Automotive · 2024</span>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <!-- Row 3: Films 9–11 (3 equal + 1 spanning) -->
+    <div class="atlas-third reveal">
+      <div class="row-num">09 — 11</div>
+      <a class="film-entry" data-src="gallery/ads/Moisturizer%20and%20Cleanser%20Ad-1.mp4" data-name="Moisturizer &amp; Cleanser" data-i="09">
+        <div class="film-inner">
+          <video class="film-video" src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/Moisturizer%20and%20Cleanser%20Ad-1.mp4" muted loop preload="none" playsinline></video>
+          <div class="film-overlay"></div>
+          <div class="film-play"><svg viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg></div>
+          <div class="film-meta">
+            <span class="film-index">No.09</span>
+            <span class="film-name">Moisturizer &amp; Cleanser</span>
+            <span class="film-tag">Skincare · 2025</span>
+          </div>
+        </div>
+      </a>
+      <a class="film-entry" data-src="gallery/ads/RR%20Ad.mp4" data-name="RR Ad" data-i="10">
+        <div class="film-inner">
+          <video class="film-video" src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/RR%20Ad.mp4" muted loop preload="none" playsinline></video>
+          <div class="film-overlay"></div>
+          <div class="film-play"><svg viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg></div>
+          <div class="film-meta">
+            <span class="film-index">No.10</span>
+            <span class="film-name">RR Ad</span>
+            <span class="film-tag">Luxury · 2024</span>
+          </div>
+        </div>
+      </a>
+      <a class="film-entry" data-src="gallery/ads/Reelvideo-29689.mp4" data-name="Reel" data-i="11">
+        <div class="film-inner" style="aspect-ratio:9/16;min-height:unset">
+          <video class="film-video" src="https://pub-88341f47988743aba3154d2af5c6327e.r2.dev/gallery/ads/Reelvideo-29689.mp4" muted loop preload="none" playsinline></video>
+          <div class="film-overlay"></div>
+          <div class="film-play"><svg viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg></div>
+          <div class="film-meta">
+            <span class="film-index">No.11</span>
+            <span class="film-name">Showreel</span>
+            <span class="film-tag">Compilation · 2025</span>
+          </div>
+        </div>
+      </a>
+      <!-- Empty fourth slot to maintain grid structure -->
+      <div class="film-entry" style="background:var(--bg-1);display:flex;align-items:center;justify-content:center">
+        <div style="text-align:center;padding:2rem">
+          <div style="font-family:var(--f-mono);font-size:0.55rem;letter-spacing:0.3em;color:var(--ink-ghost)">MORE<br>COMING<br>SOON</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Modal Viewer -->
+<div id="modal">
+  <button id="modal-close">✕ CLOSE</button>
+  <video id="modal-video" controls playsinline></video>
+  <div id="modal-title"></div>
+  <div id="modal-index"></div>
+</div>
+
+<footer class="section-footer">
+  <a href="concepts-index.html" class="footer-back">← All Concepts</a>
+  <span class="footer-concept">Concept A · Cinematic Film Atlas · CGI Commercial Direction</span>
+</footer>
+
+<script>
+const CDN = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev';
+
+// Cursor
+const dot = document.getElementById('cur-dot');
+const ring = document.getElementById('cur-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.transform=`translate(${mx}px,${my}px) translate(-50%,-50%)`;});
+function animCursor(){rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;ring.style.transform=`translate(${rx}px,${ry}px) translate(-50%,-50%)`;requestAnimationFrame(animCursor)}
+animCursor();
+
+// Page load
+document.addEventListener('DOMContentLoaded',()=>{
+  document.body.classList.add('loaded');
+  // Hero reveals
+  document.querySelectorAll('.hero-num,.hero h1,.hero-sub').forEach((el,i)=>{
+    el.style.transitionDelay=`${0.2+i*0.15}s`;
+    el.style.opacity='1';
+    el.style.transform='none';
+  });
+});
+
+// Intersection reveal
+const revealIO = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');revealIO.unobserve(e.target)}})
+},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>revealIO.observe(el));
+
+// Video hover play
+document.querySelectorAll('.film-entry').forEach(entry=>{
+  if(!entry.href && !entry.dataset.src) return;
+  const vid = entry.querySelector('.film-video');
+  if(!vid) return;
+  let hovered=false;
+  entry.addEventListener('mouseenter',()=>{hovered=true;vid.play().catch(()=>{})});
+  entry.addEventListener('mouseleave',()=>{hovered=false;vid.pause();vid.currentTime=0});
+});
+
+// Modal
+const modal = document.getElementById('modal');
+const modalVid = document.getElementById('modal-video');
+const modalTitle = document.getElementById('modal-title');
+const modalIndex = document.getElementById('modal-index');
+
+document.querySelectorAll('.film-entry[data-src]').forEach(entry=>{
+  entry.addEventListener('click',e=>{
+    e.preventDefault();
+    const src = `${CDN}/${entry.dataset.src}`;
+    modalVid.src = src;
+    modalTitle.textContent = entry.dataset.name;
+    modalIndex.textContent = `No.${entry.dataset.i} / 11`;
+    modal.classList.add('active');
+    modalVid.play();
+  });
+});
+
+document.getElementById('modal-close').addEventListener('click',()=>{
+  modal.classList.remove('active');
+  modalVid.pause();
+  modalVid.src='';
+});
+modal.addEventListener('click',e=>{
+  if(e.target===modal){modal.classList.remove('active');modalVid.pause();modalVid.src=''}
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&modal.classList.contains('active')){modal.classList.remove('active');modalVid.pause();modalVid.src=''}
+});
+</script>
+</body>
+</html>

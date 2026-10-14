@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About — Concept C: Digital Artist Dossier</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@200;300;400;600&family=Barlow:wght@300;400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#040410;
+  --bg-1:#0a0920;
+  --bg-2:#10102c;
+  --ink:#e8e5ff;
+  --ink-mute:rgba(232,229,255,0.48);
+  --ink-ghost:rgba(232,229,255,0.1);
+  --accent:#e0ff80;
+  --accent-rgb:224,255,128;
+  --f-display:'Barlow Condensed',sans-serif;
+  --f-body:'Barlow',sans-serif;
+  --f-mono:'DM Mono',monospace;
+}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);overflow-x:hidden;cursor:none}
+
+/* Cursor */
+#cursor{position:fixed;z-index:9999;pointer-events:none}
+.c-dot{position:absolute;width:5px;height:5px;background:var(--accent);border-radius:50%;transform:translate(-50%,-50%)}
+.c-ring{position:absolute;width:36px;height:36px;border:1px solid rgba(var(--accent-rgb),0.25);border-radius:50%;transform:translate(-50%,-50%);transition:width 0.2s,height 0.2s}
+
+/* Hdr */
+.hdr{position:fixed;top:0;left:0;right:0;z-index:100;padding:1.8rem 3rem;display:flex;justify-content:space-between;align-items:center;background:rgba(4,4,16,0.8);backdrop-filter:blur(8px);border-bottom:1px solid var(--ink-ghost)}
+.hdr a{font-family:var(--f-mono);font-size:0.6rem;letter-spacing:0.3em;color:var(--ink-mute);text-decoration:none;transition:color 0.2s}
+.hdr a:hover{color:var(--accent)}
+.hdr-id{font-family:var(--f-mono);font-size:0.6rem;letter-spacing:0.2em;color:var(--accent)}
+
+/* ── DOSSIER HEADER ── */
+.dossier-cover{padding:6rem 3rem 4rem;border-bottom:1px solid var(--ink-ghost);display:grid;grid-template-columns:1fr auto;gap:4rem;align-items:end}
+.dc-tag{font-family:var(--f-mono);font-size:0.55rem;letter-spacing:0.35em;color:var(--accent);margin-bottom:1.5rem;opacity:0;animation:up 0.7s ease 0.2s forwards}
+.dc-name{font-family:var(--f-display);font-weight:200;font-size:clamp(4rem,8vw,8.5rem);letter-spacing:-0.03em;line-height:0.9;opacity:0;animation:up 0.8s ease 0.4s forwards}
+.dc-title{font-family:var(--f-mono);font-size:0.7rem;letter-spacing:0.3em;color:var(--ink-mute);margin-top:1.5rem;opacity:0;animation:up 0.7s ease 0.7s forwards}
+.dc-data{display:flex;flex-direction:column;gap:1.5rem;opacity:0;animation:up 0.7s ease 0.9s forwards;text-align:right}
+.dc-field{display:flex;flex-direction:column;gap:0.3rem}
+.dc-field-label{font-family:var(--f-mono);font-size:0.48rem;letter-spacing:0.3em;color:var(--ink-ghost);text-transform:uppercase}
+.dc-field-value{font-family:var(--f-mono);font-size:0.7rem;letter-spacing:0.1em;color:var(--ink)}
+.dc-field-value span{color:var(--accent)}
+
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ── DOSSIER BODY ── */
+.dossier-body{display:grid;grid-template-columns:260px 1fr;min-height:80vh}
+.dossier-sidebar{border-right:1px solid var(--ink-ghost);padding:3rem 2rem;position:sticky;top:80px;height:calc(100vh - 80px);overflow-y:auto;display:flex;flex-direction:column;gap:3rem}
+.dossier-sidebar::-webkit-scrollbar{width:3px}
+.dossier-sidebar::-webkit-scrollbar-track{background:transparent}
+.dossier-sidebar::-webkit-scrollbar-thumb{background:var(--ink-ghost)}
+
+.sidebar-section{display:flex;flex-direction:column;gap:0.6rem}
+.sidebar-label{font-family:var(--f-mono);font-size:0.48rem;letter-spacing:0.35em;color:var(--ink-ghost);text-transform:uppercase;margin-bottom:0.2rem}
+.sidebar-item{font-family:var(--f-mono);font-size:0.6rem;letter-spacing:0.15em;color:var(--ink-mute);padding:0.3rem 0;border-bottom:1px solid transparent;transition:color 0.2s,border-color 0.2s;cursor:pointer}
+.sidebar-item:hover{color:var(--accent);border-color:rgba(var(--accent-rgb),0.2)}
+.sidebar-item.active{color:var(--accent)}
+
+/* Main content */
+.dossier-main{padding:3rem;display:flex;flex-direction:column;gap:4rem}
+
+/* Section blocks */
+.d-section{border-bottom:1px solid var(--ink-ghost);padding-bottom:3rem}
+.d-section-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2rem}
+.d-section-title{font-family:var(--f-display);font-weight:300;font-size:1.5rem;letter-spacing:0.04em}
+.d-section-num{font-family:var(--f-mono);font-size:0.52rem;letter-spacing:0.25em;color:var(--ink-ghost)}
+
+/* Profile text */
+.profile-text{font-size:1rem;color:var(--ink-mute);line-height:1.8;max-width:600px}
+.profile-text strong{color:var(--ink);font-weight:400}
+
+/* Competencies */
+.comp-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--ink-ghost)}
+.comp-cell{background:var(--bg);padding:1.2rem;display:flex;flex-direction:column;gap:0.5rem}
+.comp-name{font-family:var(--f-display);font-weight:300;font-size:1.05rem;letter-spacing:0.03em}
+.comp-bar-outer{height:2px;background:var(--ink-ghost);border-radius:1px;overflow:hidden;margin-top:0.3rem}
+.comp-bar-inner{height:100%;background:var(--accent);border-radius:1px;width:0;transition:width 1.2s cubic-bezier(0.16,1,0.3,1)}
+.comp-bar-inner.animate{width:var(--level)}
+.comp-level{font-family:var(--f-mono);font-size:0.45rem;letter-spacing:0.2em;color:var(--ink-ghost)}
+
+/* Software table */
+.sw-table{width:100%;border-collapse:collapse}
+.sw-table tr{border-bottom:1px solid var(--ink-ghost)}
+.sw-table td{padding:0.9rem 0;vertical-align:middle;font-size:0.85rem;color:var(--ink-mute)}
+.sw-table td:first-child{font-family:var(--f-display);font-weight:300;font-size:1.05rem;color:var(--ink);letter-spacing:0.03em;width:240px}
+.sw-table td:last-child{text-align:right}
+.sw-tag{font-family:var(--f-mono);font-size:0.45rem;letter-spacing:0.2em;padding:0.2rem 0.5rem;border:1px solid var(--ink-ghost);color:var(--ink-ghost)}
+
+/* Approach list */
+.approach-list{list-style:none;display:flex;flex-direction:column;gap:0}
+.approach-item{padding:1rem 0;border-bottom:1px solid var(--ink-ghost);display:grid;grid-template-columns:24px 1fr;gap:1rem;align-items:start;font-size:0.9rem;color:var(--ink-mute);line-height:1.65;transition:color 0.2s}
+.approach-item:hover{color:var(--ink)}
+.approach-item::before{content:attr(data-n);font-family:var(--f-mono);font-size:0.5rem;letter-spacing:0.2em;color:var(--accent);padding-top:0.2rem}
+.approach-item strong{color:var(--ink);font-weight:400}
+
+/* Footer */
+.pg-footer{padding:3rem;border-top:1px solid var(--ink-ghost);display:flex;justify-content:space-between;align-items:center}
+.pg-back{font-family:var(--f-mono);font-size:0.6rem;letter-spacing:0.28em;color:var(--ink-mute);text-decoration:none;transition:color 0.2s}
+.pg-back:hover{color:var(--accent)}
+.pg-cpt{font-family:var(--f-mono);font-size:0.58rem;letter-spacing:0.2em;color:var(--ink-ghost)}
+
+.reveal{opacity:0;transform:translateY(16px);transition:opacity 0.7s ease,transform 0.7s ease}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:900px){
+  .dossier-cover{grid-template-columns:1fr;gap:2rem}
+  .dc-data{text-align:left}
+  .dossier-body{grid-template-columns:1fr}
+  .dossier-sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--ink-ghost);flex-direction:row;flex-wrap:wrap;gap:2rem}
+  .comp-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .hdr,.dossier-cover,.dossier-main,.pg-footer{padding-left:1.5rem;padding-right:1.5rem}
+}
+</style>
+</head>
+<body>
+<div id="cursor"><div class="c-dot"></div><div class="c-ring"></div></div>
+
+<header class="hdr">
+  <a href="concepts-index.html">← All Concepts</a>
+  <span class="hdr-id">Concept C — Digital Artist Dossier</span>
+</header>
+
+<!-- Dossier header -->
+<div class="dossier-cover">
+  <div>
+    <p class="dc-tag">Concept C / 03 · Artist Dossier</p>
+    <h1 class="dc-name">Jatin<br>Shinde</h1>
+    <p class="dc-title">CGI Artist · VFX Director · Creative Lead</p>
+  </div>
+  <div class="dc-data">
+    <div class="dc-field">
+      <span class="dc-field-label">Experience</span>
+      <span class="dc-field-value"><span>7+</span> Years</span>
+    </div>
+    <div class="dc-field">
+      <span class="dc-field-label">Discipline</span>
+      <span class="dc-field-value">3D · VFX · Motion</span>
+    </div>
+    <div class="dc-field">
+      <span class="dc-field-label">Specialisation</span>
+      <span class="dc-field-value">CGI · Realtime</span>
+    </div>
+    <div class="dc-field">
+      <span class="dc-field-label">Tools Mastered</span>
+      <span class="dc-field-value"><span>13</span></span>
+    </div>
+  </div>
+</div>
+
+<!-- Dossier body -->
+<div class="dossier-body">
+  <aside class="dossier-sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Contents</div>
+      <div class="sidebar-item active" onclick="scrollTo('#profile')">Profile</div>
+      <div class="sidebar-item" onclick="scrollTo('#competencies')">Competencies</div>
+      <div class="sidebar-item" onclick="scrollTo('#software')">Software</div>
+      <div class="sidebar-item" onclick="scrollTo('#approach')">Approach</div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Discipline</div>
+      <div class="sidebar-item">CGI / 3D</div>
+      <div class="sidebar-item">VFX</div>
+      <div class="sidebar-item">Motion Graphics</div>
+      <div class="sidebar-item">Realtime Environments</div>
+      <div class="sidebar-item">Creative Direction</div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Status</div>
+      <div class="sidebar-item" style="color:var(--accent)">Available for Projects</div>
+    </div>
+  </aside>
+
+  <main class="dossier-main">
+    <div class="d-section reveal" id="profile">
+      <div class="d-section-head">
+        <span class="d-section-title">Profile</span>
+        <span class="d-section-num">01 / 04</span>
+      </div>
+      <p class="profile-text">
+        <strong>CGI artist and VFX director</strong> with 7+ years of production experience across commercial campaigns, product visualisation, and cinematic environments.<br><br>
+        I lead teams of graphic designers and video editors, translating complex creative briefs into finished visual work. My practice spans the full pipeline — from 3D modelling and character creation to realtime rendering in Unreal Engine 5, compositing in After Effects, and delivery in DaVinci Resolve.<br><br>
+        The work I care about most merges <strong>technical execution</strong> with <strong>directorial intent</strong> — every commercial, every frame, every world is a crafted experience, not a rendered export.
+      </p>
+    </div>
+
+    <div class="d-section reveal" id="competencies">
+      <div class="d-section-head">
+        <span class="d-section-title">Competencies</span>
+        <span class="d-section-num">02 / 04</span>
+      </div>
+      <div class="comp-grid" id="comp-grid"></div>
+    </div>
+
+    <div class="d-section reveal" id="software">
+      <div class="d-section-head">
+        <span class="d-section-title">Software</span>
+        <span class="d-section-num">03 / 04</span>
+      </div>
+      <table class="sw-table" id="sw-table">
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="d-section reveal" id="approach">
+      <div class="d-section-head">
+        <span class="d-section-title">Approach</span>
+        <span class="d-section-num">04 / 04</span>
+      </div>
+      <ul class="approach-list">
+        <li class="approach-item" data-n="—"><strong>Story first, technique second.</strong> I start every project by asking what the work needs to feel like, not what software I'll use to make it.</li>
+        <li class="approach-item" data-n="—"><strong>Realtime over batch rendering.</strong> Unreal Engine 5 lets me direct lighting and camera as a cinematographer would — iterating in seconds, not hours.</li>
+        <li class="approach-item" data-n="—"><strong>Team direction through visual standards.</strong> I set the quality bar with my own frames, then give my designers and editors the space to own their craft.</li>
+        <li class="approach-item" data-n="—"><strong>Full pipeline ownership.</strong> From brief to delivery, I manage the entire production — not as a specialist but as an end-to-end creative and technical director.</li>
+      </ul>
+    </div>
+  </main>
+</div>
+
+<footer class="pg-footer">
+  <a href="concepts-index.html" class="pg-back">← All Concepts</a>
+  <span class="pg-cpt">Concept C · Digital Artist Dossier · About Jatin Shinde</span>
+</footer>
+
+<script>
+const COMPETENCIES=[
+  {name:'CGI / 3D Production',level:'92%'},
+  {name:'VFX & Compositing',level:'88%'},
+  {name:'Motion Graphics',level:'90%'},
+  {name:'Realtime Environments',level:'85%'},
+  {name:'Creative Direction',level:'87%'},
+  {name:'Color Grading',level:'82%'},
+  {name:'Character Pipeline',level:'78%'},
+  {name:'Sound Design',level:'72%'},
+];
+
+const SOFTWARE=[
+  ['Adobe After Effects','Motion graphics, VFX, compositing','VFX'],
+  ['Adobe Premiere Pro','Non-linear video editing','Edit'],
+  ['Adobe Photoshop','Compositing, retouching, textures','2D'],
+  ['Adobe Illustrator','Vector design, art direction','2D'],
+  ['Adobe Audition','Sound design, audio mix','Audio'],
+  ['Adobe Lightroom','Photography, RAW grading','Photo'],
+  ['CorelDRAW','Design, vector, publication','2D'],
+  ['Blender','3D modelling, animation','3D'],
+  ['Unreal Engine 5','Realtime CG environments','Realtime'],
+  ['Substance 3D Painter','PBR texturing, materials','Texture'],
+  ['Character Creator 4','Digital human pipeline','Character'],
+  ['Marvelous Designer','Cloth simulation, wardrobe','Simulation'],
+  ['DaVinci Resolve','Color grading, finishing','Grade'],
+];
+
+// Build competencies
+const cg=document.getElementById('comp-grid');
+COMPETENCIES.forEach(c=>{
+  const div=document.createElement('div');
+  div.className='comp-cell';
+  div.innerHTML=`<span class="comp-name">${c.name}</span><div class="comp-bar-outer"><div class="comp-bar-inner" style="--level:${c.level}"></div></div><span class="comp-level">${c.level}</span>`;
+  cg.appendChild(div);
+});
+
+// Build software
+const tb=document.querySelector('#sw-table tbody');
+SOFTWARE.forEach(s=>{
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td>${s[0]}</td><td>${s[1]}</td><td><span class="sw-tag">${s[2]}</span></td>`;
+  tb.appendChild(tr);
+});
+
+// Cursor
+const cdot=document.querySelector('.c-dot'),cring=document.querySelector('.c-ring');
+let mx=0,my=0,tx=0,ty=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cdot.style.transform=`translate(${mx}px,${my}px) translate(-50%,-50%)`});
+(function a(){tx+=(mx-tx)*0.1;ty+=(my-ty)*0.1;cring.style.transform=`translate(${tx}px,${ty}px) translate(-50%,-50%)`;requestAnimationFrame(a)})();
+
+// Reveal + competency bar animation
+const io=new IntersectionObserver(entries=>{entries.forEach(e=>{
+  if(e.isIntersecting){
+    e.target.classList.add('in');
+    e.target.querySelectorAll('.comp-bar-inner').forEach(b=>{setTimeout(()=>b.classList.add('animate'),200)});
+    io.unobserve(e.target);
+  }})
+},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+// Sidebar scroll
+function scrollTo(id){
+  const el=document.querySelector(id);
+  if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commercial CGI — Concept B: Living Film Wall</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@200;300;400;600&family=Barlow:wght@300;400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#04040a;
+  --bg-1:#0c0b14;
+  --bg-2:#13121e;
+  --ink:#ede9f5;
+  --ink-mute:rgba(237,233,245,0.5);
+  --ink-ghost:rgba(237,233,245,0.15);
+  --accent:#c8f0a0;
+  --f-display:'Barlow Condensed',sans-serif;
+  --f-body:'Barlow',sans-serif;
+  --f-mono:'DM Mono',monospace;
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);overflow-x:hidden;cursor:none}
+
+/* Cursor */
+#cursor{position:fixed;z-index:9999;pointer-events:none;top:0;left:0}
+.c-dot{width:5px;height:5px;background:var(--ink);border-radius:50%;transform:translate(-50%,-50%);mix-blend-mode:difference}
+.c-trail{position:absolute;top:0;left:0;width:40px;height:40px;border:1px solid rgba(200,240,160,0.4);border-radius:50%;transform:translate(-50%,-50%);transition:all 0.15s ease}
+body:has(.film-card:hover) .c-trail{width:56px;height:56px;border-color:var(--accent)}
+
+/* Header */
+.hdr{position:fixed;top:0;left:0;right:0;z-index:200;padding:1.8rem 2.5rem;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(to bottom,rgba(4,4,10,0.9),transparent)}
+.hdr-label{font-family:var(--f-mono);font-size:0.6rem;letter-spacing:0.3em;color:var(--ink-mute);text-decoration:none}
+.hdr-label span{color:var(--accent)}
+
+/* ── INTRO ── */
+.intro{display:flex;flex-direction:column;justify-content:center;min-height:100vh;padding:0 2.5rem;position:relative;overflow:hidden}
+.intro-bg{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+/* Animated grain */
+.grain{position:absolute;inset:-50%;width:200%;height:200%;opacity:0.04;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");animation:grain 0.5s steps(2) infinite}
+@keyframes grain{0%{transform:translate(0,0)}25%{transform:translate(-2%,-3%)}50%{transform:translate(3%,1%)}75%{transform:translate(-1%,3%)}100%{transform:translate(2%,-1%)}}
+.intro-content{position:relative;z-index:1;max-width:700px}
+.intro-eyebrow{font-family:var(--f-mono);font-size:0.6rem;letter-spacing:0.35em;color:var(--accent);margin-bottom:2rem;opacity:0;animation:fadeUp 0.8s ease 0.3s forwards}
+.intro h1{font-family:var(--f-display);font-weight:200;font-size:clamp(4.5rem,10vw,10rem);line-height:0.92;letter-spacing:-0.025em;opacity:0;animation:fadeUp 0.9s ease 0.5s forwards}
+.intro h1 .line{display:block;overflow:hidden}
+.intro h1 .word{display:inline-block;transform:translateY(110%);animation:slideUp 0.8s cubic-bezier(0.16,1,0.3,1) forwards}
+.intro h1 .line:nth-child(2) .word{animation-delay:0.65s}
+.intro h1 .line:nth-child(3) .word{animation-delay:0.78s}
+.intro-desc{margin-top:2.5rem;font-size:0.85rem;color:var(--ink-mute);line-height:1.7;max-width:380px;opacity:0;animation:fadeUp 0.8s ease 0.9s forwards}
+.intro-cta{margin-top:3rem;font-family:var(--f-mono);font-size:0.6rem;letter-spacing:0.3em;color:var(--ink-ghost);opacity:0;animation:fadeUp 0.8s ease 1.1s forwards;display:flex;align-items:center;gap:1rem}
+.intro-cta::after{content:'';flex:1;max-width:80px;height:1px;background:linear-gradient(to right,var(--ink-ghost),transparent)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes slideUp{from{transform:translateY(110%)}to{transform:none}}
+
+/* ── WALL SECTION ── */
+.wall-section{padding:0 2.5rem 8rem;position:relative}
+.wall-header{display:flex;justify-content:space-between;align-items:baseline;padding-bottom:2rem;border-bottom:1px solid var(--ink-ghost);margin-bottom:0}
+.wall-title{font-family:var(--f-display);font-weight:300;font-size:0.9rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--ink-mute)}
+
+/* The Wall — masonry-style with CSS columns */
+.film-wall{columns:4 280px;column-gap:8px;padding-top:8px}
+.film-card{break-inside:avoid;position:relative;margin-bottom:8px;overflow:hidden;cursor:none;background:var(--bg-1)}
+.film-card:nth-child(3n+1){margin-top:0}
+.film-card:nth-child(3n+2){margin-top:16px}
+.film-card:nth-child(3n+3){margin-top:-8px}
+
+.film-card video{width:100%;display:block;aspect-ratio:9/16;object-fit:cover;filter:brightness(0.5) saturate(0.6) contrast(1.1);transition:filter 0.5s ease,transform 0.6s cubic-bezier(0.16,1,0.3,1)}
+.film-card:hover video{filter:brightness(0.85) saturate(1);transform:scale(1.02)}
+.film-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(4,4,10,0.95) 0%,rgba(4,4,10,0.2) 50%,transparent 100%);pointer-events:none;transition:opacity 0.4s}
+.film-card:hover .film-card-overlay{opacity:0.7}
+.film-card-label{position:absolute;bottom:0;left:0;right:0;padding:1rem;transform:translateY(8px);transition:transform 0.4s ease;opacity:0}
+.film-card:hover .film-card-label{transform:none;opacity:1}
+.film-num{font-family:var(--f-mono);font-size:0.5rem;letter-spacing:0.3em;color:var(--accent);display:block;margin-bottom:0.2rem}
+.film-name-lbl{font-family:var(--f-display);font-weight:400;font-size:1rem;letter-spacing:0.05em;display:block;line-height:1.1}
+.film-cat{font-family:var(--f-mono);font-size:0.48rem;letter-spacing:0.2em;color:var(--ink-mute);display:block;margin-top:0.2rem}
+
+/* Expand indicator */
+.expand-dot{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);width:44px;height:44px;border:1px solid rgba(200,240,160,0.7);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1),opacity 0.3s;opacity:0}
+.expand-dot svg{width:16px;height:16px;fill:var(--ink)}
+.film-card:hover .expand-dot{transform:translate(-50%,-50%) scale(1);opacity:1}
+
+/* Active playing indicator */
+.film-card.playing::after{content:'●';position:absolute;top:1rem;right:1rem;font-size:0.5rem;color:var(--accent);animation:pulse 1.2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
+/* ── MODAL ── */
+#modal{position:fixed;inset:0;z-index:500;display:none;background:rgba(4,4,10,0.97)}
+#modal.open{display:flex;align-items:center;justify-content:center}
+#modal-inner{position:relative;display:flex;gap:3rem;align-items:center;padding:2rem}
+#modal video{height:82vh;aspect-ratio:9/16;object-fit:cover}
+#modal-info{max-width:240px}
+#modal-n{font-family:var(--f-mono);font-size:0.55rem;letter-spacing:0.35em;color:var(--accent);margin-bottom:1rem}
+#modal-h{font-family:var(--f-display);font-weight:200;font-size:2.8rem;letter-spacing:-0.01em;line-height:1;margin-bottom:1.5rem}
+#modal-tag{font-family:var(--f-mono);font-size:0.55rem;letter-spacing:0.25em;color:var(--ink-mute)}
+#modal-close{position:absolute;top:1.5rem;right:1.5rem;background:none;border:1px solid var(--ink-ghost);color:var(--ink);padding:0.5rem 0.9rem;font-family:var(--f-mono);font-size:0.58rem;letter-spacing:0.2em;cursor:none;transition:all 0.2s}
+#modal-close:hover{border-color:var(--accent);color:var(--accent)}
+#modal-nav{margin-top:2rem;display:flex;gap:0.8rem}
+#modal-nav button{background:none;border:1px solid var(--ink-ghost);color:var(--ink-mute);padding:0.5rem 0.8rem;font-family:var(--f-mono);font-size:0.55rem;letter-spacing:0.2em;cursor:none;transition:all 0.2s}
+#modal-nav button:hover{border-color:var(--accent);color:var(--accent)}
+
+/* Footer */
+.wall-footer{margin-top:4rem;padding-top:2rem;border-top:1px solid var(--ink-ghost);display:flex;justify-content:space-between;align-items:center}
+.wf-back{font-family:var(--f-mono);font-size:0.6rem;letter-spacing:0.28em;color:var(--ink-mute);text-decoration:none;transition:color 0.2s}
+.wf-back:hover{color:var(--accent)}
+.wf-label{font-family:var(--f-mono);font-size:0.58rem;letter-spacing:0.2em;color:var(--ink-ghost)}
+
+@media(max-width:768px){
+  .hdr{padding:1.5rem}
+  .intro,.wall-section{padding-left:1.5rem;padding-right:1.5rem}
+  .film-wall{columns:2 140px}
+  #modal-inner{flex-direction:column;gap:1.5rem}
+  #modal video{height:55vh}
+  #modal-info{max-width:100%}
+}
+</style>
+</head>
+<body>
+<div id="cursor"><div class="c-dot"></div><div class="c-trail"></div></div>
+
+<header class="hdr">
+  <a href="concepts-index.html" class="hdr-label">← Back</a>
+  <span class="hdr-label">Concept <span>B</span> — Living Film Wall</span>
+</header>
+
+<section class="intro">
+  <div class="intro-bg"><div class="grain"></div></div>
+  <div class="intro-content">
+    <p class="intro-eyebrow">Concept B / 03 · Commercial CGI</p>
+    <h1>
+      <span class="line"><span class="word">Every</span></span>
+      <span class="line"><span class="word">Frame</span></span>
+      <span class="line"><span class="word">Alive.</span></span>
+    </h1>
+    <p class="intro-desc">11 commercial productions — each film breathing, waiting to be seen.</p>
+    <p class="intro-cta">Scroll to explore</p>
+  </div>
+</section>
+
+<section class="wall-section">
+  <div class="wall-header">
+    <span class="wall-title">Commercial Productions</span>
+    <span style="font-family:var(--f-mono);font-size:0.6rem;color:var(--accent);letter-spacing:0.2em">11 Films</span>
+  </div>
+
+  <div class="film-wall" id="wall"></div>
+
+  <div class="wall-footer">
+    <a href="concepts-index.html" class="wf-back">← All Concepts</a>
+    <span class="wf-label">Concept B · Living Film Wall · Commercial CGI</span>
+  </div>
+</section>
+
+<div id="modal">
+  <div id="modal-inner">
+    <video id="mVid" controls playsinline></video>
+    <div id="modal-info">
+      <div id="modal-n"></div>
+      <div id="modal-h"></div>
+      <div id="modal-tag"></div>
+      <div id="modal-nav">
+        <button id="btn-prev">← Prev</button>
+        <button id="btn-next">Next →</button>
+      </div>
+    </div>
+  </div>
+  <button id="modal-close">✕ Close</button>
+</div>
+
+<script>
+const CDN = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev';
+const FILMS = [
+  {src:'gallery/ads/chocolate-bar.mp4',name:'Chocolate Bar',cat:'Product · CGI'},
+  {src:'gallery/ads/earbuds.mp4',name:'Earbuds',cat:'Consumer Electronics'},
+  {src:'gallery/ads/facewash.mp4',name:'Face Wash',cat:'Beauty · Skincare'},
+  {src:'gallery/ads/pepsi.mp4',name:'Pepsi',cat:'Beverage · FMCG'},
+  {src:'gallery/ads/serum.mp4',name:'Serum',cat:'Beauty · Luxury'},
+  {src:'gallery/ads/shoe.mp4',name:'Shoe',cat:'Fashion · CGI'},
+  {src:'gallery/ads/smart-watch.mp4',name:'Smart Watch',cat:'Consumer Tech'},
+  {src:'gallery/ads/911%20Commercial.mp4',name:'911 Commercial',cat:'Automotive'},
+  {src:'gallery/ads/Moisturizer%20and%20Cleanser%20Ad-1.mp4',name:'Moisturizer & Cleanser',cat:'Skincare'},
+  {src:'gallery/ads/RR%20Ad.mp4',name:'RR Ad',cat:'Luxury'},
+  {src:'gallery/ads/Reelvideo-29689.mp4',name:'Showreel',cat:'Compilation'},
+];
+
+// Cursor
+const cdot=document.querySelector('.c-dot'),ctrail=document.querySelector('.c-trail');
+let mx=0,my=0,tx=0,ty=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cdot.style.transform=`translate(${mx}px,${my}px) translate(-50%,-50%)`});
+(function a(){tx+=(mx-tx)*0.1;ty+=(my-ty)*0.1;ctrail.style.transform=`translate(${tx}px,${ty}px) translate(-50%,-50%)`;requestAnimationFrame(a)})();
+
+// Build wall
+const wall = document.getElementById('wall');
+FILMS.forEach((f,i)=>{
+  const card = document.createElement('div');
+  card.className='film-card';
+  card.innerHTML=`
+    <video src="${CDN}/${f.src}" muted loop preload="none" playsinline></video>
+    <div class="film-card-overlay"></div>
+    <div class="expand-dot"><svg viewBox="0 0 14 14"><path d="M1 7h12M7 1v12"/></svg></div>
+    <div class="film-card-label">
+      <span class="film-num">No.${String(i+1).padStart(2,'0')}</span>
+      <span class="film-name-lbl">${f.name}</span>
+      <span class="film-cat">${f.cat}</span>
+    </div>`;
+  card.dataset.i = i;
+  const vid = card.querySelector('video');
+
+  // Hover play
+  let io;
+  io = new IntersectionObserver(entries=>{
+    if(entries[0].isIntersecting){io.disconnect();card.dataset.ready='1'}
+  },{threshold:0.1});
+  io.observe(card);
+
+  card.addEventListener('mouseenter',()=>{
+    if(card.dataset.ready){vid.play().catch(()=>{});card.classList.add('playing')}
+  });
+  card.addEventListener('mouseleave',()=>{vid.pause();vid.currentTime=0;card.classList.remove('playing')});
+  card.addEventListener('click',()=>openModal(i));
+  wall.appendChild(card);
+});
+
+// Modal
+const modal=document.getElementById('modal'),mVid=document.getElementById('mVid');
+const mN=document.getElementById('modal-n'),mH=document.getElementById('modal-h'),mTag=document.getElementById('modal-tag');
+let curFilm=0;
+
+function openModal(i){
+  curFilm=i;
+  const f=FILMS[i];
+  mVid.src=`${CDN}/${f.src}`;
+  mN.textContent=`No.${String(i+1).padStart(2,'0')} / ${FILMS.length}`;
+  mH.textContent=f.name;
+  mTag.textContent=f.cat;
+  modal.classList.add('open');
+  mVid.play();
+}
+document.getElementById('modal-close').addEventListener('click',()=>{modal.classList.remove('open');mVid.pause();mVid.src=''});
+modal.addEventListener('click',e=>{if(e.target===modal||e.target===document.getElementById('modal-inner').parentNode){modal.classList.remove('open');mVid.pause();mVid.src=''}});
+document.getElementById('btn-prev').addEventListener('click',()=>openModal((curFilm-1+FILMS.length)%FILMS.length));
+document.getElementById('btn-next').addEventListener('click',()=>openModal((curFilm+1)%FILMS.length));
+document.addEventListener('keydown',e=>{
+  if(!modal.classList.contains('open'))return;
+  if(e.key==='Escape'){modal.classList.remove('open');mVid.pause();mVid.src=''}
+  if(e.key==='ArrowLeft')openModal((curFilm-1+FILMS.length)%FILMS.length);
+  if(e.key==='ArrowRight')openModal((curFilm+1)%FILMS.length);
+});
+
+// Stagger wall entry
+const cards=[...document.querySelectorAll('.film-card')];
+const wallIO=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){
+    const i=parseInt(e.target.dataset.i);
+    setTimeout(()=>{e.target.style.opacity='1';e.target.style.transform='none';},i*55);
+    wallIO.unobserve(e.target);
+  }})
+},{threshold:0.05});
+cards.forEach(c=>{c.style.opacity='0';c.style.transform='translateY(20px)';c.style.transition='opacity 0.6s ease, transform 0.6s ease';wallIO.observe(c)});
+</script>
+</body>
+</html>
