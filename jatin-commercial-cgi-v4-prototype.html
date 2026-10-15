@@ -1,0 +1,689 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commercial CGI — Jatin Shinde</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,200;0,300;1,200;1,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#06050c;--bg-1:#0b0a14;--bg-2:#100f1c;
+  --fg:#e8d5b0;--fg-dim:rgba(232,213,176,.45);--fg-faint:rgba(232,213,176,.15);
+  --accent:#e8d5b0;--mono:#5a596e;
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  --ease-in-out:cubic-bezier(.76,0,.24,1);
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--fg);
+  font-family:'DM Mono',monospace;
+  min-height:100vh;overflow-x:hidden;
+  cursor:none;
+}
+
+/* custom cursor */
+#csr{position:fixed;width:8px;height:8px;background:var(--fg);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .2s,height .2s,background .2s;mix-blend-mode:difference}
+#csr-ring{position:fixed;width:32px;height:32px;border:1px solid rgba(232,213,176,.4);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .35s var(--ease-out),height .35s var(--ease-out),opacity .3s}
+body:has(a:hover) #csr-ring,body:has(.film-cell:hover) #csr-ring,body:has(.ctl-btn:hover) #csr-ring{width:52px;height:52px}
+@media(pointer:coarse){#csr,#csr-ring{display:none}body{cursor:auto}}
+
+/* page layout */
+.page{max-width:1440px;margin:0 auto;padding:0 48px}
+@media(max-width:768px){.page{padding:0 20px}}
+
+/* header */
+.comm-header{
+  padding:80px 0 56px;
+  display:flex;align-items:flex-end;justify-content:space-between;
+  border-bottom:1px solid var(--fg-faint);
+}
+.header-left{display:flex;flex-direction:column;gap:12px}
+.eyebrow{font-size:.7rem;letter-spacing:.3em;text-transform:uppercase;color:var(--mono);line-height:1}
+.comm-title{
+  font-family:'Cormorant Garamond',serif;
+  font-weight:200;font-size:clamp(3rem,8vw,7rem);
+  letter-spacing:-.02em;line-height:.9;
+  color:var(--fg);
+}
+.comm-title em{font-style:italic;font-weight:200}
+.header-right{
+  display:flex;flex-direction:column;align-items:flex-end;gap:6px;
+  padding-bottom:8px;
+}
+.film-count{font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mono)}
+.film-count strong{color:var(--fg);font-weight:300}
+.interact-hint{font-size:.62rem;color:var(--mono);letter-spacing:.15em;text-transform:uppercase;opacity:.7}
+@media(max-width:600px){
+  .comm-header{flex-direction:column;align-items:flex-start;gap:24px;padding:48px 0 36px}
+  .header-right{align-items:flex-start}
+}
+
+/* filmstrip */
+.filmstrip-outer{
+  position:relative;padding:48px 0 72px;
+  overflow:hidden;
+}
+.filmstrip-outer::before,
+.filmstrip-outer::after{
+  content:'';position:absolute;top:0;bottom:0;width:64px;z-index:2;pointer-events:none;
+  transition:opacity .3s;
+}
+.filmstrip-outer::before{left:0;background:linear-gradient(to right,var(--bg),transparent)}
+.filmstrip-outer::after{right:0;background:linear-gradient(to left,var(--bg),transparent)}
+
+.filmstrip{
+  display:flex;gap:16px;
+  overflow-x:auto;overflow-y:visible;
+  padding:24px 16px 20px;
+  scrollbar-width:thin;scrollbar-color:var(--fg-faint) transparent;
+  -webkit-overflow-scrolling:touch;
+  cursor:grab;
+  user-select:none;
+}
+.filmstrip:active{cursor:grabbing}
+.filmstrip::-webkit-scrollbar{height:3px}
+.filmstrip::-webkit-scrollbar-track{background:transparent}
+.filmstrip::-webkit-scrollbar-thumb{background:var(--fg-faint);border-radius:2px}
+
+/* film cell */
+.film-cell{
+  flex:0 0 auto;
+  position:relative;
+  border-radius:2px;overflow:hidden;
+  cursor:pointer;
+  transition:transform .45s var(--ease-out),opacity .35s;
+  will-change:transform;
+  background:var(--bg-2);
+}
+/* varied widths: featured (0,3,7,10) are wider */
+.film-cell[data-featured]{width:196px}
+.film-cell:not([data-featured]){width:150px}
+/* 9:16 aspect */
+.film-cell[data-featured]{height:calc(196px * 16/9)}
+.film-cell:not([data-featured]){height:calc(150px * 16/9)}
+
+.film-cell video{
+  position:absolute;inset:0;
+  width:100%;height:100%;object-fit:cover;
+  display:block;
+  opacity:.85;
+  transition:opacity .4s;
+}
+.film-cell:hover video{opacity:1}
+
+/* cell overlay */
+.cell-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(6,5,12,.95) 0%,rgba(6,5,12,.2) 45%,transparent 100%);
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:14px 12px;
+  opacity:0;
+  transition:opacity .35s;
+}
+.film-cell:hover .cell-overlay{opacity:1}
+.cell-num{font-size:.58rem;letter-spacing:.2em;color:var(--mono);text-transform:uppercase;margin-bottom:5px}
+.cell-title{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:1.05rem;letter-spacing:-.01em;line-height:1.2;color:var(--fg)}
+.cell-meta{font-size:.55rem;letter-spacing:.15em;color:var(--mono);text-transform:uppercase;margin-top:4px}
+
+/* permanent number badge (visible always, not just hover) */
+.cell-badge{
+  position:absolute;top:10px;left:10px;
+  font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;
+  color:rgba(232,213,176,.5);
+  transition:opacity .3s;
+}
+.film-cell:hover .cell-badge{opacity:0}
+
+/* scale-up on hover — desktop only */
+@media(pointer:fine){
+  .film-cell:hover{transform:scale(1.04) translateY(-4px);z-index:5}
+}
+
+/* film index strip below filmstrip */
+.film-index{
+  display:flex;gap:0;
+  border-top:1px solid var(--fg-faint);
+  overflow-x:auto;scrollbar-width:none;
+  padding-bottom:48px;
+}
+.film-index::-webkit-scrollbar{display:none}
+.index-item{
+  flex:0 0 auto;
+  padding:14px 20px 14px 0;
+  display:flex;align-items:center;gap:10px;
+  cursor:pointer;
+  border-right:1px solid var(--fg-faint);
+  margin-right:20px;
+  opacity:.5;
+  transition:opacity .25s;
+  white-space:nowrap;
+}
+.index-item:hover,.index-item.active{opacity:1}
+.idx-num{font-size:.6rem;letter-spacing:.15em;color:var(--mono)}
+.idx-title{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:.95rem;letter-spacing:-.01em}
+
+/* ===== LIGHTBOX STAGE ===== */
+#stage{
+  position:fixed;inset:0;z-index:1000;
+  background:rgba(6,5,12,0);
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:none;opacity:0;
+  transition:background .5s, opacity .01s;
+}
+#stage.open{
+  opacity:1;pointer-events:all;
+  background:rgba(6,5,12,.96);
+}
+
+/* projector flash */
+#flash{
+  position:fixed;inset:0;z-index:1001;
+  background:#fff;opacity:0;pointer-events:none;
+}
+
+.stage-inner{
+  position:relative;
+  display:flex;flex-direction:column;align-items:center;
+  gap:24px;
+  width:min(420px, 56vw);
+}
+@media(max-width:600px){.stage-inner{width:min(360px,90vw)}}
+
+#stage-video-wrap{
+  position:relative;
+  width:100%;
+  aspect-ratio:9/16;
+  background:#000;
+  overflow:hidden;
+  border-radius:2px;
+  transform-origin:center;
+}
+#stage-video{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+/* custom controls */
+.stage-controls{
+  width:100%;
+  display:flex;flex-direction:column;gap:10px;
+}
+.stage-info-row{
+  display:flex;align-items:baseline;justify-content:space-between;
+  gap:16px;
+}
+#stage-num{font-size:.62rem;letter-spacing:.2em;color:var(--mono);text-transform:uppercase}
+#stage-title{
+  font-family:'Cormorant Garamond',serif;font-weight:200;
+  font-size:clamp(1.4rem,3vw,2.2rem);letter-spacing:-.02em;
+  flex:1;text-align:left;
+}
+#stage-meta{font-size:.58rem;letter-spacing:.2em;color:var(--mono);text-transform:uppercase;white-space:nowrap}
+
+/* progress bar */
+.progress-wrap{
+  position:relative;height:2px;background:var(--fg-faint);cursor:pointer;
+  border-radius:1px;
+}
+.progress-bar{
+  height:100%;background:var(--fg);border-radius:1px;
+  width:0%;transition:width .1s linear;
+  pointer-events:none;
+}
+
+/* control buttons */
+.ctl-row{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;
+}
+.ctl-btn{
+  background:none;border:1px solid var(--fg-faint);color:var(--fg);
+  font-family:'DM Mono',monospace;font-size:.62rem;
+  letter-spacing:.15em;text-transform:uppercase;
+  padding:7px 14px;cursor:pointer;border-radius:1px;
+  transition:background .2s,border-color .2s;
+}
+.ctl-btn:hover{background:var(--fg-faint);border-color:rgba(232,213,176,.4)}
+.ctl-btn.primary{border-color:var(--fg);background:transparent}
+#ctl-close{
+  position:fixed;top:32px;right:32px;
+  background:none;border:none;color:var(--fg);
+  font-family:'DM Mono',monospace;font-size:.7rem;
+  letter-spacing:.2em;text-transform:uppercase;cursor:pointer;
+  opacity:.6;transition:opacity .2s;z-index:1002;
+  padding:8px 0;
+}
+#ctl-close:hover{opacity:1}
+@media(max-width:600px){#ctl-close{top:20px;right:20px;font-size:.65rem}}
+
+/* time display */
+#stage-time{font-size:.6rem;letter-spacing:.1em;color:var(--mono)}
+
+/* initial state — filmstrip item scale-from origin */
+.film-cell.launching{opacity:0;pointer-events:none}
+
+/* footer credit */
+.page-footer{
+  border-top:1px solid var(--fg-faint);
+  padding:32px 0 48px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.footer-name{font-family:'Cormorant Garamond',serif;font-weight:200;font-size:1.1rem;letter-spacing:.05em}
+.footer-note{font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--mono)}
+</style>
+</head>
+<body>
+
+<div id="csr"></div>
+<div id="csr-ring"></div>
+<div id="flash"></div>
+
+<!-- Lightbox Stage -->
+<div id="stage" role="dialog" aria-modal="true" aria-label="Film viewer">
+  <button id="ctl-close" aria-label="Close">ESC / Close</button>
+  <div class="stage-inner">
+    <div id="stage-video-wrap">
+      <video id="stage-video" playsinline preload="none"></video>
+    </div>
+    <div class="stage-controls">
+      <div class="stage-info-row">
+        <span id="stage-num">01</span>
+        <h3 id="stage-title">Film Title</h3>
+        <span id="stage-meta">Product / CGI</span>
+      </div>
+      <div class="progress-wrap" id="progress-wrap" role="progressbar" aria-label="Playback progress">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+      <div class="ctl-row">
+        <button class="ctl-btn primary" id="ctl-play">Pause</button>
+        <span id="stage-time">0:00 / 0:00</span>
+        <button class="ctl-btn" id="ctl-mute">Unmute</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Page -->
+<div class="page">
+  <header class="comm-header">
+    <div class="header-left">
+      <span class="eyebrow">Jatin Shinde — 7+ Years</span>
+      <h1 class="comm-title">Commercial <em>CGI</em></h1>
+    </div>
+    <div class="header-right">
+      <span class="film-count"><strong>11</strong> Films</span>
+      <span class="interact-hint">Select any to screen</span>
+    </div>
+  </header>
+
+  <div class="filmstrip-outer">
+    <div class="filmstrip" id="filmstrip"></div>
+  </div>
+
+  <div class="film-index" id="film-index"></div>
+
+  <footer class="page-footer">
+    <span class="footer-name">Jatin Shinde</span>
+    <span class="footer-note">CGI &amp; VFX — Commercial Production</span>
+  </footer>
+</div>
+
+<!-- GSAP -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<script>
+'use strict';
+
+const CDN = 'https://pub-88341f47988743aba3154d2af5c6327e.r2.dev';
+
+const FILMS = [
+  { src:'gallery/ads/chocolate-bar.mp4',                       title:'Chocolate Bar',          meta:'Product / CGI',       featured:true  },
+  { src:'gallery/ads/earbuds.mp4',                             title:'Earbuds',                meta:'Product / CGI',       featured:false },
+  { src:'gallery/ads/facewash.mp4',                            title:'Facewash',               meta:'Product / CGI',       featured:false },
+  { src:'gallery/ads/pepsi.mp4',                               title:'Pepsi',                  meta:'Advertising / CGI',   featured:true  },
+  { src:'gallery/ads/serum.mp4',                               title:'Serum',                  meta:'Product / CGI',       featured:false },
+  { src:'gallery/ads/shoe.mp4',                                title:'Shoe',                   meta:'Product / CGI',       featured:false },
+  { src:'gallery/ads/smart-watch.mp4',                         title:'Smart Watch',            meta:'Product / CGI',       featured:false },
+  { src:'gallery/ads/911%20Commercial.mp4',                    title:'911 Commercial',         meta:'Advertising / CGI',   featured:true  },
+  { src:'gallery/ads/Moisturizer%20and%20Cleanser%20Ad-1.mp4', title:'Moisturizer & Cleanser', meta:'Product / CGI',       featured:false },
+  { src:'gallery/ads/RR%20Ad.mp4',                             title:'RR Ad',                  meta:'Advertising / CGI',   featured:true  },
+  { src:'gallery/ads/Reelvideo-29689.mp4',                     title:'Commercial Reel',        meta:'Motion / CGI',        featured:false },
+];
+
+/* ---- cursor ---- */
+const csr = document.getElementById('csr');
+const csrRing = document.getElementById('csr-ring');
+let mx = -100, my = -100, rx = -100, ry = -100;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+(function raf() {
+  requestAnimationFrame(raf);
+  rx += (mx - rx) * 0.18;
+  ry += (my - ry) * 0.18;
+  csr.style.left = mx + 'px'; csr.style.top = my + 'px';
+  csrRing.style.left = rx + 'px'; csrRing.style.top = ry + 'px';
+})();
+
+/* ---- build filmstrip ---- */
+const strip = document.getElementById('filmstrip');
+const indexEl = document.getElementById('film-index');
+
+FILMS.forEach((f, i) => {
+  const num = String(i + 1).padStart(2, '0');
+
+  /* cell */
+  const cell = document.createElement('div');
+  cell.className = 'film-cell';
+  cell.dataset.idx = i;
+  if (f.featured) cell.dataset.featured = '';
+
+  cell.innerHTML = `
+    <video muted loop playsinline preload="none" tabindex="-1">
+      <source src="${CDN}/${f.src}" type="video/mp4">
+    </video>
+    <span class="cell-badge">${num}</span>
+    <div class="cell-overlay">
+      <span class="cell-num">${num}</span>
+      <span class="cell-title">${f.title}</span>
+      <span class="cell-meta">${f.meta}</span>
+    </div>
+  `;
+  strip.appendChild(cell);
+
+  /* play muted video on hover */
+  const vid = cell.querySelector('video');
+  let loadStarted = false;
+  cell.addEventListener('mouseenter', () => {
+    if (!loadStarted) { vid.load(); loadStarted = true; }
+    vid.play().catch(() => {});
+  });
+  cell.addEventListener('mouseleave', () => { vid.pause(); });
+
+  /* touch: start playing on touch */
+  cell.addEventListener('touchstart', () => {
+    if (!loadStarted) { vid.load(); loadStarted = true; }
+    vid.play().catch(() => {});
+  }, { passive: true });
+
+  /* click → open stage */
+  cell.addEventListener('click', () => openStage(i, cell));
+
+  /* index row */
+  const item = document.createElement('div');
+  item.className = 'index-item';
+  item.dataset.idx = i;
+  item.innerHTML = `<span class="idx-num">${num}</span><span class="idx-title">${f.title}</span>`;
+  item.addEventListener('click', () => {
+    const c = strip.querySelector(`.film-cell[data-idx="${i}"]`);
+    openStage(i, c);
+  });
+  indexEl.appendChild(item);
+});
+
+/* ---- stagger entrance ---- */
+gsap.registerPlugin(ScrollTrigger);
+gsap.set('.film-cell', { opacity: 0, y: 28 });
+gsap.to('.film-cell', {
+  opacity: 1, y: 0,
+  duration: 0.7,
+  ease: 'power3.out',
+  stagger: 0.055,
+  delay: 0.3,
+});
+gsap.from('.comm-header', { opacity: 0, y: -16, duration: 0.9, ease: 'power2.out', delay: 0.1 });
+
+/* ---- stage / lightbox ---- */
+const stage     = document.getElementById('stage');
+const stageWrap = document.getElementById('stage-video-wrap');
+const stageVid  = document.getElementById('stage-video');
+const flashEl   = document.getElementById('flash');
+const stageNum  = document.getElementById('stage-num');
+const stageTitleEl = document.getElementById('stage-title');
+const stageMeta = document.getElementById('stage-meta');
+const progressBar = document.getElementById('progress-bar');
+const progressWrap = document.getElementById('progress-wrap');
+const ctlPlay   = document.getElementById('ctl-play');
+const ctlMute   = document.getElementById('ctl-mute');
+const ctlClose  = document.getElementById('ctl-close');
+const stageTime = document.getElementById('stage-time');
+
+let stageOpen = false;
+let userInteracted = false;
+let currentIdx = -1;
+
+function fmt(s) {
+  const m = Math.floor(s / 60);
+  const ss = Math.floor(s % 60);
+  return `${m}:${ss.toString().padStart(2,'0')}`;
+}
+
+function openStage(idx, cell) {
+  const f = FILMS[idx];
+  const num = String(idx + 1).padStart(2, '0');
+  currentIdx = idx;
+
+  /* mark active index item */
+  document.querySelectorAll('.index-item').forEach(el => el.classList.remove('active'));
+  const activeItem = indexEl.querySelector(`[data-idx="${idx}"]`);
+  if (activeItem) activeItem.classList.add('active');
+
+  /* set meta */
+  stageNum.textContent = num;
+  stageTitleEl.textContent = f.title;
+  stageMeta.textContent = f.meta;
+  progressBar.style.width = '0%';
+  stageTime.textContent = '0:00 / 0:00';
+  ctlPlay.textContent = 'Pause';
+  ctlMute.textContent = userInteracted ? 'Mute' : 'Unmute';
+
+  /* get cell rect for FLIP-like origin */
+  const rect = cell ? cell.getBoundingClientRect() : null;
+
+  /* set video src */
+  stageVid.src = `${CDN}/${f.src}`;
+  stageVid.muted = !userInteracted;
+  stageVid.load();
+
+  /* GSAP — open stage with origin animation */
+  stageOpen = true;
+  stage.classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  if (rect) {
+    /* start stageWrap at cell's screen position/size */
+    const cw = window.innerWidth / 2;
+    const ch = window.innerHeight / 2;
+    const startX = rect.left + rect.width / 2 - cw;
+    const startY = rect.top + rect.height / 2 - ch;
+    const scaleX = rect.width / stageWrap.offsetWidth;
+    const scaleY = rect.height / stageWrap.offsetHeight;
+    const startScale = Math.min(scaleX, scaleY) || 0.15;
+
+    gsap.fromTo(stageWrap,
+      { x: startX, y: startY, scale: startScale, opacity: 0.7 },
+      { x: 0, y: 0, scale: 1, opacity: 1, duration: 0.65, ease: 'power3.out' }
+    );
+    gsap.from('.stage-controls', { opacity: 0, y: 12, duration: 0.5, ease: 'power2.out', delay: 0.35 });
+    gsap.from('#ctl-close', { opacity: 0, duration: 0.4, delay: 0.5 });
+    gsap.from(stage, { background: 'rgba(6,5,12,0)', duration: 0.5, ease: 'power2.out' });
+  } else {
+    gsap.from(stageWrap, { scale: 0.8, opacity: 0, duration: 0.6, ease: 'back.out(1.4)' });
+    gsap.from('.stage-controls', { opacity: 0, y: 12, duration: 0.5, ease: 'power2.out', delay: 0.3 });
+  }
+
+  /* mango moment: projector flash on first open */
+  if (!userInteracted) {
+    gsap.to(flashEl, {
+      opacity: 0.55,
+      duration: 0.04,
+      ease: 'none',
+      delay: 0.58,
+      onComplete: () => {
+        gsap.to(flashEl, { opacity: 0, duration: 0.22, ease: 'power2.out' });
+      }
+    });
+  }
+
+  /* play when ready */
+  stageVid.addEventListener('canplay', function onCan() {
+    stageVid.removeEventListener('canplay', onCan);
+    stageVid.play().catch(() => {});
+  }, { once: true });
+
+  /* lazy-load filmstrip for context */
+  cell && cell.classList.add('launching');
+}
+
+function closeStage() {
+  if (!stageOpen) return;
+  stageOpen = false;
+
+  gsap.to(stageWrap, { scale: 0.92, opacity: 0, duration: 0.35, ease: 'power2.in' });
+  gsap.to(stage, {
+    background: 'rgba(6,5,12,0)',
+    duration: 0.4,
+    ease: 'power2.in',
+    onComplete: () => {
+      stage.classList.remove('open');
+      stageVid.pause();
+      stageVid.src = '';
+      document.body.style.overflow = '';
+      document.querySelectorAll('.film-cell.launching').forEach(c => c.classList.remove('launching'));
+      document.querySelectorAll('.index-item').forEach(el => el.classList.remove('active'));
+    }
+  });
+  gsap.to('#ctl-close', { opacity: 0, duration: 0.25 });
+}
+
+/* ---- controls ---- */
+ctlClose.addEventListener('click', closeStage);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeStage(); });
+
+ctlPlay.addEventListener('click', () => {
+  if (stageVid.paused) {
+    stageVid.play();
+    ctlPlay.textContent = 'Pause';
+  } else {
+    stageVid.pause();
+    ctlPlay.textContent = 'Play';
+  }
+});
+
+ctlMute.addEventListener('click', () => {
+  userInteracted = true;
+  stageVid.muted = !stageVid.muted;
+  ctlMute.textContent = stageVid.muted ? 'Unmute' : 'Mute';
+});
+
+stageVid.addEventListener('timeupdate', () => {
+  if (!stageVid.duration) return;
+  const p = stageVid.currentTime / stageVid.duration * 100;
+  progressBar.style.width = p + '%';
+  stageTime.textContent = `${fmt(stageVid.currentTime)} / ${fmt(stageVid.duration)}`;
+});
+
+stageVid.addEventListener('ended', () => {
+  ctlPlay.textContent = 'Play';
+  /* auto-advance to next */
+  if (currentIdx < FILMS.length - 1) {
+    setTimeout(() => {
+      const nextCell = strip.querySelector(`.film-cell[data-idx="${currentIdx + 1}"]`);
+      openStage(currentIdx + 1, nextCell);
+    }, 800);
+  }
+});
+
+/* scrub progress bar */
+let scrubbing = false;
+function seek(e) {
+  const rect = progressWrap.getBoundingClientRect();
+  const p = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  if (stageVid.duration) stageVid.currentTime = p * stageVid.duration;
+}
+progressWrap.addEventListener('mousedown', e => { scrubbing = true; seek(e); });
+window.addEventListener('mousemove', e => { if (scrubbing) seek(e); });
+window.addEventListener('mouseup', () => { scrubbing = false; });
+progressWrap.addEventListener('touchstart', e => {
+  seek(e.touches[0]); e.preventDefault();
+}, { passive: false });
+progressWrap.addEventListener('touchmove', e => {
+  seek(e.touches[0]); e.preventDefault();
+}, { passive: false });
+
+/* enable sound on any stage interaction */
+stage.addEventListener('click', () => { userInteracted = true; }, { once: true });
+
+/* keyboard: arrow keys navigate films in stage */
+document.addEventListener('keydown', e => {
+  if (!stageOpen) return;
+  if (e.key === 'ArrowRight' && currentIdx < FILMS.length - 1) {
+    const nc = strip.querySelector(`.film-cell[data-idx="${currentIdx + 1}"]`);
+    openStage(currentIdx + 1, nc);
+  }
+  if (e.key === 'ArrowLeft' && currentIdx > 0) {
+    const pc = strip.querySelector(`.film-cell[data-idx="${currentIdx - 1}"]`);
+    openStage(currentIdx - 1, pc);
+  }
+  if (e.key === ' ') {
+    e.preventDefault();
+    stageVid.paused ? stageVid.play() : stageVid.pause();
+    ctlPlay.textContent = stageVid.paused ? 'Play' : 'Pause';
+  }
+});
+
+/* ---- filmstrip drag scroll ---- */
+let isDragging = false;
+let dragStartX = 0;
+let dragScrollLeft = 0;
+strip.addEventListener('mousedown', e => {
+  isDragging = true;
+  dragStartX = e.pageX - strip.offsetLeft;
+  dragScrollLeft = strip.scrollLeft;
+  strip.style.cursor = 'grabbing';
+});
+window.addEventListener('mouseup', () => {
+  isDragging = false;
+  strip.style.cursor = 'grab';
+});
+strip.addEventListener('mousemove', e => {
+  if (!isDragging) return;
+  e.preventDefault();
+  const x = e.pageX - strip.offsetLeft;
+  strip.scrollLeft = dragScrollLeft - (x - dragStartX);
+});
+/* prevent click when drag moved */
+let dragMoved = false;
+strip.addEventListener('mousedown', () => { dragMoved = false; });
+strip.addEventListener('mousemove', () => { if (isDragging) dragMoved = true; });
+strip.querySelectorAll('.film-cell').length; /* trigger layout */
+strip.addEventListener('click', e => {
+  if (dragMoved) e.stopImmediatePropagation();
+}, true);
+
+/* ---- touch swipe filmstrip ---- */
+let tStartX = 0, tScrollLeft = 0;
+strip.addEventListener('touchstart', e => {
+  tStartX = e.touches[0].clientX;
+  tScrollLeft = strip.scrollLeft;
+}, { passive: true });
+strip.addEventListener('touchmove', e => {
+  const dx = tStartX - e.touches[0].clientX;
+  strip.scrollLeft = tScrollLeft + dx;
+}, { passive: true });
+
+/* ---- index scroll sync ---- */
+strip.addEventListener('scroll', () => {
+  /* subtle — just for reference, not functional */
+});
+
+/* ---- mobile: start first film on tap of filmstrip outer ---- */
+/* already handled by cell click events */
+
+</script>
+</body>
+</html>
