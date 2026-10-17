@@ -1572,6 +1572,15 @@ const viewer = (() => {
       v.addEventListener('pause', () => { bPlay.textContent = 'Play'; bPlay.setAttribute('aria-label', 'Play'); });
       v.addEventListener('loadedmetadata', () => { if (v.videoWidth) fit(v.videoWidth, v.videoHeight); });
       v.addEventListener('volumechange', setSoundUI);
+      if (it.audio === undefined) {
+        const probe = () => {
+          if (v.currentTime < 1.2) return;
+          v.removeEventListener('timeupdate', probe);
+          const has = v.audioTracks ? v.audioTracks.length > 0 : v.mozHasAudio !== undefined ? v.mozHasAudio : v.webkitAudioDecodedByteCount !== undefined ? v.webkitAudioDecodedByteCount > 0 : true;
+          if (!has && items[idx] === it) { it.audio = false; v.muted = true; setSoundUI(); }
+        };
+        v.addEventListener('timeupdate', probe);
+      }
       v.addEventListener('click', toggle);
       frame.insertBefore(v, buf);
       media = v;
@@ -2194,7 +2203,7 @@ const jon = (() => {
       obj.traverse(o => {
         if (!o.isMesh) return;
         o.frustumCulled = false;
-        const eyeMesh = !o.isSkinnedMesh && /^(LE|RE)/.test(o.name);
+        const eyeMesh = !o.isSkinnedMesh && (/^(LE|RE)/.test(o.name) || (!!o.parent && !o.parent.isBone && /^(LE|RE)/.test(o.parent.name)));
         (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => {
           if (!m) return;
           const eye = eyeMesh || /sclera|cornea|eye/i.test(m.name);
@@ -2239,9 +2248,9 @@ const jon = (() => {
       }
       const eyes = [];
       if (head) {
-        head.children.filter(c => c.isMesh && !c.isSkinnedMesh).forEach(m => {
-          m.geometry.computeBoundingSphere();
-          const wc = m.geometry.boundingSphere.center.clone().applyMatrix4(m.matrixWorld);
+        const isEyeNode = c => !c.isBone && !c.isSkinnedMesh && (c.isMesh || c.children.some(k => k.isMesh && !k.isSkinnedMesh));
+        head.children.filter(isEyeNode).forEach(m => {
+          const wc = new THREE.Box3().setFromObject(m).getCenter(new V());
           const pivot = new THREE.Object3D();
           pivot.position.copy(head.worldToLocal(wc.clone()));
           head.add(pivot); pivot.updateMatrixWorld(true); pivot.attach(m);
