@@ -2388,6 +2388,7 @@ const jon = (() => {
       if (!inView || !R) return;
       if (R.mixer) R.mixer.update(dt);
       R.obj.updateMatrixWorld(true);
+      if (R.head && status.debug) { const v = R.headFwd.clone().applyQuaternion(R.head.getWorldQuaternion(new THREE.Quaternion())); status.headRaw = [Math.round(Math.atan2(v.x, v.z) * 57.3), Math.round(Math.asin(clamp(v.y, -1, 1)) * 57.3)]; }
       look(dt, performance.now());
       controls.update();
       renderer.render(scene, camera);
