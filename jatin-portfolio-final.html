@@ -2227,7 +2227,9 @@ const jon = (() => {
       const obj = gltf.scene;
       const blend = fixMaterials(obj);
       const mixer = new THREE.AnimationMixer(obj);
-      const clip = [...gltf.animations].sort((a, b) => b.duration - a.duration)[0] || null;
+      const boneTracks = c => c.tracks.filter(t => /\.(quaternion|position)$/.test(t.name)).length;
+      const clip = gltf.animations.filter(c => boneTracks(c) > 0)
+        .sort((a, b) => (/mixamo/i.test(b.name) - /mixamo/i.test(a.name)) || b.duration - a.duration)[0] || null;
       if (clip) { mixer.clipAction(clip).play(); mixer.update(0); }
       scene.add(obj); obj.updateMatrixWorld(true);
       const head = find(obj, /Head$/), neck = find(obj, /Neck$/), hips = find(obj, /Hips$/);
@@ -2259,7 +2261,8 @@ const jon = (() => {
       }
       let joints = 0; obj.traverse(o => { if (o.isSkinnedMesh && o.skeleton) joints = Math.max(joints, o.skeleton.bones.length); });
       scene.remove(obj);
-      return { obj, mixer, clip, head, neck, eyes, center, extent, width, joints, blend, home: new V() };
+      const headFwd = head ? Z.clone().applyQuaternion(head.getWorldQuaternion(new Q()).invert()).normalize() : Z.clone();
+      return { obj, mixer, clip, head, neck, eyes, headFwd, center, extent, width, joints, blend, home: new V() };
     }
 
     function frameCam(r, snap) {
@@ -2313,7 +2316,7 @@ const jon = (() => {
     function setStatus() {
       $('#js-rig').textContent = R ? `Mixamo-style · ${R.joints} joints` : '—';
       $('#js-gaze').textContent = !R ? '—' : R.eyes.length ? `Eyes (${R.eyes.length}) + head follow cursor` : R.head ? 'Head follows cursor (no eye meshes)' : 'Not supported by rig';
-      $('#js-clip').textContent = R && R.clip ? `${R.clip.name.split('|').pop()} · ${R.clip.duration.toFixed(1)} s loop` : 'No animation';
+      $('#js-clip').textContent = !R || !R.clip ? 'No animation' : R.clip.duration < .5 ? 'Held pose (authored)' : `Mixamo · ${R.clip.duration.toFixed(1)} s loop`;
       Object.assign(status, { rig: $('#js-rig').textContent, gaze: $('#js-gaze').textContent, clip: $('#js-clip').textContent, eyes: R ? R.eyes.length : 0, blendFixed: R ? R.blend : 0, ready: !!R });
     }
     function loadGLB(k) {
@@ -2371,6 +2374,10 @@ const jon = (() => {
         const qe = clampQ(new Q().setFromUnitVectors(cur, T.clone().sub(ep).normalize()), .4);
         E.pivot.quaternion.copy(hq.clone().invert().multiply(qe).multiply(hq));
       });
+      const deg = v => [Math.round(Math.atan2(v.x, v.z) * 57.3), Math.round(Math.asin(clamp(v.y, -1, 1)) * 57.3)];
+      status.target = deg(T.clone().sub(hp).normalize());
+      status.headDir = deg(R.headFwd.clone().applyQuaternion(R.head.getWorldQuaternion(new Q())).normalize());
+      if (R.eyes[0]) status.eyeDir = deg(R.eyes[0].fwdLocal.clone().applyQuaternion(R.eyes[0].pivot.getWorldQuaternion(new Q())).normalize());
     }
 
     new IntersectionObserver(([e]) => { inView = e.isIntersecting; if (inView) entry(); }, { threshold: .3 }).observe(view);
