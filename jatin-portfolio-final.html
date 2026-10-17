@@ -2354,16 +2354,17 @@ const jon = (() => {
       ndcT.set(clamp(((e.clientX - r.left) / r.width) * 2 - 1, -2.4, 2.4), clamp(-(((e.clientY - r.top) / r.height) * 2 - 1), -2, 2));
       lastMove = performance.now();
     }, { passive: true });
-    const ray = new THREE.Raycaster(), T = new V();
+    const T = new V();
     function look(dt, now) {
       if (!R || !R.head) return;
       const idle = now - lastMove > 2600;
       const tx = idle ? Math.sin(now * .00035) * .1 : ndcT.x, ty = idle ? .03 + Math.sin(now * .00021) * .04 : ndcT.y;
       const k = 1 - Math.exp(-dt * 6);
       ndc.x += (tx - ndc.x) * k; ndc.y += (ty - ndc.y) * k;
-      ray.setFromCamera(ndc, camera);
       const hp = wp(R.head);
-      T.copy(ray.ray.origin).addScaledVector(ray.ray.direction, camera.position.distanceTo(hp) * .95);
+      const dist = camera.position.distanceTo(hp);
+      const right = new V().setFromMatrixColumn(camera.matrixWorld, 0), up = new V().setFromMatrixColumn(camera.matrixWorld, 1);
+      T.copy(camera.position).addScaledVector(right, ndc.x * dist * .55).addScaledVector(up, ndc.y * dist * .42);
       const full = clampQ(new Q().setFromUnitVectors(Z, T.clone().sub(hp).normalize()), .75);
       applyWorld(R.neck, full, .32);
       applyWorld(R.head, full, .42);
