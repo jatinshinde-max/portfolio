@@ -2365,9 +2365,10 @@ const jon = (() => {
       const dist = camera.position.distanceTo(hp);
       const right = new V().setFromMatrixColumn(camera.matrixWorld, 0), up = new V().setFromMatrixColumn(camera.matrixWorld, 1);
       T.copy(camera.position).addScaledVector(right, ndc.x * dist * .55).addScaledVector(up, ndc.y * dist * .42);
-      const full = clampQ(new Q().setFromUnitVectors(Z, T.clone().sub(hp).normalize()), .75);
-      applyWorld(R.neck, full, .32);
-      applyWorld(R.head, full, .42);
+      const curFwd = R.headFwd.clone().applyQuaternion(R.head.getWorldQuaternion(new Q())).normalize();
+      const full = clampQ(new Q().setFromUnitVectors(curFwd, T.clone().sub(hp).normalize()), .85);
+      applyWorld(R.neck, full, .35);
+      applyWorld(R.head, full, .5);
       const hq = R.head.getWorldQuaternion(new Q());
       R.eyes.forEach(E => {
         const ep = wp(E.pivot);
