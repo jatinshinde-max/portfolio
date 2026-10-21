@@ -2374,6 +2374,21 @@ const jon = (() => {
       if (head && hips) { obj.quaternion.premultiply(new Q().setFromUnitVectors(wp(head).sub(wp(hips)).normalize(), Y)); obj.updateMatrixWorld(true); }
       if (ls && rs) { const a = wp(ls).sub(wp(rs)); a.y = 0; const f = new V().crossVectors(a, Y).normalize(); obj.rotateOnWorldAxis(Y, -Math.atan2(f.x, f.z)); obj.updateMatrixWorld(true); }
       if (hips) { const h = wp(hips); obj.position.x -= h.x; obj.position.z -= h.z; obj.updateMatrixWorld(true); }
+      // The authored idle drifts the hips ~40 cm sideways over its loop, which walks JON out of a
+      // chest-up frame. Keep 20 % of the horizontal travel (a natural weight shift); the vertical
+      // axis is found from the rig, not assumed.
+      if (hips && idle) {
+        const up = Y.clone().applyQuaternion(hips.parent.getWorldQuaternion(new Q()).invert());
+        const vAxis = [0, 1, 2].reduce((m, i) => Math.abs(up.getComponent(i)) > Math.abs(up.getComponent(m)) ? i : m, 0);
+        idle.tracks.filter(t => t.name === `${hips.name}.position`).forEach(t => {
+          const v = t.values, n = v.length / 3;
+          [0, 1, 2].filter(i => i !== vAxis).forEach(i => {
+            let mean = 0; for (let k = 0; k < n; k++) mean += v[k * 3 + i]; mean /= n;
+            for (let k = 0; k < n; k++) v[k * 3 + i] = mean + (v[k * 3 + i] - mean) * .2;
+          });
+        });
+        status.rootSway = `hips horizontal travel damped to 20 % (vertical axis ${'xyz'[vAxis]})`;
+      }
       let center, extent, width;
       if (head && spine) {
         const H = wp(head), S = wp(spine), tY = top ? wp(top).y : H.y + (H.y - S.y) * .6, span = tY - S.y;
