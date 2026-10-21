@@ -91,11 +91,13 @@ Two other effects made it worse:
 - **In the harness:** Idle-raw shows solid white eyes (`%%@@%%%`). Idle-repaired and Stand-repaired show a dark pupil in both eyes, matching the Wave reference.
 - **On the v2 page:** the pupil metric is the fraction of dark pixels inside each eye's centre disc; a white, pupil-less eye scores 0.
 
-| State | Desktop (left, right eye) | Mobile (left, right eye) |
-|---|---|---|
-| Stand | 0.24, 0.23 | 0.31, 0.34 |
-| Wave | 0.25, 0.26 | 0.32, 0.33 |
-| Idle | 0.25, 0.24 | Not measured: the head never held still long enough at software-render frame rates (see limitations) |
+| State | Desktop (left, right eye) | Mobile (left, right eye) | How measured |
+|---|---|---|---|
+| Idle | 0.23–0.28, 0.29–0.32 (6 frames) | 0.25–0.30, 0.32–0.33 | `qa/v2/eyesync.mjs`: eye positions and WebGL pixels read in the same rendered frame |
+| Stand | 0.29–0.30, 0.30–0.34 (3 frames) | 0.31, 0.34 | Same; also 0.25/0.24 in the screenshot-based run |
+| Wave | 0.24–0.25, 0.26–0.27 | 0.32, 0.33 | Screenshot crop taken while the eyes were still (drift ≤ 0.003) |
+
+Every sample in every state shows a pupil.
 
 **Gaze:** eyes and head follow the cursor. Target vs eye direction (yaw, pitch):
 - centre −5,9 / −4,5
@@ -162,6 +164,6 @@ Before/After, Commercial, ComfyUI, AI Systems and Archive code was not changed i
 
 - **Frame rate of the worlds:** these are 6.25 fps sources. Clean, but not smooth until re-exported.
 - **Visual evidence format:** the sandbox renders with SwiftShader at a few fps, and screenshots could not be copied out of it as images. Evidence is therefore numbers plus ASCII renders taken from real screenshots. **A final look in a desktop browser by you is still the decisive visual check.**
-- **Idle eye measurement:** in Idle, the authored head motion meant some eye crops were taken while the head was moving. Idle pupils were confirmed in a stable crop in an earlier run.
+- **Wave framing:** at the far end of each wave stroke, JON's wrist crosses the left edge of the chest-up frame by about 6 % for a moment. The head stays within x 0.37–0.52 on both desktop and mobile; it moved across 0.18–0.74 before the root sway was damped.
 - **The authored wave is a low wave:** a higher wave needs a new export (asset checklist item 9).
 - **Stand:** derived from the idle's first frame, because `JON stand.glb` is an A-pose.
