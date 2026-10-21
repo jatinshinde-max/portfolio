@@ -2382,7 +2382,7 @@ const jon = (() => {
       let joints = 0; obj.traverse(o => { if (o.isSkinnedMesh && o.skeleton) joints = Math.max(joints, o.skeleton.bones.length); });
       const headFwd = head ? Z.clone().applyQuaternion(head.getWorldQuaternion(new Q()).invert()).normalize() : Z.clone();
       status.clips = { idle: idle && `${idle.name} (${idle.duration.toFixed(2)} s)`, wave: wave && `${wave.name} (${wave.duration.toFixed(2)} s)`, stand: idle ? 'pose from idle frame 0' : null };
-      return { obj, mixer, A, head, neck, spine, spine1, eyes, headFwd, center, extent, width, joints, blend, pupils, home: new V() };
+      return { obj, mixer, A, head, neck, spine, spine1, rhand: find(obj, /RightHand$/), eyes, headFwd, center, extent, width, joints, blend, pupils, home: new V() };
     }
 
     function frameCam(r, snap) {
@@ -2512,6 +2512,12 @@ const jon = (() => {
       status.target = deg(T.clone().sub(hp).normalize());
       status.headDir = deg(R.headFwd.clone().applyQuaternion(R.head.getWorldQuaternion(new Q())).normalize());
       if (R.eyes[0]) status.eyeDir = deg(R.eyes[0].fwdLocal.clone().applyQuaternion(R.eyes[0].pivot.getWorldQuaternion(new Q())).normalize());
+      if (status.debug) {
+        const scr = o => { const v = wp(o).project(camera); return [+((v.x + 1) / 2).toFixed(3), +((1 - v.y) / 2).toFixed(3)]; };
+        status.eyeScreen = R.eyes.map(E => scr(E.pivot));
+        if (R.rhand) status.handScreen = scr(R.rhand);
+        status.headScreen = scr(R.head);
+      }
     }
     // breathing: a slow chest rise layered on top of the clip (about the body's lateral axis)
     function breathe(now) {
