@@ -2382,7 +2382,7 @@ const jon = (() => {
         width = ls && rs ? wp(ls).distanceTo(wp(rs)) : extent * .28; // shoulder span; frameCam widens it per aspect
       } else {
         const box = new THREE.Box3().setFromObject(obj), sz = box.getSize(new V());
-        extent = sz.y * .42; width = sz.x; center = new V(0, box.max.y - extent / 2, 0);
+        extent = sz.y * .42; width = sz.x / 2.9; center = new V(0, box.max.y - extent / 2, 0);
       }
       const eyes = [];
       if (head) {
