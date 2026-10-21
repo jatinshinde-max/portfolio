@@ -2532,6 +2532,7 @@ const jon = (() => {
         const scr = o => { const v = wp(o).project(camera); return [+((v.x + 1) / 2).toFixed(3), +((1 - v.y) / 2).toFixed(3)]; };
         status.eyeScreen = R.eyes.map(E => scr(E.pivot));
         if (R.rhand) status.handScreen = scr(R.rhand);
+        status.armScreen = ['RightArm', 'RightForeArm', 'RightHand', 'LeftArm', 'LeftHand'].map(n => { const b = find(R.obj, new RegExp(n + '$')); return b ? [n, ...scr(b)] : null; });
         status.headScreen = scr(R.head);
         status.weights = Object.fromEntries(Object.entries(R.A).map(([k, a]) => [k, +a.getEffectiveWeight().toFixed(2) + (a.isRunning() ? ' run' : '')]));
         status.mixerTime = +R.mixer.time.toFixed(2);
