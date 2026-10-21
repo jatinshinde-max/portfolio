@@ -2,8 +2,9 @@ import { chromium } from 'playwright-core';
 export const B = 'http://127.0.0.1:8080/v2.html';
 export const wait = ms => new Promise(r => setTimeout(r, ms));
 export const browser = await chromium.launch({ executablePath: '/opt/google/chrome/chrome', headless: false, args: ['--headless=new', '--no-sandbox', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--autoplay-policy=no-user-gesture-required'] });
-export async function open(q = '', vp = { width: 1440, height: 900 }, extra = {}) {
+export async function open(q = '', vp = { width: 1440, height: 900 }, extra = {}, setup = null) {
   const ctx = await browser.newContext({ viewport: vp, ...extra });
+  if (setup) await setup(ctx);
   const p = await ctx.newPage(); const errs = [], fails = [];
   p.on('pageerror', e => errs.push(e.message));
   p.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });

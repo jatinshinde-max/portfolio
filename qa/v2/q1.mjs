@@ -26,7 +26,9 @@ const out = {};
   await ctx.close();
 }
 {
-  const { ctx, p } = await open('?diag=worlds&blend=1');
+  // Test-only: the legacy-lag metric reads canvas pixels, so the page copy loaded here gets
+  // crossorigin="anonymous" on the world videos (R2 answers GET with ACAO *). The site itself is unchanged.
+  const { ctx, p } = await open('?diag=worlds&blend=1', undefined, {}, async c => c.route(/v2\.html/, async r => { const res = await r.fetch(); const body = (await res.text()).replaceAll('class="w-vid"', 'class="w-vid" crossorigin="anonymous"'); r.fulfill({ response: res, body }); }));
   await p.evaluate(() => document.getElementById('worlds').scrollIntoView());
   await p.waitForFunction(() => window.__site.worlds.state().live, null, { timeout: 30000 }).catch(() => {});
   await wait(4000);
