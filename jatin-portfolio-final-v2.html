@@ -2364,7 +2364,7 @@ const jon = (() => {
         || body.filter(c => c.duration > .5 && c.duration < 5).sort((a, b) => /mixamo/i.test(b.name) - /mixamo/i.test(a.name))[0] || null;
       const mixer = new THREE.AnimationMixer(obj);
       const A = {};
-      if (idle) { A.idle = mixer.clipAction(idle); A.stand = mixer.clipAction(poseClip(idle, 'stand-pose')); }
+      if (idle) A.idle = mixer.clipAction(idle);
       if (wave) { A.wave = mixer.clipAction(wave); A.wave.setLoop(THREE.LoopRepeat, 2); A.wave.clampWhenFinished = true; }
       if (A.idle) { A.idle.play(); mixer.update(0); }
       scene.add(obj); obj.updateMatrixWorld(true);
@@ -2388,7 +2388,10 @@ const jon = (() => {
           });
         });
         status.rootSway = `hips horizontal travel damped to 20 % (vertical axis ${'xyz'[vAxis]})`;
+        mixer.update(0); obj.updateMatrixWorld(true);
+        const h2 = wp(hips); obj.position.x -= h2.x; obj.position.z -= h2.z; obj.updateMatrixWorld(true);
       }
+      if (idle) A.stand = mixer.clipAction(poseClip(idle, 'stand-pose'));
       let center, extent, width;
       if (head && spine) {
         const H = wp(head), S = wp(spine), tY = top ? wp(top).y : H.y + (H.y - S.y) * .6, span = tY - S.y;
