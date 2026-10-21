@@ -2379,7 +2379,7 @@ const jon = (() => {
         const H = wp(head), S = wp(spine), tY = top ? wp(top).y : H.y + (H.y - S.y) * .6, span = tY - S.y;
         const bottom = S.y - span * .42, topY = tY + span * .2;
         extent = topY - bottom; center = new V(H.x, (topY + bottom) / 2, H.z);
-        width = ls && rs ? wp(ls).distanceTo(wp(rs)) * 2.9 : extent * .8;
+        width = ls && rs ? wp(ls).distanceTo(wp(rs)) : extent * .28; // shoulder span; frameCam widens it per aspect
       } else {
         const box = new THREE.Box3().setFromObject(obj), sz = box.getSize(new V());
         extent = sz.y * .42; width = sz.x; center = new V(0, box.max.y - extent / 2, 0);
@@ -2404,7 +2404,9 @@ const jon = (() => {
     function frameCam(r, snap) {
       const vf = THREE.MathUtils.degToRad(camera.fov);
       const hf = 2 * Math.atan(Math.tan(vf / 2) * camera.aspect);
-      const d = Math.max((r.extent / 2) / Math.tan(vf / 2), (r.width / 2) / Math.tan(hf / 2));
+      // portrait viewports get more lateral room so the idle sway and the wave stay inside the frame
+      const w = r.width * (camera.aspect < .9 ? 3.8 : 2.9);
+      const d = Math.max((r.extent / 2) / Math.tan(vf / 2), (w / 2) / Math.tan(hf / 2));
       r.home.set(r.center.x, r.center.y + r.extent * .02, r.center.z + d);
       controls.target.copy(r.center);
       controls.minPolarAngle = Math.PI / 2 - .3; controls.maxPolarAngle = Math.PI / 2 + .2;
